@@ -1,0 +1,268 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { X, Droplets, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { insertTreatment } from "@/lib/data-provider";
+import { useParcelles, useOperators } from "@/hooks/useData";
+import type { Parcelle } from "@/lib/mock-data";
+import { cn } from "@/lib/utils";
+
+interface ScheduleTreatmentModalProps {
+  open: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
+  initialParcelleName?: string;
+}
+
+const TREATMENT_TYPES = [
+  "Fongicide",
+  "Insecticide",
+  "Herbicide",
+  "Fertilisation",
+  "Traitement foliaire",
+  "Autre",
+];
+
+export default function ScheduleTreatmentModal({
+  open,
+  onClose,
+  onSuccess,
+  initialParcelleName,
+}: ScheduleTreatmentModalProps) {
+  const { data: parcellesRaw } = useParcelles();
+  const { data: operatorsRaw } = useOperators();
+  const parcelles = (parcellesRaw || []) as Parcelle[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const operators = (operatorsRaw || []) as any[];
+
+  const today = new Date().toISOString().split("T")[0];
+
+  const [parcelleName, setParcelleName] = useState(initialParcelleName || "");
+  const [type, setType] = useState(TREATMENT_TYPES[0]);
+  const [plannedDate, setPlannedDate] = useState(today);
+  const [operatorName, setOperatorName] = useState("");
+  const [volumeBouillie, setVolumeBouillie] = useState("");
+  const [notes, setNotes] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    if (open) {
+      setParcelleName(initialParcelleName || "");
+      setType(TREATMENT_TYPES[0]);
+      setPlannedDate(today);
+      setOperatorName("");
+      setVolumeBouillie("");
+      setNotes("");
+      setStatus("idle");
+      setErrorMsg("");
+    }
+  }, [open, initialParcelleName, today]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  const allParcelleNames: string[] = [];
+  parcelles.forEach((p) => {
+    allParcelleNames.push(p.name);
+    p.children?.forEach((c) => allParcelleNames.push(`${p.name} / ${c.name}`));
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!parcelleName.trim()) {
+      setStatus("error");
+      setErrorMsg("Sélectionnez une parcelle");
+      return;
+    }
+    if (!plannedDate) {
+      setStatus("error");
+      setErrorMsg("Date requise");
+      return;
+    }
+
+    setSaving(true);
+    setStatus("idle");
+    setErrorMsg("");
+
+    try {
+      const selected = parcelles.find((p) => p.name === parcelleName);
+      await insertTreatment({
+        parcelleName: parcelleName.trim(),
+        type,
+        plannedDate,
+        operatorName: operatorName || undefined,
+        areaTreatedHectares: selected?.areaHectares,
+        volumeBouillie: volumeBouillie ? parseFloat(volumeBouillie) : undefined,
+        volumeBouillieUnit: volumeBouillie ? "L/ha" : undefined,
+        notes: notes || undefined,
+      });
+      setStatus("success");
+      setTimeout(() => {
+        onSuccess?.();
+        onClose();
+      }, 700);
+    } catch (err) {
+      console.error(err);
+      setStatus("error");
+      setErrorMsg(err instanceof Error ? err.message : "Erreur inattendue");
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="glass-card w-full max-w-lg max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between p-5 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center">
+              <Droplets className="w-4 h-4 text-cyan-400" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-white/90">Planifier un traitement</h2>
+              <p className="text-[11px] text-white/40">Nouveau traitement phytosanitaire</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg hover:bg-white/[0.08] text-white/40 hover:text-white/70 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+          <div>
+            <label className="block text-[11px] text-white/50 mb-1.5 font-medium">Parcelle *</label>
+            <select
+              value={parcelleName}
+              onChange={(e) => setParcelleName(e.target.value)}
+              className="glass-input w-full px-3 py-2.5 text-sm"
+              required
+            >
+              <option value="">— Sélectionner —</option>
+              {allParcelleNames.map((n) => (
+                <option key={n} value={n.includes(" / ") ? n.split(" / ")[1] : n}>{n}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] text-white/50 mb-1.5 font-medium">Type *</label>
+              <select
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                className="glass-input w-full px-3 py-2.5 text-sm"
+              >
+                {TREATMENT_TYPES.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-[11px] text-white/50 mb-1.5 font-medium">Date prévue *</label>
+              <input
+                type="date"
+                value={plannedDate}
+                onChange={(e) => setPlannedDate(e.target.value)}
+                className="glass-input w-full px-3 py-2.5 text-sm"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[11px] text-white/50 mb-1.5 font-medium">Opérateur</label>
+            <select
+              value={operatorName}
+              onChange={(e) => setOperatorName(e.target.value)}
+              className="glass-input w-full px-3 py-2.5 text-sm"
+            >
+              <option value="">— Non assigné —</option>
+              {operators.map((o) => (
+                <option key={o.id} value={o.name}>{o.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[11px] text-white/50 mb-1.5 font-medium">Volume de bouillie (L/ha)</label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              value={volumeBouillie}
+              onChange={(e) => setVolumeBouillie(e.target.value)}
+              placeholder="ex: 500"
+              className="glass-input w-full px-3 py-2.5 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[11px] text-white/50 mb-1.5 font-medium">Notes</label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={2}
+              placeholder="Observations, conditions..."
+              className="glass-input w-full px-3 py-2.5 text-sm resize-none"
+            />
+          </div>
+
+          {status === "error" && (
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/25 text-xs text-red-300">
+              <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+              {errorMsg}
+            </div>
+          )}
+          {status === "success" && (
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-xs text-emerald-300">
+              <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+              Traitement planifié avec succès
+            </div>
+          )}
+
+          <div className="flex gap-2 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2.5 rounded-xl border border-white/15 text-sm text-white/70 hover:bg-white/[0.05] transition-colors"
+              disabled={saving}
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              disabled={saving || status === "success"}
+              className={cn(
+                "flex-1 glass-button py-2.5 text-sm font-semibold flex items-center justify-center gap-2",
+                saving && "opacity-60 cursor-not-allowed"
+              )}
+            >
+              {saving ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Planification…</>
+              ) : status === "success" ? (
+                <><CheckCircle2 className="w-4 h-4" /> Planifié</>
+              ) : (
+                <><Droplets className="w-4 h-4" /> Planifier</>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
