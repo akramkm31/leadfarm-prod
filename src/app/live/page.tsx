@@ -53,6 +53,64 @@ type Reading = {
   created_at: string;
 };
 
+type TrajectoryData = {
+  segments: { points: [number, number][]; speed: number; color: string }[];
+  start: [number, number] | null;
+  end: [number, number] | null;
+  startTime: string;
+  endTime: string;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapTrajectoryToParcelle(
+  source: any,
+  boundary: [number, number][]
+): TrajectoryData | null {
+  if (!boundary || boundary.length < 3) return null;
+
+  // Source bounding box
+  const allPts: number[][] = source.segments.flatMap((s: any) => s.points);
+  const srcMinLat = Math.min(...allPts.map(p => p[0]));
+  const srcMaxLat = Math.max(...allPts.map(p => p[0]));
+  const srcMinLon = Math.min(...allPts.map(p => p[1]));
+  const srcMaxLon = Math.max(...allPts.map(p => p[1]));
+  const srcW = srcMaxLon - srcMinLon || 0.0001;
+  const srcH = srcMaxLat - srcMinLat || 0.0001;
+
+  // Target bounding box (with 5% padding inward)
+  const tgtMinLat = Math.min(...boundary.map(b => b[0]));
+  const tgtMaxLat = Math.max(...boundary.map(b => b[0]));
+  const tgtMinLon = Math.min(...boundary.map(b => b[1]));
+  const tgtMaxLon = Math.max(...boundary.map(b => b[1]));
+  const padLat = (tgtMaxLat - tgtMinLat) * 0.05;
+  const padLon = (tgtMaxLon - tgtMinLon) * 0.05;
+  const tMinLat = tgtMinLat + padLat;
+  const tMaxLat = tgtMaxLat - padLat;
+  const tMinLon = tgtMinLon + padLon;
+  const tMaxLon = tgtMaxLon - padLon;
+  const tgtW = tMaxLon - tMinLon;
+  const tgtH = tMaxLat - tMinLat;
+
+  const remap = (pt: number[]): [number, number] => {
+    const normLat = (pt[0] - srcMinLat) / srcH;
+    const normLon = (pt[1] - srcMinLon) / srcW;
+    return [tMinLat + normLat * tgtH, tMinLon + normLon * tgtW];
+  };
+
+  return {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    segments: source.segments.map((seg: any) => ({
+      points: seg.points.map((p: number[]) => remap(p)),
+      speed: seg.speed,
+      color: seg.color,
+    })),
+    start: source.start ? remap(source.start as [number, number]) : null,
+    end: source.end ? remap(source.end as [number, number]) : null,
+    startTime: source.startTime,
+    endTime: source.endTime,
+  };
+}
+
 type TreatmentData = {
   id: string;
   parcelleName: string;
@@ -83,6 +141,7 @@ export default function LivePage() {
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [loadingTreatments, setLoadingTreatments] = useState(false);
   const [ending, setEnding] = useState(false);
+  const [activeTrajectory, setActiveTrajectory] = useState<TrajectoryData | null>(null);
 
   const fetchLatest = useCallback(async () => {
     const { data } = await supabase
@@ -109,13 +168,25 @@ export default function LivePage() {
           setSessionStartTime(new Date());
           setSessionStartVol(0);
         }
+        // Restore trajectory for in-progress treatment
+        if (!activeTrajectory) {
+          const allP = parcelles.flatMap((p) => [p, ...(p.children || [])]);
+          const target = allP.find(
+            (p) => p.name.toLowerCase().includes(inProgress.parcelleName.toLowerCase()) ||
+                   inProgress.parcelleName.toLowerCase().includes(p.name.toLowerCase())
+          ) || parcelles[0];
+          if (target?.boundary?.length >= 3) {
+            setActiveTrajectory(mapTrajectoryToParcelle(tractorTrajectory, target.boundary));
+          }
+        }
       }
     } catch {
       // silent
     } finally {
       setLoadingTreatments(false);
     }
-  }, [sessionStartTime]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionStartTime, parcelles.length]);
 
   useEffect(() => {
     fetchLatest();
@@ -150,6 +221,19 @@ export default function LivePage() {
       setSessionStartTime(new Date());
       setActiveTreatment({ ...treatment, status: "in_progress" });
       setShowSelector(false);
+
+      // Map trajectory to the treatment's parcelle
+      const allParcelles = parcelles.flatMap((p) => [p, ...(p.children || [])]);
+      const targetParcelle = allParcelles.find(
+        (p) => p.name.toLowerCase().includes(treatment.parcelleName.toLowerCase()) ||
+               treatment.parcelleName.toLowerCase().includes(p.name.toLowerCase())
+      ) || parcelles[0];
+
+      if (targetParcelle?.boundary?.length >= 3) {
+        const mapped = mapTrajectoryToParcelle(tractorTrajectory, targetParcelle.boundary);
+        setActiveTrajectory(mapped);
+      }
+
       await loadTreatments();
     } catch (err) {
       console.error("Failed to start treatment:", err);
@@ -168,6 +252,7 @@ export default function LivePage() {
       setActiveTreatment(null);
       setSessionStartVol(0);
       setSessionStartTime(null);
+      setActiveTrajectory(null);
       await loadTreatments();
     } catch (err) {
       console.error("Failed to end treatment:", err);
@@ -256,7 +341,7 @@ export default function LivePage() {
       <div className="relative" style={{ height: "calc(100vh - 90px)" }}>
         {/* Full-screen map */}
         <div className="absolute inset-0 rounded-2xl overflow-hidden border border-white/10">
-          <TractorLiveMap points={[]} parcelles={parcelleOverlays} trajectory={tractorTrajectory as unknown as { segments: { points: [number, number][]; speed: number; color: string }[]; start: [number, number]; end: [number, number]; startTime: string; endTime: string }} className="w-full h-full" />
+          <TractorLiveMap points={[]} parcelles={parcelleOverlays} trajectory={activeTrajectory || undefined} className="w-full h-full" />
         </div>
 
         {/* ═══ TOP HUD BAR ═══ */}
