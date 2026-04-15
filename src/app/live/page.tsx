@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
 import AppLayout from "@/components/layout/AppLayout";
 import { supabase } from "@/lib/supabase";
@@ -142,6 +142,8 @@ export default function LivePage() {
   const [loadingTreatments, setLoadingTreatments] = useState(false);
   const [ending, setEnding] = useState(false);
   const [activeTrajectory, setActiveTrajectory] = useState<TrajectoryData | null>(null);
+  const [simIndex, setSimIndex] = useState(0);
+  const [simRunning, setSimRunning] = useState(false);
 
   const fetchLatest = useCallback(async () => {
     const { data } = await supabase
@@ -211,6 +213,29 @@ export default function LivePage() {
     return () => { supabase.removeChannel(channel); };
   }, [fetchLatest, loadTreatments]);
 
+  // Default demo boundary around Tlemcen (fallback if no parcelle has a boundary)
+  const DEFAULT_SIM_BOUNDARY: [number, number][] = [
+    [34.9880, -0.5380],
+    [34.9880, -0.5340],
+    [34.9855, -0.5340],
+    [34.9855, -0.5380],
+  ];
+
+  const pickBoundaryForTreatment = (treatmentName?: string): [number, number][] => {
+    const allParcelles = parcelles.flatMap((p) => [p, ...(p.children || [])]);
+    const withBoundary = allParcelles.filter((p) => p.boundary?.length >= 3);
+    if (treatmentName) {
+      const match = withBoundary.find(
+        (p) =>
+          p.name.toLowerCase().includes(treatmentName.toLowerCase()) ||
+          treatmentName.toLowerCase().includes(p.name.toLowerCase())
+      );
+      if (match) return match.boundary;
+    }
+    if (withBoundary.length > 0) return withBoundary[0].boundary;
+    return DEFAULT_SIM_BOUNDARY;
+  };
+
   const startTreatment = async (treatment: TreatmentData) => {
     try {
       await updateTreatmentStatus(treatment.id, "in_progress", {
@@ -222,17 +247,11 @@ export default function LivePage() {
       setActiveTreatment({ ...treatment, status: "in_progress" });
       setShowSelector(false);
 
-      // Map trajectory to the treatment's parcelle
-      const allParcelles = parcelles.flatMap((p) => [p, ...(p.children || [])]);
-      const targetParcelle = allParcelles.find(
-        (p) => p.name.toLowerCase().includes(treatment.parcelleName.toLowerCase()) ||
-               treatment.parcelleName.toLowerCase().includes(p.name.toLowerCase())
-      ) || parcelles[0];
-
-      if (targetParcelle?.boundary?.length >= 3) {
-        const mapped = mapTrajectoryToParcelle(tractorTrajectory, targetParcelle.boundary);
-        setActiveTrajectory(mapped);
-      }
+      const boundary = pickBoundaryForTreatment(treatment.parcelleName);
+      const mapped = mapTrajectoryToParcelle(tractorTrajectory, boundary);
+      setActiveTrajectory(mapped);
+      setSimIndex(0);
+      setSimRunning(true);
 
       await loadTreatments();
     } catch (err) {
@@ -240,20 +259,48 @@ export default function LivePage() {
     }
   };
 
+  // Demo simulation — runs simulation without needing a DB treatment
+  const startDemoSimulation = () => {
+    const boundary = pickBoundaryForTreatment();
+    const mapped = mapTrajectoryToParcelle(tractorTrajectory, boundary);
+    setActiveTrajectory(mapped);
+    setSessionStartTime(new Date());
+    setSessionStartVol(0);
+    setActiveTreatment({
+      id: "demo-sim",
+      parcelleName: "Démo simulation",
+      type: "pulverisation",
+      status: "in_progress",
+      plannedDate: new Date().toISOString(),
+      operatorName: "—",
+      products: [],
+      volumeBouillie: null,
+      areaTreatedHectares: 0,
+    });
+    setShowSelector(false);
+    setSimIndex(0);
+    setSimRunning(true);
+  };
+
   const endTreatment = async () => {
     if (!activeTreatment) return;
     setEnding(true);
     try {
-      const currentVol = latest ? latest.vol1 + latest.vol2 : 0;
-      const consumed = Math.max(0, currentVol - sessionStartVol);
-      await updateTreatmentStatus(activeTreatment.id, "completed", {
-        volumeBouillie: consumed > 0.1 ? consumed : undefined,
-      });
+      // Demo simulation doesn't exist in DB — skip update
+      if (activeTreatment.id !== "demo-sim") {
+        const realConsumed = latest ? Math.max(0, latest.vol1 + latest.vol2 - sessionStartVol) : 0;
+        const consumed = simIndex > 0 ? simIndex * (4 + 8) / 60 * 0.25 : realConsumed;
+        await updateTreatmentStatus(activeTreatment.id, "completed", {
+          volumeBouillie: consumed > 0.1 ? consumed : undefined,
+        });
+        await loadTreatments();
+      }
       setActiveTreatment(null);
       setSessionStartVol(0);
       setSessionStartTime(null);
       setActiveTrajectory(null);
-      await loadTreatments();
+      setSimIndex(0);
+      setSimRunning(false);
     } catch (err) {
       console.error("Failed to end treatment:", err);
     } finally {
@@ -320,6 +367,67 @@ export default function LivePage() {
 
   const flowHistory = history.slice(0, 20).reverse();
 
+  // ═══ SIMULATION LOOP ═══
+  // Flatten trajectory into ordered [lat, lon, speed] points
+  const simFlatPath = useMemo(() => {
+    if (!activeTrajectory) return [] as { lat: number; lon: number; speed: number }[];
+    return activeTrajectory.segments.flatMap((s) =>
+      s.points.map((p) => ({ lat: p[0], lon: p[1], speed: s.speed }))
+    );
+  }, [activeTrajectory]);
+
+  // Reset sim when treatment changes
+  useEffect(() => {
+    setSimIndex(0);
+    setSimRunning(!!activeTreatment && simFlatPath.length > 0);
+  }, [activeTreatment?.id, simFlatPath.length]);
+
+  // Advance simulation tick
+  useEffect(() => {
+    if (!simRunning || simFlatPath.length === 0) return;
+    const iv = setInterval(() => {
+      setSimIndex((i) => {
+        if (i >= simFlatPath.length - 1) {
+          setSimRunning(false);
+          return simFlatPath.length - 1;
+        }
+        return i + 1;
+      });
+    }, 250); // 250ms per point → ~45s total for 180 points
+    return () => clearInterval(iv);
+  }, [simRunning, simFlatPath.length]);
+
+  const simCurrent = simFlatPath[simIndex] || null;
+  const simTrail = useMemo(
+    () => simFlatPath.slice(0, simIndex + 1).map((p) => [p.lat, p.lon] as [number, number]),
+    [simFlatPath, simIndex]
+  );
+  const simPosition = simCurrent
+    ? { lat: simCurrent.lat, lon: simCurrent.lon, speed: simCurrent.speed }
+    : null;
+
+  // Simulated metrics (per-tick increments, 250ms tick)
+  // Flow ≈ 4 L/min base + 0.4 per km/h → realistic sprayer flow
+  const simFlow = simCurrent ? 4 + simCurrent.speed * 0.4 : 0;
+  // Volume: integrate flow over elapsed ticks (0.25s each)
+  const simVolume = simIndex * (simFlow / 60) * 0.25;
+  // Area: speed (m/s) × tick (0.25s) × working width (6m) × number of ticks, in m²
+  const simAreaM2 = simFlatPath.slice(0, simIndex + 1).reduce(
+    (acc, p) => acc + (p.speed * 1000 / 3600) * 0.25 * 6,
+    0
+  );
+  const simAreaHa = simAreaM2 / 10000;
+  const simDosePerHa = simAreaHa > 0.01 ? simVolume / simAreaHa : 0;
+
+  // Override displayed metrics with sim values when simulation is active
+  const displayVol = simCurrent ? simVolume : sessionVol;
+  const displayArea = simCurrent ? simAreaHa : areaHa;
+  const displayDose = simCurrent ? simDosePerHa : dosePerHa;
+  const displaySpeed = simCurrent ? simCurrent.speed : latest?.speed ?? 0;
+  const displayFlow1 = simCurrent ? simFlow / 2 : latest?.flow1 ?? 0;
+  const displayFlow2 = simCurrent ? simFlow / 2 : latest?.flow2 ?? 0;
+  const simProgress = simFlatPath.length > 0 ? (simIndex / (simFlatPath.length - 1)) * 100 : 0;
+
   const typeLabels: Record<string, string> = {
     pulverisation: "Pulvérisation",
     fertilisation: "Fertilisation",
@@ -341,7 +449,14 @@ export default function LivePage() {
       <div className="relative" style={{ height: "calc(100vh - 90px)" }}>
         {/* Full-screen map */}
         <div className="absolute inset-0 rounded-2xl overflow-hidden border border-white/10">
-          <TractorLiveMap points={[]} parcelles={parcelleOverlays} trajectory={activeTrajectory || undefined} className="w-full h-full" />
+          <TractorLiveMap
+            points={[]}
+            parcelles={parcelleOverlays}
+            trajectory={activeTrajectory || undefined}
+            simPosition={simPosition}
+            simTrail={simTrail.length >= 2 ? simTrail : undefined}
+            className="w-full h-full"
+          />
         </div>
 
         {/* ═══ TOP HUD BAR ═══ */}
@@ -443,19 +558,35 @@ export default function LivePage() {
                   </button>
                 </div>
 
+                {/* Simulation progress bar */}
+                {simCurrent && (
+                  <div className="mb-2">
+                    <div className="flex items-center justify-between text-[9px] text-white/40 mb-1">
+                      <span>SIMULATION</span>
+                      <span className="font-mono text-emerald-400">{simProgress.toFixed(0)}%</span>
+                    </div>
+                    <div className="h-1 bg-black/40 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all"
+                        style={{ width: `${simProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {/* Live session metrics */}
                 <div className="grid grid-cols-4 gap-2">
                   <div className="bg-black/30 rounded-lg p-2 text-center border border-white/[0.06]">
                     <span className="text-[9px] text-white/35 block mb-0.5">VOLUME</span>
-                    <span className={cn("text-sm font-bold font-mono", sessionVol > 0.1 ? "text-cyan-400" : "text-white/30")}>
-                      {sessionVol.toFixed(1)}
+                    <span className={cn("text-sm font-bold font-mono", displayVol > 0.1 ? "text-cyan-400" : "text-white/30")}>
+                      {displayVol.toFixed(1)}
                     </span>
                     <span className="text-[8px] text-white/25 ml-0.5">L</span>
                   </div>
                   <div className="bg-black/30 rounded-lg p-2 text-center border border-white/[0.06]">
                     <span className="text-[9px] text-white/35 block mb-0.5">DOSE/HA</span>
-                    <span className={cn("text-sm font-bold font-mono", dosePerHa > 0.1 ? "text-amber-400" : "text-white/30")}>
-                      {dosePerHa.toFixed(1)}
+                    <span className={cn("text-sm font-bold font-mono", displayDose > 0.1 ? "text-amber-400" : "text-white/30")}>
+                      {displayDose.toFixed(1)}
                     </span>
                     <span className="text-[8px] text-white/25 ml-0.5">L</span>
                   </div>
@@ -471,9 +602,9 @@ export default function LivePage() {
                     <span className="text-[9px] text-white/35 block mb-0.5">DÉBIT</span>
                     <span className={cn(
                       "text-sm font-bold font-mono",
-                      (latest?.flow1 ?? 0) + (latest?.flow2 ?? 0) > 0.1 ? "text-cyan-400" : "text-white/30"
+                      displayFlow1 + displayFlow2 > 0.1 ? "text-cyan-400" : "text-white/30"
                     )}>
-                      {((latest?.flow1 ?? 0) + (latest?.flow2 ?? 0)).toFixed(1)}
+                      {(displayFlow1 + displayFlow2).toFixed(1)}
                     </span>
                     <span className="text-[8px] text-white/25 ml-0.5">L/m</span>
                   </div>
@@ -492,8 +623,17 @@ export default function LivePage() {
               </div>
             </div>
           ) : (
-            /* No active treatment — start button */
-            <div className="relative">
+            /* No active treatment — start button + demo */
+            <div className="relative flex gap-2">
+              <button
+                onClick={startDemoSimulation}
+                className="hud-panel px-3 py-3 flex items-center gap-2 hover:bg-emerald-500/15 transition-all border-emerald-500/30 shrink-0"
+                title="Lancer une simulation de démonstration"
+              >
+                <Play className="w-4 h-4 text-emerald-400" fill="currentColor" />
+                <span className="text-xs font-bold text-emerald-400">DÉMO</span>
+              </button>
+              <div className="flex-1 relative">
               <button
                 onClick={() => setShowSelector(!showSelector)}
                 className={cn(
@@ -579,6 +719,7 @@ export default function LivePage() {
                   )}
                 </div>
               )}
+              </div>
             </div>
           )}
         </div>
@@ -587,21 +728,25 @@ export default function LivePage() {
         <div className="absolute left-3 top-16 z-[500] space-y-2">
           <RadialFlowGauge
             label="DEBIT 1"
-            flow={latest?.flow1 ?? 0}
-            volume={latest?.vol1 ?? 0}
-            active={flow1Active}
+            flow={displayFlow1}
+            volume={simCurrent ? simVolume / 2 : (latest?.vol1 ?? 0)}
+            active={displayFlow1 > 0.1}
             color="cyan"
             maxFlow={30}
-            sparkline={flowHistory.map(r => r.flow1)}
+            sparkline={simCurrent
+              ? simFlatPath.slice(Math.max(0, simIndex - 20), simIndex + 1).map((p) => 2 + p.speed * 0.2)
+              : flowHistory.map(r => r.flow1)}
           />
           <RadialFlowGauge
             label="DEBIT 2"
-            flow={latest?.flow2 ?? 0}
-            volume={latest?.vol2 ?? 0}
-            active={flow2Active}
+            flow={displayFlow2}
+            volume={simCurrent ? simVolume / 2 : (latest?.vol2 ?? 0)}
+            active={displayFlow2 > 0.1}
             color="orange"
             maxFlow={30}
-            sparkline={flowHistory.map(r => r.flow2)}
+            sparkline={simCurrent
+              ? simFlatPath.slice(Math.max(0, simIndex - 20), simIndex + 1).map((p) => 2 + p.speed * 0.2)
+              : flowHistory.map(r => r.flow2)}
           />
         </div>
 
@@ -620,7 +765,12 @@ export default function LivePage() {
                 </div>
                 <span className="text-[10px] text-white/50 font-bold tracking-widest">GPS</span>
               </div>
-              {gpsValid ? (
+              {simCurrent ? (
+                <div className="flex items-center gap-1.5 bg-emerald-500/15 border border-emerald-500/30 rounded-md px-2 py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[9px] font-bold text-emerald-400">SIM</span>
+                </div>
+              ) : gpsValid ? (
                 <div className="flex items-center gap-1.5 bg-emerald-500/15 border border-emerald-500/30 rounded-md px-2 py-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="text-[9px] font-bold text-emerald-400">FIXE</span>
@@ -630,7 +780,30 @@ export default function LivePage() {
               )}
             </div>
 
-            {gpsValid && latest ? (
+            {simCurrent ? (
+              <div className="space-y-2">
+                <div className="bg-emerald-500/10 rounded-lg p-2 border border-emerald-500/20">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <MapPin className="w-3 h-3 text-emerald-400/70" />
+                    <span className="text-[10px] font-mono text-white/70">
+                      {simCurrent.lat.toFixed(5)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Target className="w-3 h-3 text-emerald-400/70" />
+                    <span className="text-[10px] font-mono text-white/70">
+                      {simCurrent.lon.toFixed(5)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-1.5">
+                  <MiniStat icon={<Satellite className="w-3 h-3" />} value="12" label="SAT" color="emerald" />
+                  <MiniStat icon={<Navigation className="w-3 h-3" />} value={displaySpeed.toFixed(0)} label="KM/H" color="cyan" />
+                  <MiniStat icon={<Radio className="w-3 h-3" />} value="0.8" label="HDOP" color="emerald" />
+                </div>
+              </div>
+            ) : gpsValid && latest ? (
               <div className="space-y-2">
                 <div className="bg-black/30 rounded-lg p-2 border border-white/[0.06]">
                   <div className="flex items-center gap-1.5 mb-1">
