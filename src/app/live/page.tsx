@@ -61,56 +61,6 @@ type TrajectoryData = {
   endTime: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mapTrajectoryToParcelle(
-  source: any,
-  boundary: [number, number][]
-): TrajectoryData | null {
-  if (!boundary || boundary.length < 3) return null;
-
-  // Source bounding box
-  const allPts: number[][] = source.segments.flatMap((s: any) => s.points);
-  const srcMinLat = Math.min(...allPts.map(p => p[0]));
-  const srcMaxLat = Math.max(...allPts.map(p => p[0]));
-  const srcMinLon = Math.min(...allPts.map(p => p[1]));
-  const srcMaxLon = Math.max(...allPts.map(p => p[1]));
-  const srcW = srcMaxLon - srcMinLon || 0.0001;
-  const srcH = srcMaxLat - srcMinLat || 0.0001;
-
-  // Target bounding box (with 5% padding inward)
-  const tgtMinLat = Math.min(...boundary.map(b => b[0]));
-  const tgtMaxLat = Math.max(...boundary.map(b => b[0]));
-  const tgtMinLon = Math.min(...boundary.map(b => b[1]));
-  const tgtMaxLon = Math.max(...boundary.map(b => b[1]));
-  const padLat = (tgtMaxLat - tgtMinLat) * 0.05;
-  const padLon = (tgtMaxLon - tgtMinLon) * 0.05;
-  const tMinLat = tgtMinLat + padLat;
-  const tMaxLat = tgtMaxLat - padLat;
-  const tMinLon = tgtMinLon + padLon;
-  const tMaxLon = tgtMaxLon - padLon;
-  const tgtW = tMaxLon - tMinLon;
-  const tgtH = tMaxLat - tMinLat;
-
-  const remap = (pt: number[]): [number, number] => {
-    const normLat = (pt[0] - srcMinLat) / srcH;
-    const normLon = (pt[1] - srcMinLon) / srcW;
-    return [tMinLat + normLat * tgtH, tMinLon + normLon * tgtW];
-  };
-
-  return {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    segments: source.segments.map((seg: any) => ({
-      points: seg.points.map((p: number[]) => remap(p)),
-      speed: seg.speed,
-      color: seg.color,
-    })),
-    start: source.start ? remap(source.start as [number, number]) : null,
-    end: source.end ? remap(source.end as [number, number]) : null,
-    startTime: source.startTime,
-    endTime: source.endTime,
-  };
-}
-
 type TreatmentData = {
   id: string;
   parcelleName: string;
@@ -170,16 +120,19 @@ export default function LivePage() {
           setSessionStartTime(new Date());
           setSessionStartVol(0);
         }
-        // Restore trajectory for in-progress treatment
+        // Restore trajectory for in-progress treatment (real KMZ coords, no remap)
         if (!activeTrajectory) {
-          const allP = parcelles.flatMap((p) => [p, ...(p.children || [])]);
-          const target = allP.find(
-            (p) => p.name.toLowerCase().includes(inProgress.parcelleName.toLowerCase()) ||
-                   inProgress.parcelleName.toLowerCase().includes(p.name.toLowerCase())
-          ) || parcelles[0];
-          if (target?.boundary?.length >= 3) {
-            setActiveTrajectory(mapTrajectoryToParcelle(tractorTrajectory, target.boundary));
-          }
+          setActiveTrajectory({
+            segments: tractorTrajectory.segments.map((s) => ({
+              points: s.points.map((p) => [p[0], p[1]] as [number, number]),
+              speed: s.speed,
+              color: s.color,
+            })),
+            start: tractorTrajectory.start as [number, number],
+            end: tractorTrajectory.end as [number, number],
+            startTime: tractorTrajectory.startTime,
+            endTime: tractorTrajectory.endTime,
+          });
         }
       }
     } catch {
@@ -213,28 +166,18 @@ export default function LivePage() {
     return () => { supabase.removeChannel(channel); };
   }, [fetchLatest, loadTreatments]);
 
-  // Default demo boundary around Tlemcen (fallback if no parcelle has a boundary)
-  const DEFAULT_SIM_BOUNDARY: [number, number][] = [
-    [34.9880, -0.5380],
-    [34.9880, -0.5340],
-    [34.9855, -0.5340],
-    [34.9855, -0.5380],
-  ];
-
-  const pickBoundaryForTreatment = (treatmentName?: string): [number, number][] => {
-    const allParcelles = parcelles.flatMap((p) => [p, ...(p.children || [])]);
-    const withBoundary = allParcelles.filter((p) => p.boundary?.length >= 3);
-    if (treatmentName) {
-      const match = withBoundary.find(
-        (p) =>
-          p.name.toLowerCase().includes(treatmentName.toLowerCase()) ||
-          treatmentName.toLowerCase().includes(p.name.toLowerCase())
-      );
-      if (match) return match.boundary;
-    }
-    if (withBoundary.length > 0) return withBoundary[0].boundary;
-    return DEFAULT_SIM_BOUNDARY;
-  };
+  // Use the KMZ trajectory AS-IS (real GPS coords, no remap to parcelle box)
+  const getRealTrajectory = (): TrajectoryData => ({
+    segments: tractorTrajectory.segments.map((s) => ({
+      points: s.points.map((p) => [p[0], p[1]] as [number, number]),
+      speed: s.speed,
+      color: s.color,
+    })),
+    start: [tractorTrajectory.start[0], tractorTrajectory.start[1]] as [number, number],
+    end: [tractorTrajectory.end[0], tractorTrajectory.end[1]] as [number, number],
+    startTime: tractorTrajectory.startTime,
+    endTime: tractorTrajectory.endTime,
+  });
 
   const startTreatment = async (treatment: TreatmentData) => {
     try {
@@ -247,9 +190,7 @@ export default function LivePage() {
       setActiveTreatment({ ...treatment, status: "in_progress" });
       setShowSelector(false);
 
-      const boundary = pickBoundaryForTreatment(treatment.parcelleName);
-      const mapped = mapTrajectoryToParcelle(tractorTrajectory, boundary);
-      setActiveTrajectory(mapped);
+      setActiveTrajectory(getRealTrajectory());
       setSimIndex(0);
       setSimRunning(true);
 
@@ -261,9 +202,7 @@ export default function LivePage() {
 
   // Demo simulation — runs simulation without needing a DB treatment
   const startDemoSimulation = () => {
-    const boundary = pickBoundaryForTreatment();
-    const mapped = mapTrajectoryToParcelle(tractorTrajectory, boundary);
-    setActiveTrajectory(mapped);
+    setActiveTrajectory(getRealTrajectory());
     setSessionStartTime(new Date());
     setSessionStartVol(0);
     setActiveTreatment({
