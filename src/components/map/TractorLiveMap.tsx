@@ -186,13 +186,17 @@ export default function TractorLiveMap({
 
     const speedLabels: Record<number, string> = { 2: "Lent", 5: "Moyen", 8: "Normal", 12: "Rapide", 18: "Très rapide" };
 
-    // Draw each colored segment
+    // Draw each colored segment — vivid speed colors (slow→green ... vfast→red)
     trajectory.segments.forEach((seg) => {
       if (seg.points.length < 2) return;
+      // White outline halo for contrast
+      layer.addLayer(L.polyline(seg.points as L.LatLngExpression[], {
+        color: "#ffffff", weight: 7, opacity: 0.4, lineCap: "round", lineJoin: "round",
+      }));
       const line = L.polyline(seg.points as L.LatLngExpression[], {
         color: seg.color,
         weight: 5,
-        opacity: 0.85,
+        opacity: 1,
         smoothFactor: 1,
         lineCap: "round",
         lineJoin: "round",
@@ -302,22 +306,44 @@ export default function TractorLiveMap({
     }
     prevSimPosRef.current = { lat: simPosition.lat, lon: simPosition.lon };
 
-    // Update icon with direction arrow (bigger during sim)
+    // Creative tractor icon — top-down tractor silhouette with wheels + cabin
+    const speedKmh = simPosition.speed;
+    const glow = speedKmh > 10 ? "rgba(255,80,80,0.7)" : speedKmh > 5 ? "rgba(0,212,240,0.7)" : "rgba(34,197,94,0.7)";
+    const bodyColor = "#e8a838"; // tractor amber
     const simIcon = L.divIcon({
       className: "",
       html: `<div style="
-        width: 40px; height: 40px; border-radius: 50%;
-        background: rgba(34,197,94,0.95); border: 3px solid white;
-        box-shadow: 0 0 20px rgba(34,197,94,0.8), 0 2px 10px rgba(0,0,0,0.4);
+        width: 56px; height: 56px;
         display: flex; align-items: center; justify-content: center;
-        transform: rotate(${heading}deg); transition: transform 0.25s linear;
+        transform: rotate(${heading}deg); transition: transform 0.3s ease-out;
+        filter: drop-shadow(0 0 12px ${glow}) drop-shadow(0 3px 6px rgba(0,0,0,0.5));
       ">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2L4 20h16L12 2z"/>
+        <svg width="44" height="44" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <!-- Front wheels -->
+          <rect x="8" y="14" width="8" height="14" rx="2" fill="#1a1a1a" stroke="white" stroke-width="1.5"/>
+          <rect x="48" y="14" width="8" height="14" rx="2" fill="#1a1a1a" stroke="white" stroke-width="1.5"/>
+          <!-- Rear wheels (bigger) -->
+          <rect x="4" y="36" width="12" height="20" rx="3" fill="#1a1a1a" stroke="white" stroke-width="1.5"/>
+          <rect x="48" y="36" width="12" height="20" rx="3" fill="#1a1a1a" stroke="white" stroke-width="1.5"/>
+          <!-- Tractor body / chassis -->
+          <rect x="16" y="18" width="32" height="36" rx="4" fill="${bodyColor}" stroke="white" stroke-width="2"/>
+          <!-- Cabin (driver area) -->
+          <rect x="22" y="26" width="20" height="18" rx="2" fill="#1f3a5f" stroke="white" stroke-width="1.5"/>
+          <!-- Windshield highlight -->
+          <rect x="24" y="28" width="16" height="6" rx="1" fill="#7ec8e3" opacity="0.85"/>
+          <!-- Front grille / hood -->
+          <rect x="20" y="10" width="24" height="10" rx="2" fill="#c8902f" stroke="white" stroke-width="1.5"/>
+          <!-- Headlights -->
+          <circle cx="24" cy="14" r="1.8" fill="#fff8b0"/>
+          <circle cx="40" cy="14" r="1.8" fill="#fff8b0"/>
+          <!-- Exhaust pipe -->
+          <rect x="28" y="4" width="3" height="8" rx="1" fill="#666"/>
+          <!-- Direction indicator (front arrow tip) -->
+          <path d="M32 2L28 8h8z" fill="#22c55e" stroke="white" stroke-width="1"/>
         </svg>
       </div>`,
-      iconSize: [40, 40],
-      iconAnchor: [20, 20],
+      iconSize: [56, 56],
+      iconAnchor: [28, 28],
     });
     markerRef.current.setIcon(simIcon);
     markerRef.current.bindPopup(
@@ -344,12 +370,14 @@ export default function TractorLiveMap({
     }
 
     if (simTrail && simTrail.length >= 2) {
+      // Semi-transparent green overlay — preserves speed colors underneath
       simTrailRef.current = L.polyline(simTrail as L.LatLngExpression[], {
         color: "#22c55e",
-        weight: 7,
-        opacity: 0.95,
+        weight: 9,
+        opacity: 0.45,
         lineCap: "round",
         lineJoin: "round",
+        dashArray: "1, 8",
       }).addTo(map);
     }
   }, [simTrail, mapReady]);

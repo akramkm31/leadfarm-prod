@@ -705,6 +705,28 @@ export default function LivePage() {
           )}
         </div>
 
+        {/* ═══ SPEED LEGEND (bottom-left, only during sim) ═══ */}
+        {simCurrent && (
+          <div className="absolute bottom-4 left-3 z-[500] hud-panel px-3 py-2">
+            <div className="text-[9px] text-white/40 font-bold tracking-widest mb-1.5">VITESSE</div>
+            <div className="flex items-center gap-2">
+              {[
+                { c: "#1a9850", l: "Lent", v: "2" },
+                { c: "#91cf60", l: "Moyen", v: "5" },
+                { c: "#f0d400", l: "Normal", v: "8" },
+                { c: "#fc7850", l: "Rapide", v: "12" },
+                { c: "#d73027", l: "Très rapide", v: "18" },
+              ].map((s) => (
+                <div key={s.l} className="flex items-center gap-1">
+                  <span className="w-2.5 h-2.5 rounded-sm" style={{ background: s.c, boxShadow: `0 0 6px ${s.c}` }} />
+                  <span className="text-[9px] text-white/60 font-mono">{s.v}</span>
+                </div>
+              ))}
+              <span className="text-[8px] text-white/30 ml-1">km/h</span>
+            </div>
+          </div>
+        )}
+
         {/* ═══ LEFT: RADIAL FLOW GAUGES ═══ */}
         <div className="absolute left-3 top-16 z-[500] space-y-2">
           <RadialFlowGauge
