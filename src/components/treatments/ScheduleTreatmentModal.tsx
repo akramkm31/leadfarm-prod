@@ -14,13 +14,16 @@ interface ScheduleTreatmentModalProps {
   initialParcelleName?: string;
 }
 
-const TREATMENT_TYPES = [
-  "Fongicide",
-  "Insecticide",
-  "Herbicide",
-  "Fertilisation",
-  "Traitement foliaire",
-  "Autre",
+const TREATMENT_TYPES: { value: string; label: string; icon: string }[] = [
+  { value: "Fongicide", label: "Fongicide", icon: "🍄" },
+  { value: "Insecticide", label: "Insecticide", icon: "🐛" },
+  { value: "Herbicide", label: "Herbicide", icon: "🌿" },
+  { value: "Fertilisation", label: "Fertilisation", icon: "🧪" },
+  { value: "Traitement foliaire", label: "Traitement foliaire", icon: "🍃" },
+  { value: "Acaricide", label: "Acaricide", icon: "🕷" },
+  { value: "Nématicide", label: "Nématicide", icon: "🪱" },
+  { value: "Régulateur", label: "Régulateur de croissance", icon: "📏" },
+  { value: "Autre", label: "Autre", icon: "📦" },
 ];
 
 export default function ScheduleTreatmentModal({
@@ -38,7 +41,7 @@ export default function ScheduleTreatmentModal({
   const today = new Date().toISOString().split("T")[0];
 
   const [parcelleName, setParcelleName] = useState(initialParcelleName || "");
-  const [type, setType] = useState(TREATMENT_TYPES[0]);
+  const [type, setType] = useState(TREATMENT_TYPES[0].value);
   const [plannedDate, setPlannedDate] = useState(today);
   const [operatorName, setOperatorName] = useState("");
   const [volumeBouillie, setVolumeBouillie] = useState("");
@@ -50,7 +53,7 @@ export default function ScheduleTreatmentModal({
   useEffect(() => {
     if (open) {
       setParcelleName(initialParcelleName || "");
-      setType(TREATMENT_TYPES[0]);
+      setType(TREATMENT_TYPES[0].value);
       setPlannedDate(today);
       setOperatorName("");
       setVolumeBouillie("");
@@ -167,8 +170,8 @@ export default function ScheduleTreatmentModal({
                 onChange={(e) => setType(e.target.value)}
                 className="glass-input w-full px-3 py-2.5 text-sm"
               >
-                {TREATMENT_TYPES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
+                {TREATMENT_TYPES.map((tt) => (
+                  <option key={tt.value} value={tt.value}>{tt.icon} {tt.label}</option>
                 ))}
               </select>
             </div>

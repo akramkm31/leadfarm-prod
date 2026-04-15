@@ -1,0 +1,6 @@
+[    1229ms] Error: Map container is already initialized.
+    at NewClass._initContainer (http://localhost:3000/_next/static/chunks/9f915_leaflet_dist_leaflet-src_2cfd6706.js:3445:23)
+    at NewClass.initialize (http://localhost:3000/_next/static/chunks/9f915_leaflet_dist_leaflet-src_2cfd6706.js:2675:18)
+    at new NewClass (http://localhost:3000/_next/static/chunks/9f915_leaflet_dist_leaflet-src_2cfd6706.js:260:33)
+    at Object.createMap [as map] (http://localhost:3000/_next/static/chunks/9f915_leaflet_dist_leaflet-src_2cfd6706.js:3979:16)
+    at ParcelleMap.useEffect.initMap (http://localhost:3000/_next/static/chunks/_6d64a957._.js:34:35)

@@ -1,0 +1,182 @@
+[  925103ms] [ERROR] ./src/components/dashboard/TreatmentActivityChart.tsx:73:8
+Parsing ecmascript source code failed
+  71 |           </BarChart>
+  72 |         </ResponsiveContainer>
+> 73 |       </div>
+     |        ^^^^^
+  74 |     </div>
+  75 |   );
+  76 | }
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/TreatmentActivityChart.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/TreatmentActivityChart.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  930298ms] [ERROR] ./src/components/dashboard/TreatmentActivityChart.tsx:73:8
+Parsing ecmascript source code failed
+  71 |           </BarChart>
+  72 |         </ResponsiveContainer>
+> 73 |       </div>
+     |        ^^^^^
+  74 |     </div>
+  75 |   );
+  76 | }
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/TreatmentActivityChart.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/TreatmentActivityChart.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  934292ms] [ERROR] ./src/components/dashboard/TreatmentActivityChart.tsx:73:8
+Parsing ecmascript source code failed
+  71 |           </BarChart>
+  72 |         </ResponsiveContainer>
+> 73 |       </div>
+     |        ^^^^^
+  74 |     </div>
+  75 |   );
+  76 | }
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/TreatmentActivityChart.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/TreatmentActivityChart.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  997703ms] [ERROR] ./src/app/stock/page.tsx:339:83
+Parsing ecmascript source code failed
+  337 |                 <p className="text-xs text-slate-400 mb-4">Répartition de la valeur</p>
+  338 |                 <div className="h-[220px]">
+> 339 |                   {chartsReady && <ResponsiveContainer width="100%" height="100%">}
+      |                                                                                   ^
+  340 |                     <BarChart data={stockByCategory} layout="vertical" barCategoryGap="20%">
+  341 |                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" horizontal={false} />
+  342 |                       <XAxis
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./src/app/stock/page.tsx [Client Component Browser]
+    ./src/app/stock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/stock/page.tsx [Client Component SSR]
+    ./src/app/stock/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  997704ms] [ERROR] ./src/app/stock/page.tsx:373:18
+Parsing ecmascript source code failed
+  371 |                     </BarChart>
+  372 |                   </ResponsiveContainer>
+> 373 |                 </div>
+      |                  ^^^^^
+  374 |               </div>
+  375 |             </div>
+  376 |
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./src/app/stock/page.tsx [Client Component Browser]
+    ./src/app/stock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/stock/page.tsx [Client Component SSR]
+    ./src/app/stock/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[ 1000373ms] [ERROR] ./src/app/stock/page.tsx:339:83
+Parsing ecmascript source code failed
+  337 |                 <p className="text-xs text-slate-400 mb-4">Répartition de la valeur</p>
+  338 |                 <div className="h-[220px]">
+> 339 |                   {chartsReady && <ResponsiveContainer width="100%" height="100%">}
+      |                                                                                   ^
+  340 |                     <BarChart data={stockByCategory} layout="vertical" barCategoryGap="20%">
+  341 |                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" horizontal={false} />
+  342 |                       <XAxis
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./src/app/stock/page.tsx [Client Component Browser]
+    ./src/app/stock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/stock/page.tsx [Client Component SSR]
+    ./src/app/stock/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[ 1000374ms] [ERROR] ./src/app/stock/page.tsx:373:18
+Parsing ecmascript source code failed
+  371 |                     </BarChart>
+  372 |                   </ResponsiveContainer>
+> 373 |                 </div>
+      |                  ^^^^^
+  374 |               </div>
+  375 |             </div>
+  376 |
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./src/app/stock/page.tsx [Client Component Browser]
+    ./src/app/stock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/stock/page.tsx [Client Component SSR]
+    ./src/app/stock/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[ 1003405ms] [ERROR] ./src/app/stock/page.tsx:373:18
+Parsing ecmascript source code failed
+  371 |                     </BarChart>
+  372 |                   </ResponsiveContainer>
+> 373 |                 </div>
+      |                  ^^^^^
+  374 |               </div>
+  375 |             </div>
+  376 |
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./src/app/stock/page.tsx [Client Component Browser]
+    ./src/app/stock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/stock/page.tsx [Client Component SSR]
+    ./src/app/stock/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[ 1317269ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1317270ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1317271ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1317271ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297

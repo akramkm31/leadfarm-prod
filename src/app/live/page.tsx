@@ -382,10 +382,17 @@ export default function LivePage() {
     setSimRunning(!!activeTreatment && simFlatPath.length > 0);
   }, [activeTreatment?.id, simFlatPath.length]);
 
-  // Advance simulation tick
+  // Advance simulation tick — speed-proportional timing (slow=slow, fast=fast)
+  const [simSpeedMult, setSimSpeedMult] = useState(3); // 1x = real time
   useEffect(() => {
     if (!simRunning || simFlatPath.length === 0) return;
-    const iv = setInterval(() => {
+    const curSpeedKmh = simFlatPath[simIndex]?.speed || 5;
+    const speedMs = (curSpeedKmh * 1000) / 3600; // m/s
+    const POINT_SPACING_M = 2; // KMZ samples ≈2m apart
+    const realMs = (POINT_SPACING_M / speedMs) * 1000;
+    const tickMs = Math.max(40, Math.min(1500, realMs / simSpeedMult));
+
+    const timer = setTimeout(() => {
       setSimIndex((i) => {
         if (i >= simFlatPath.length - 1) {
           setSimRunning(false);
@@ -393,9 +400,9 @@ export default function LivePage() {
         }
         return i + 1;
       });
-    }, 250); // 250ms per point → ~45s total for 180 points
-    return () => clearInterval(iv);
-  }, [simRunning, simFlatPath.length]);
+    }, tickMs);
+    return () => clearTimeout(timer);
+  }, [simRunning, simIndex, simFlatPath, simSpeedMult]);
 
   const simCurrent = simFlatPath[simIndex] || null;
   const simTrail = useMemo(
@@ -558,12 +565,52 @@ export default function LivePage() {
                   </button>
                 </div>
 
-                {/* Simulation progress bar */}
+                {/* Simulation progress + controls */}
                 {simCurrent && (
                   <div className="mb-2">
                     <div className="flex items-center justify-between text-[9px] text-white/40 mb-1">
-                      <span>SIMULATION</span>
-                      <span className="font-mono text-emerald-400">{simProgress.toFixed(0)}%</span>
+                      <div className="flex items-center gap-1.5">
+                        <span>SIM</span>
+                        <span className="font-mono text-white/60">
+                          {simIndex}/{simFlatPath.length - 1}
+                        </span>
+                        <span className="font-mono text-emerald-400">·</span>
+                        <span className="font-mono text-emerald-400">{simCurrent.speed.toFixed(0)} km/h</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => setSimRunning((r) => !r)}
+                          className={cn(
+                            "px-2 py-0.5 rounded text-[9px] font-bold border transition-colors",
+                            simRunning
+                              ? "bg-amber-500/20 border-amber-500/30 text-amber-400 hover:bg-amber-500/30"
+                              : "bg-emerald-500/20 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30"
+                          )}
+                        >
+                          {simRunning ? "PAUSE" : "PLAY"}
+                        </button>
+                        <button
+                          onClick={() => { setSimIndex(0); setSimRunning(true); }}
+                          className="px-2 py-0.5 rounded text-[9px] font-bold bg-white/10 border border-white/15 text-white/70 hover:bg-white/20"
+                        >
+                          ↻
+                        </button>
+                        {[1, 3, 6].map((m) => (
+                          <button
+                            key={m}
+                            onClick={() => setSimSpeedMult(m)}
+                            className={cn(
+                              "px-1.5 py-0.5 rounded text-[9px] font-bold border transition-colors",
+                              simSpeedMult === m
+                                ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-300"
+                                : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
+                            )}
+                          >
+                            {m}x
+                          </button>
+                        ))}
+                        <span className="font-mono text-emerald-400 ml-1">{simProgress.toFixed(0)}%</span>
+                      </div>
                     </div>
                     <div className="h-1 bg-black/40 rounded-full overflow-hidden">
                       <div

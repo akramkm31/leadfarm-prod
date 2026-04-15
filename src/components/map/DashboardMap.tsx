@@ -21,8 +21,12 @@ export default function DashboardMap() {
   const treatments = (treatmentsRaw || []) as Treatment[];
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const LRef = useRef<any>(null);
+  const layersRef = useRef<L.Layer[]>([]);
   const [loaded, setLoaded] = useState(false);
 
+  // Init map once
   useEffect(() => {
     const container = mapRef.current;
     if (!container || mapInstance.current) return;
@@ -32,6 +36,7 @@ export default function DashboardMap() {
     const initMap = async () => {
       const L = (await import("leaflet")).default;
       if (cancelled) return;
+      LRef.current = L;
 
       const map = L.map(container, {
         center: [34.9871, -0.5361],
@@ -42,53 +47,9 @@ export default function DashboardMap() {
 
       L.control.zoom({ position: "topright" }).addTo(map);
 
-      L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-        maxZoom: 19,
+      L.tileLayer("https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
+        maxZoom: 20,
       }).addTo(map);
-
-      parcelles.forEach((parcelle) => {
-        if (parcelle.boundary.length === 0) return;
-
-        const hasActiveTreatment = treatments.some(
-          (t) => t.parcelleId === parcelle.id && t.status === "in_progress"
-        );
-
-        const polygon = L.polygon(parcelle.boundary as L.LatLngExpression[], {
-          color: parcelle.color,
-          fillColor: parcelle.color,
-          fillOpacity: hasActiveTreatment ? 0.25 : 0.15,
-          weight: hasActiveTreatment ? 3 : 2,
-          dashArray: parcelle.lastTreatmentDate ? undefined : "5, 5",
-        }).addTo(map);
-
-        polygon.bindPopup(`
-          <div style="font-family: system-ui; padding: 4px;">
-            <strong style="color: ${escapeHtml(String(parcelle.color))}; font-size: 13px;">${escapeHtml(String(parcelle.name))}</strong>
-            <div style="margin-top: 6px; font-size: 11px; color: rgba(255,255,255,0.6);">
-              ${escapeHtml(String(parcelle.areaHectares))} ha · ${escapeHtml(String(parcelle.cropType))}
-            </div>
-            <div style="margin-top: 2px; font-size: 10px; color: rgba(255,255,255,0.4);">
-              ${escapeHtml(String(parcelle.treatmentCount))} traitements · ${escapeHtml(String(parcelle.soilType))}
-            </div>
-          </div>
-        `);
-
-        if (hasActiveTreatment) {
-          const pulseIcon = L.divIcon({
-            className: "",
-            html: `
-              <div style="position:relative;width:20px;height:20px;">
-                <div style="position:absolute;inset:0;background:${parcelle.color};border-radius:50%;opacity:0.3;animation:pulse 2s ease-out infinite;"></div>
-                <div style="position:absolute;top:5px;left:5px;width:10px;height:10px;background:${parcelle.color};border-radius:50%;border:2px solid white;box-shadow:0 0 8px ${parcelle.color};"></div>
-              </div>
-              <style>@keyframes pulse{0%{transform:scale(1);opacity:0.3}100%{transform:scale(2.5);opacity:0}}</style>
-            `,
-            iconSize: [20, 20],
-            iconAnchor: [10, 10],
-          });
-          L.marker(parcelle.center as L.LatLngExpression, { icon: pulseIcon }).addTo(map);
-        }
-      });
 
       mapInstance.current = map;
       setLoaded(true);
@@ -104,6 +65,103 @@ export default function DashboardMap() {
       }
     };
   }, []);
+
+  // Render parcelles whenever data changes
+  useEffect(() => {
+    if (!loaded) return;
+    const L = LRef.current;
+    const map = mapInstance.current;
+    if (!L || !map) return;
+
+    // Clear old layers
+    layersRef.current.forEach((layer) => map.removeLayer(layer));
+    layersRef.current = [];
+
+    const allBounds: L.LatLngExpression[] = [];
+
+    parcelles.forEach((parcelle) => {
+      if (!parcelle.boundary || parcelle.boundary.length === 0) return;
+
+      const hasActiveTreatment = treatments.some(
+        (t) => t.parcelleId === parcelle.id && t.status === "in_progress"
+      );
+
+      const polygon = L.polygon(parcelle.boundary as L.LatLngExpression[], {
+        color: parcelle.color,
+        fillColor: parcelle.color,
+        fillOpacity: hasActiveTreatment ? 0.25 : 0.15,
+        weight: hasActiveTreatment ? 3 : 2,
+        dashArray: parcelle.lastTreatmentDate ? undefined : "5, 5",
+      }).addTo(map);
+
+      polygon.bindPopup(`
+        <div style="font-family: system-ui; padding: 4px;">
+          <strong style="color: ${escapeHtml(String(parcelle.color))}; font-size: 13px;">${escapeHtml(String(parcelle.name))}</strong>
+          <div style="margin-top: 6px; font-size: 11px; color: rgba(255,255,255,0.6);">
+            ${escapeHtml(String(parcelle.areaHectares))} ha · ${escapeHtml(String(parcelle.cropType))}
+          </div>
+          <div style="margin-top: 2px; font-size: 10px; color: rgba(255,255,255,0.4);">
+            ${escapeHtml(String(parcelle.treatmentCount))} traitements · ${escapeHtml(String(parcelle.soilType))}
+          </div>
+        </div>
+      `);
+      layersRef.current.push(polygon);
+      allBounds.push(...(parcelle.boundary as L.LatLngExpression[]));
+
+      if (hasActiveTreatment) {
+        const pulseIcon = L.divIcon({
+          className: "",
+          html: `
+            <div style="position:relative;width:20px;height:20px;">
+              <div style="position:absolute;inset:0;background:${parcelle.color};border-radius:50%;opacity:0.3;animation:pulse 2s ease-out infinite;"></div>
+              <div style="position:absolute;top:5px;left:5px;width:10px;height:10px;background:${parcelle.color};border-radius:50%;border:2px solid white;box-shadow:0 0 8px ${parcelle.color};"></div>
+            </div>
+            <style>@keyframes pulse{0%{transform:scale(1);opacity:0.3}100%{transform:scale(2.5);opacity:0}}</style>
+          `,
+          iconSize: [20, 20],
+          iconAnchor: [10, 10],
+        });
+        const marker = L.marker(parcelle.center as L.LatLngExpression, { icon: pulseIcon }).addTo(map);
+        layersRef.current.push(marker);
+      }
+
+      // Render sous-parcelles
+      parcelle.children?.forEach((child) => {
+        if (!child.boundary || child.boundary.length === 0) return;
+        const childPoly = L.polygon(child.boundary as L.LatLngExpression[], {
+          color: child.color,
+          fillColor: child.color,
+          fillOpacity: 0.25,
+          weight: 2,
+          dashArray: "6, 4",
+        }).addTo(map);
+        childPoly.bindPopup(`
+          <div style="font-family: system-ui; padding: 4px;">
+            <strong style="color: ${escapeHtml(String(child.color))}; font-size: 12px;">${escapeHtml(String(child.name))}</strong>
+            <div style="margin-top: 4px; font-size: 10px; color: rgba(255,255,255,0.5);">
+              ${escapeHtml(String(child.areaHectares))} ha · ${escapeHtml(String(child.cropType))}
+            </div>
+          </div>
+        `);
+        childPoly.bringToFront();
+        layersRef.current.push(childPoly);
+      });
+
+      // Label
+      const labelIcon = L.divIcon({
+        className: "",
+        html: `<div style="white-space:nowrap;font-family:system-ui;font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.8),0 0 2px rgba(0,0,0,0.5);pointer-events:none;">${escapeHtml(String(parcelle.name))}</div>`,
+        iconAnchor: [30, 8],
+      });
+      const label = L.marker(parcelle.center as L.LatLngExpression, { icon: labelIcon, interactive: false }).addTo(map);
+      layersRef.current.push(label);
+    });
+
+    // Fit bounds to show all parcelles
+    if (allBounds.length > 0) {
+      map.fitBounds(L.latLngBounds(allBounds).pad(0.1));
+    }
+  }, [parcelles, treatments, loaded]);
 
   return (
     <div className="glass-card overflow-hidden relative">

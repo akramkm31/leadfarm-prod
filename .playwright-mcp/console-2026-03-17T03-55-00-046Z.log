@@ -1,0 +1,14 @@
+[    1227ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    1229ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ http://localhost:3000/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    2034ms] Error: Map container is already initialized.
+    at NewClass._initContainer (http://localhost:3000/_next/static/chunks/9f915_leaflet_dist_leaflet-src_2cfd6706.js:3445:23)
+    at NewClass.initialize (http://localhost:3000/_next/static/chunks/9f915_leaflet_dist_leaflet-src_2cfd6706.js:2675:18)
+    at new NewClass (http://localhost:3000/_next/static/chunks/9f915_leaflet_dist_leaflet-src_2cfd6706.js:260:33)
+    at Object.createMap [as map] (http://localhost:3000/_next/static/chunks/9f915_leaflet_dist_leaflet-src_2cfd6706.js:3979:16)
+    at DashboardMap.useEffect.initMap (http://localhost:3000/_next/static/chunks/_295500d4._.js:32:35)

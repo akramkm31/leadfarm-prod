@@ -39,11 +39,15 @@ export default function TractorLiveMap({
   points,
   parcelles,
   trajectory,
+  simPosition,
+  simTrail,
   className,
 }: {
   points: GpsPoint[];
   parcelles?: ParcelleOverlay[];
   trajectory?: Trajectory;
+  simPosition?: { lat: number; lon: number; speed: number } | null;
+  simTrail?: [number, number][];
   className?: string;
 }) {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -53,6 +57,7 @@ export default function TractorLiveMap({
   const LRef = useRef<any>(null);
   const parcelleLayerRef = useRef<L.LayerGroup | null>(null);
   const trajectoryLayerRef = useRef<L.LayerGroup | null>(null);
+  const simTrailRef = useRef<L.Polyline | null>(null);
   const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
@@ -239,17 +244,18 @@ export default function TractorLiveMap({
       layer.addLayer(m);
     }
 
-    // Fit bounds to trajectory
+    // Fit bounds to trajectory — zoom in closer for realistic driving POV
     const allPts = trajectory.segments.flatMap(s => s.points);
     if (allPts.length > 0) {
       const bounds = L.latLngBounds(allPts as L.LatLngExpression[]);
-      mapInstance.current?.fitBounds(bounds, { padding: [40, 40], maxZoom: 17 });
+      mapInstance.current?.fitBounds(bounds, { padding: [60, 60], maxZoom: 18 });
     }
   }, [trajectory, mapReady]);
 
   // Update live trajectory when points change
   useEffect(() => {
     if (!mapInstance.current || !markerRef.current || !LRef.current) return;
+    if (simPosition) return; // don't override sim marker
 
     const validPoints = points.filter((p) => p.lat !== 0 && p.lon !== 0);
     if (validPoints.length === 0) return;
@@ -272,7 +278,81 @@ export default function TractorLiveMap({
     if (!trajectory?.segments?.length) {
       mapInstance.current.panTo(latLng, { animate: true, duration: 0.5 });
     }
-  }, [points, trajectory]);
+  }, [points, trajectory, simPosition]);
+
+  // ═══ SIMULATION: animate tractor along trajectory ═══
+  const prevSimPosRef = useRef<{ lat: number; lon: number } | null>(null);
+  useEffect(() => {
+    if (!mapReady || !markerRef.current || !LRef.current || !mapInstance.current) return;
+    if (!simPosition) {
+      prevSimPosRef.current = null;
+      return;
+    }
+
+    const L = LRef.current;
+    const latLng = L.latLng(simPosition.lat, simPosition.lon);
+    markerRef.current.setLatLng(latLng);
+
+    // Calculate heading from previous position for rotation
+    let heading = 0;
+    if (prevSimPosRef.current) {
+      const dy = simPosition.lat - prevSimPosRef.current.lat;
+      const dx = simPosition.lon - prevSimPosRef.current.lon;
+      heading = (Math.atan2(dx, dy) * 180) / Math.PI;
+    }
+    prevSimPosRef.current = { lat: simPosition.lat, lon: simPosition.lon };
+
+    // Update icon with direction arrow (bigger during sim)
+    const simIcon = L.divIcon({
+      className: "",
+      html: `<div style="
+        width: 40px; height: 40px; border-radius: 50%;
+        background: rgba(34,197,94,0.95); border: 3px solid white;
+        box-shadow: 0 0 20px rgba(34,197,94,0.8), 0 2px 10px rgba(0,0,0,0.4);
+        display: flex; align-items: center; justify-content: center;
+        transform: rotate(${heading}deg); transition: transform 0.25s linear;
+      ">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L4 20h16L12 2z"/>
+        </svg>
+      </div>`,
+      iconSize: [40, 40],
+      iconAnchor: [20, 20],
+    });
+    markerRef.current.setIcon(simIcon);
+    markerRef.current.bindPopup(
+      `<div style="font-family: system-ui; font-size: 12px; line-height: 1.6;">
+        <b style="color: #22c55e;">Tracteur (Simulation)</b><br/>
+        <span style="color: #888;">Vitesse:</span> <b>${simPosition.speed.toFixed(1)}</b> km/h<br/>
+        <span style="color: #888;">Mode:</span> <b>Traitement en cours</b>
+      </div>`
+    );
+
+    // Always follow tractor — smooth pan every tick
+    mapInstance.current.panTo(latLng, { animate: true, duration: 0.25, easeLinearity: 0.5 });
+  }, [simPosition, mapReady]);
+
+  // Progressive trail — the path the tractor has covered so far
+  useEffect(() => {
+    if (!mapReady || !LRef.current || !mapInstance.current) return;
+    const L = LRef.current;
+    const map = mapInstance.current;
+
+    if (simTrailRef.current) {
+      map.removeLayer(simTrailRef.current);
+      simTrailRef.current = null;
+    }
+
+    if (simTrail && simTrail.length >= 2) {
+      simTrailRef.current = L.polyline(simTrail as L.LatLngExpression[], {
+        color: "#22c55e",
+        weight: 7,
+        opacity: 0.95,
+        lineCap: "round",
+        lineJoin: "round",
+      }).addTo(map);
+    }
+  }, [simTrail, mapReady]);
 
   return (
     <div ref={mapRef} className={className || "w-full h-full"} style={{ minHeight: 300, borderRadius: 16 }} />

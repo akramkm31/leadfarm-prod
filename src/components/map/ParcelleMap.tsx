@@ -18,6 +18,7 @@ export type DrawTool = "polygon" | "rectangle" | "gps";
 
 interface ParcelleMapProps {
   onParcelleClick?: (id: string) => void;
+  onChildParcelleClick?: (childId: string, parentId: string) => void;
   onCreateSubParcelle?: (parentId: string) => void;
   drawMode?: boolean;
   drawTool?: DrawTool;
@@ -30,10 +31,12 @@ interface ParcelleMapProps {
   onShapeComplete?: (points: [number, number][]) => void;
   drawColor?: string;
   hideHud?: boolean;
+  constrainBoundary?: [number, number][];
 }
 
 export default function ParcelleMap({
   onParcelleClick,
+  onChildParcelleClick,
   onCreateSubParcelle,
   drawMode,
   drawTool = "polygon",
@@ -46,6 +49,7 @@ export default function ParcelleMap({
   onShapeComplete,
   drawColor = "#10b981",
   hideHud = false,
+  constrainBoundary,
 }: ParcelleMapProps) {
   const { data: parcellesRaw } = useParcelles();
   const parcelles = (parcellesRaw || []) as Parcelle[];
@@ -57,6 +61,8 @@ export default function ParcelleMap({
   const [expanded, setExpanded] = useState(false);
   const onClickRef = useRef(onParcelleClick);
   onClickRef.current = onParcelleClick;
+  const onChildClickRef = useRef(onChildParcelleClick);
+  onChildClickRef.current = onChildParcelleClick;
   const onCreateSubRef = useRef(onCreateSubParcelle);
   onCreateSubRef.current = onCreateSubParcelle;
   const onMapClickRef = useRef(onMapClick);
@@ -77,6 +83,8 @@ export default function ParcelleMap({
   drawColorRef.current = drawColor;
   const onPointDeleteRef = useRef(onPointDelete);
   onPointDeleteRef.current = onPointDelete;
+
+  const constrainRef = useRef<L.Polygon | null>(null);
 
   // Drawing layers
   const drawPolyRef = useRef<L.Polygon | null>(null);
@@ -327,19 +335,20 @@ export default function ParcelleMap({
           className: "leaflet-interactive-child",
         }).addTo(map);
         childPoly.setStyle({ className: "leaflet-interactive-child" });
-        childPoly.bindPopup(`
-          <div style="font-family: system-ui; padding: 4px;">
-            <strong style="color: ${escapeHtml(String(child.color))}; font-size: 12px;">${escapeHtml(String(child.name))}</strong>
-            <div style="margin-top: 4px; font-size: 10px; color: rgba(255,255,255,0.5);">
-              ${escapeHtml(String(child.areaHectares))} ha · ${escapeHtml(String(child.cropType))}
-            </div>
-          </div>
-        `);
         childPoly.on("click", (e: any) => {
           L.DomEvent.stopPropagation(e);
-          onClickRef.current?.(child.id);
+          if (onChildClickRef.current) {
+            onChildClickRef.current(child.id, parcelle.id);
+          } else {
+            onClickRef.current?.(child.id);
+          }
         });
-        // Bring child above parent for click priority
+        childPoly.on("mouseover", () => {
+          childPoly.setStyle({ fillOpacity: 0.5, weight: 3.5 });
+        });
+        childPoly.on("mouseout", () => {
+          childPoly.setStyle({ fillOpacity: 0.3, weight: 2.5 });
+        });
         childPoly.bringToFront();
         parcelleLayersRef.current.push(childPoly);
       });
@@ -357,6 +366,33 @@ export default function ParcelleMap({
       parcelleLayersRef.current.push(label);
     });
   }, [parcelles, loaded]);
+
+  // Highlight parent boundary when drawing sous-parcelle
+  useEffect(() => {
+    const map = mapInstance.current;
+    const L = LRef.current;
+    if (!map || !L) return;
+
+    // Remove previous constraint
+    if (constrainRef.current) {
+      map.removeLayer(constrainRef.current);
+      constrainRef.current = null;
+    }
+
+    if (drawMode && constrainBoundary && constrainBoundary.length >= 3) {
+      constrainRef.current = L.polygon(constrainBoundary as L.LatLngExpression[], {
+        color: "#fbbf24",
+        fillColor: "#fbbf24",
+        fillOpacity: 0.08,
+        weight: 3,
+        dashArray: "8, 6",
+        interactive: false,
+      }).addTo(map);
+
+      // Zoom to parent boundary
+      map.fitBounds(constrainRef.current!.getBounds().pad(0.05), { animate: true, duration: 0.3 });
+    }
+  }, [drawMode, constrainBoundary]);
 
   // Update cursor for draw mode
   useEffect(() => {

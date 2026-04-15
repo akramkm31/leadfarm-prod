@@ -86,6 +86,7 @@ export default function ParcellesPage() {
   const [editModal, setEditModal] = useState<{ open: boolean; name: string; cropType: string; color: string }>({ open: false, name: "", cropType: "", color: "" });
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [mapOverlayChild, setMapOverlayChild] = useState<{ child: Parcelle; parent: Parcelle } | null>(null);
 
   const startDrawingSubParcelle = useCallback((parent: Parcelle): void => {
     setDrawingParentId(parent.id);
@@ -462,6 +463,14 @@ export default function ParcellesPage() {
             const found = all.find((p: Parcelle) => p.id === id);
             if (found) setSelectedParcelle(found);
           }}
+          onChildParcelleClick={(childId: string, parentId: string) => {
+            if (drawMode) return;
+            const parent = parcelles.find((p: Parcelle) => p.id === parentId);
+            const child = parent?.children?.find((c: Parcelle) => c.id === childId);
+            if (child && parent) {
+              setMapOverlayChild({ child, parent });
+            }
+          }}
           onCreateSubParcelle={(parentId: string) => {
             const parent = parcelles.find((p: Parcelle) => p.id === parentId);
             if (parent) {
@@ -480,7 +489,140 @@ export default function ParcellesPage() {
           onPointDelete={deletePoint}
           drawColor={newParcelle.color}
           hideHud={showDrawForm}
+          constrainBoundary={drawingParentId ? parcelles.find((p) => p.id === drawingParentId)?.boundary : undefined}
         />
+
+        {/* ═══ SOUS-PARCELLE MAP OVERLAY SIDEBAR ═══ */}
+        {mapOverlayChild && (
+          <div
+            className="absolute top-0 right-0 bottom-0 z-[1100] w-80 flex flex-col animate-slide-in-right"
+            style={{ pointerEvents: "auto" }}
+          >
+            <div className="h-full m-3 ml-0 rounded-2xl bg-[#0d1a0d]/92 backdrop-blur-2xl border border-white/[0.12] shadow-2xl shadow-black/50 flex flex-col overflow-hidden">
+              {/* Header with color accent */}
+              <div className="relative p-4 pb-3">
+                <div
+                  className="absolute inset-x-0 top-0 h-1 rounded-t-2xl"
+                  style={{ background: `linear-gradient(90deg, ${mapOverlayChild.child.color}, ${mapOverlayChild.child.color}80)` }}
+                />
+                <div className="flex items-start justify-between mt-1">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div
+                      className="w-10 h-10 rounded-xl border-2 flex items-center justify-center shrink-0"
+                      style={{
+                        borderColor: mapOverlayChild.child.color,
+                        backgroundColor: mapOverlayChild.child.color + "20",
+                      }}
+                    >
+                      <Layers className="w-5 h-5" style={{ color: mapOverlayChild.child.color }} />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-bold text-white/90 truncate">{mapOverlayChild.child.name}</h3>
+                      <p className="text-[10px] text-white/40 truncate">
+                        sous-parcelle de {mapOverlayChild.parent.name}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setMapOverlayChild(null)}
+                    className="p-1.5 rounded-lg hover:bg-white/[0.1] text-white/40 hover:text-white/70 transition-colors shrink-0"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick stats row */}
+              <div className="px-4 pb-3 grid grid-cols-2 gap-2">
+                <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+                  <span className="text-lg font-bold text-amber-400 font-mono block">{formatHectares(mapOverlayChild.child.areaHectares)}</span>
+                  <span className="text-[9px] text-white/40 uppercase tracking-wider">Surface</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+                  <span className="text-lg font-bold text-cyan-400 font-mono block">{mapOverlayChild.child.treatmentCount ?? 0}</span>
+                  <span className="text-[9px] text-white/40 uppercase tracking-wider">Traitements</span>
+                </div>
+              </div>
+
+              {/* Details */}
+              <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
+                <div className="space-y-0">
+                  <DetailRow label="Culture" value={mapOverlayChild.child.cropType || "—"} />
+                  <DetailRow label="Variété" value={mapOverlayChild.child.variete || "—"} highlight="amber" />
+                  <DetailRow label="Sol" value={mapOverlayChild.child.soilType || "—"} />
+                  <DetailRow label="Irrigation" value={irrigationLabels[mapOverlayChild.child.irrigation] || mapOverlayChild.child.irrigation || "—"} />
+                  {mapOverlayChild.child.densitePlantation && (
+                    <DetailRow label="Densité" value={`${mapOverlayChild.child.densitePlantation} ${mapOverlayChild.child.densiteUnit}`} highlight="cyan" />
+                  )}
+                  <DetailRow label="Dernier traitement" value={
+                    mapOverlayChild.child.lastTreatmentDate
+                      ? new Date(mapOverlayChild.child.lastTreatmentDate).toLocaleDateString("fr-FR")
+                      : "Jamais"
+                  } />
+                  <DetailRow label="Secteur" value={mapOverlayChild.child.secteur || "—"} />
+                </div>
+
+                {/* Recent treatments */}
+                {treatments.filter((t: Treatment) => t.sousParcelleId === mapOverlayChild.child.id).length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Droplets className="w-3 h-3 text-amber-400" />
+                      <span className="text-[10px] font-semibold text-white/55 uppercase tracking-wider">Récents</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {treatments
+                        .filter((t: Treatment) => t.sousParcelleId === mapOverlayChild.child.id)
+                        .slice(0, 3)
+                        .map((t: Treatment) => (
+                          <div key={t.id} className="flex items-center justify-between p-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+                            <div>
+                              <span className="text-[11px] text-white/60">{t.products[0]?.productName || t.type}</span>
+                              <span className="text-[9px] text-white/35 block">{new Date(t.plannedDate).toLocaleDateString("fr-FR")}</span>
+                            </div>
+                            <span className={cn(
+                              "badge text-[9px]",
+                              t.status === "completed" ? "badge-success" :
+                              t.status === "in_progress" ? "badge-warning" :
+                              t.status === "planned" ? "badge-info" : "badge-danger"
+                            )}>
+                              {t.status === "completed" ? "Terminé" :
+                               t.status === "in_progress" ? "En cours" :
+                               t.status === "planned" ? "Planifié" : "Annulé"}
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action buttons */}
+              <div className="p-3 border-t border-white/[0.08] space-y-2">
+                <button
+                  onClick={() => {
+                    setSelectedParcelle(mapOverlayChild.child);
+                    setMapOverlayChild(null);
+                    setScheduleOpen(true);
+                  }}
+                  className="w-full py-2.5 text-xs font-semibold rounded-xl bg-cyan-500/15 border border-cyan-500/25 text-cyan-300 hover:bg-cyan-500/25 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Droplets className="w-3.5 h-3.5" />
+                  Planifier un traitement
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedParcelle(mapOverlayChild.child);
+                    setMapOverlayChild(null);
+                  }}
+                  className="w-full py-2 text-[11px] font-medium rounded-xl border border-white/10 text-white/50 hover:bg-white/[0.06] hover:text-white/70 transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <Info className="w-3 h-3" />
+                  Voir tous les détails
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ═══ GPS Walk mode: giant tap-to-add-position button ═══ */}
         {drawMode && drawTool === "gps" && !showDrawForm && (
@@ -1145,6 +1287,18 @@ function DetailRow({ label, value, highlight }: { label: string; value: string; 
       </span>
     </div>
   );
+}
+
+function isInsidePolygon(lat: number, lon: number, boundary: [number, number][]): boolean {
+  let inside = false;
+  for (let i = 0, j = boundary.length - 1; i < boundary.length; j = i++) {
+    const [yi, xi] = boundary[i];
+    const [yj, xj] = boundary[j];
+    if (((yi > lat) !== (yj > lat)) && (lon < ((xj - xi) * (lat - yi)) / (yj - yi) + xi)) {
+      inside = !inside;
+    }
+  }
+  return inside;
 }
 
 function computeArea(points: [number, number][]): number {

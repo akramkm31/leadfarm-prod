@@ -3,6 +3,7 @@
 import { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { useOperators } from "@/hooks/useData";
+import { insertOperator } from "@/lib/data-provider";
 import type { Operator } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import { PageSkeleton } from "@/components/ui/Skeleton";
@@ -17,6 +18,10 @@ import {
   Wrench,
   Leaf,
   Search,
+  X,
+  Loader2,
+  Phone,
+  BadgeCheck,
 } from "lucide-react";
 
 const roleLabels: Record<string, string> = {
@@ -41,10 +46,13 @@ const avatarColors = [
 ];
 
 export default function OperatorsPage() {
-  const { data: operatorsRaw, loading } = useOperators();
+  const { data: operatorsRaw, loading, refetch } = useOperators();
   const operators = (operatorsRaw || []) as Operator[];
 
   const [search, setSearch] = useState("");
+  const [addOpen, setAddOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [newOp, setNewOp] = useState({ name: "", role: "operator", phone: "", cert: "" });
 
   if (loading) {
     return (
@@ -84,7 +92,7 @@ export default function OperatorsPage() {
                 className="glass-input pl-9 pr-4 py-2 text-sm w-52"
               />
             </div>
-            <button className="glass-button px-4 py-2.5 flex items-center gap-2 text-sm">
+            <button onClick={() => setAddOpen(true)} className="glass-button px-4 py-2.5 flex items-center gap-2 text-sm">
               <Plus className="w-4 h-4" />
               Ajouter un opérateur
             </button>
@@ -198,6 +206,116 @@ export default function OperatorsPage() {
         })}
       </div>
       <div className="h-8" />
+
+      {/* ═══ ADD OPERATOR MODAL ═══ */}
+      {addOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setAddOpen(false)}>
+          <div className="glass-card w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-base font-bold text-white/90">Nouvel opérateur</h3>
+              <button onClick={() => setAddOpen(false)} className="p-1 rounded-lg hover:bg-white/10 text-white/40">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[10px] text-white/50 font-medium uppercase tracking-wider mb-1">Nom complet *</label>
+                <input
+                  value={newOp.name}
+                  onChange={(e) => setNewOp({ ...newOp, name: e.target.value })}
+                  placeholder="Ex: Ahmed Benali"
+                  className="w-full px-3 py-2.5 rounded-lg bg-white/[0.06] border border-white/10 text-sm text-white/90 focus:border-amber-500/40 focus:outline-none placeholder:text-white/20"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] text-white/50 font-medium uppercase tracking-wider mb-1">Rôle *</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["operator", "technician", "agronomist"] as const).map((r) => {
+                    const Icon = roleIcons[r] || Users;
+                    return (
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => setNewOp({ ...newOp, role: r })}
+                        className={cn(
+                          "flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all text-center",
+                          newOp.role === r
+                            ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
+                            : "bg-white/[0.03] border-white/[0.08] text-white/40 hover:bg-white/[0.06]"
+                        )}
+                      >
+                        <Icon className="w-5 h-5" />
+                        <span className="text-[10px] font-semibold">{roleLabels[r]}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] text-white/50 font-medium uppercase tracking-wider mb-1">
+                    <Phone className="w-3 h-3 inline mr-1" />Téléphone
+                  </label>
+                  <input
+                    value={newOp.phone}
+                    onChange={(e) => setNewOp({ ...newOp, phone: e.target.value })}
+                    placeholder="0555 00 00 00"
+                    className="w-full px-3 py-2.5 rounded-lg bg-white/[0.06] border border-white/10 text-sm text-white/90 focus:border-amber-500/40 focus:outline-none placeholder:text-white/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-white/50 font-medium uppercase tracking-wider mb-1">
+                    <BadgeCheck className="w-3 h-3 inline mr-1" />N° Certification
+                  </label>
+                  <input
+                    value={newOp.cert}
+                    onChange={(e) => setNewOp({ ...newOp, cert: e.target.value })}
+                    placeholder="CERT-XXXX"
+                    className="w-full px-3 py-2.5 rounded-lg bg-white/[0.06] border border-white/10 text-sm text-white/90 focus:border-amber-500/40 focus:outline-none placeholder:text-white/20"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2 mt-5">
+              <button
+                onClick={() => setAddOpen(false)}
+                className="flex-1 py-2.5 text-xs font-medium rounded-xl border border-white/10 text-white/60 hover:bg-white/[0.06] transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                disabled={saving || !newOp.name.trim()}
+                onClick={async () => {
+                  setSaving(true);
+                  try {
+                    await insertOperator({
+                      name: newOp.name.trim(),
+                      role: newOp.role,
+                      phone: newOp.phone.trim() || undefined,
+                      certificationNumber: newOp.cert.trim() || undefined,
+                    });
+                    await refetch();
+                    setAddOpen(false);
+                    setNewOp({ name: "", role: "operator", phone: "", cert: "" });
+                  } catch (err) {
+                    alert((err as Error).message);
+                  } finally {
+                    setSaving(false);
+                  }
+                }}
+                className="flex-1 py-2.5 text-xs font-semibold rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/30 transition-colors disabled:opacity-40 flex items-center justify-center gap-1.5"
+              >
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                Ajouter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 }

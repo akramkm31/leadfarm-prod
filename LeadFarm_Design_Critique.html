@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeadFarm — Design Critique Report</title>
+<style>
+  :root {
+    --bg: #0f1a0f;
+    --card: #1a2e1a;
+    --border: rgba(255,255,255,0.08);
+    --text: rgba(255,255,255,0.85);
+    --muted: rgba(255,255,255,0.45);
+    --amber: #e8a838;
+    --green: #4ade80;
+    --red: #f87171;
+    --yellow: #fbbf24;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 40px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 2rem;
+    color: var(--amber);
+    border-bottom: 2px solid var(--amber);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+  }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 40px; }
+  h2 {
+    font-size: 1.4rem;
+    color: var(--green);
+    margin: 36px 0 16px;
+    padding-left: 12px;
+    border-left: 3px solid var(--green);
+  }
+  h3 { font-size: 1.1rem; color: var(--amber); margin: 20px 0 10px; }
+  p { margin-bottom: 14px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 0.9rem;
+  }
+  th {
+    text-align: left;
+    padding: 10px 12px;
+    background: rgba(232,168,56,0.1);
+    border-bottom: 1px solid var(--border);
+    color: var(--amber);
+    font-weight: 600;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .severity-critical { color: var(--red); font-weight: 700; }
+  .severity-moderate { color: var(--yellow); font-weight: 600; }
+  .severity-minor { color: var(--green); font-weight: 600; }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-good { background: rgba(74,222,128,0.15); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+  .badge-warn { background: rgba(251,191,36,0.15); color: var(--yellow); border: 1px solid rgba(251,191,36,0.3); }
+  .badge-bad { background: rgba(248,113,113,0.15); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+  .score-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    margin: 8px 0;
+    overflow: hidden;
+  }
+  .score-fill { height: 100%; border-radius: 3px; }
+  .works-well li {
+    list-style: none;
+    padding: 6px 0 6px 24px;
+    position: relative;
+  }
+  .works-well li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--green);
+    font-weight: bold;
+  }
+  .priority-list { counter-reset: priority; }
+  .priority-list li {
+    list-style: none;
+    padding: 12px 0 12px 40px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+  .priority-list li::before {
+    counter-increment: priority;
+    content: counter(priority);
+    position: absolute;
+    left: 0;
+    top: 12px;
+    width: 28px;
+    height: 28px;
+    background: rgba(232,168,56,0.15);
+    border: 1px solid rgba(232,168,56,0.3);
+    color: var(--amber);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .grade-box {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .grade-item {
+    flex: 1;
+    min-width: 140px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .grade-score {
+    font-size: 1.8rem;
+    font-weight: 800;
+  }
+  .grade-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<h1>LeadFarm — Design Critique</h1>
+<p class="subtitle">Precision Agriculture Platform &middot; Production UI Review &middot; 28 mars 2026</p>
+
+<!-- Overall Scores -->
+<div class="grade-box">
+  <div class="grade-item">
+    <div class="grade-score" style="color: var(--green);">B+</div>
+    <div class="grade-label">Overall</div>
+  </div>
+  <div class="grade-item">
+    <div class="grade-score" style="color: var(--amber);">A-</div>
+    <div class="grade-label">Visual Identity</div>
+  </div>
+  <div class="grade-item">
+    <div class="grade-score" style="color: var(--yellow);">B</div>
+    <div class="grade-label">Usability</div>
+  </div>
+  <div class="grade-item">
+    <div class="grade-score" style="color: var(--yellow);">B-</div>
+    <div class="grade-label">Consistency</div>
+  </div>
+  <div class="grade-item">
+    <div class="grade-score" style="color: var(--red);">C+</div>
+    <div class="grade-label">Accessibility</div>
+  </div>
+  <div class="grade-item">
+    <div class="grade-score" style="color: var(--red);">C</div>
+    <div class="grade-label">Empty States</div>
+  </div>
+</div>
+
+<!-- OVERALL IMPRESSION -->
+<h2>Overall Impression</h2>
+<div class="card">
+  <p>LeadFarm has a <strong>striking, premium visual identity</strong>. The dark agricultural theme with glass-morphism cards, amber accents, and the photographic farm backdrop immediately communicates the domain. It feels like a high-end SaaS tool designed specifically for Algerian precision agriculture.</p>
+  <p>The biggest opportunity is <strong>polish at the edges</strong>: empty states are bare, contrast ratios fall short in several places, the background image competes with data when tables are populated, and the information architecture could guide new users better with progressive onboarding.</p>
+</div>
+
+<!-- FIRST IMPRESSION -->
+<h2>First Impression (2-Second Test)</h2>
+<div class="card">
+  <p><strong>What draws the eye first:</strong> The satellite map on the dashboard dominates the viewport, which is correct for a geospatial agriculture tool. Good choice.</p>
+  <p><strong>Emotional reaction:</strong> Professional, modern, niche. The dark green + amber palette feels agricultural without being corny. The farm backdrop adds personality.</p>
+  <p><strong>Is the purpose clear?</strong> Partially. The "Precision Agriculture Platform" subtitle is small and monospaced. A first-time user might not immediately understand what actions to take. The KPI cards all show "0" which gives no signal about what this tool tracks.</p>
+</div>
+
+<!-- USABILITY -->
+<h2>Usability</h2>
+
+<table>
+  <thead>
+    <tr><th>Finding</th><th>Severity</th><th>Recommendation</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Background image fights content.</strong> The photographic farm backdrop (tractor, orchard) is beautiful but creates visual noise behind data tables, charts, and form fields. On stock and products pages, the tractor imagery directly competes with column data.</td>
+      <td><span class="severity-critical">Critical</span></td>
+      <td>Apply a heavier dark overlay (80-90% opacity) below the main content area, or replace with a subtle gradient/pattern for inner pages. Reserve the full-bleed photo for the login page only.</td>
+    </tr>
+    <tr>
+      <td><strong>Empty states are uninstructive.</strong> Stock shows "0 produits" with an empty table. Products shows "Aucun produit trouv&eacute;". No guidance on what to do next. Users landing here after signup will feel lost.</td>
+      <td><span class="severity-critical">Critical</span></td>
+      <td>Add illustrated empty states with a clear CTA: "Ajoutez votre premier produit" with an arrow pointing to the button. Include a brief onboarding checklist (1. Ajouter produits, 2. Cr&eacute;er parcelles, 3. Enregistrer mouvements).</td>
+    </tr>
+    <tr>
+      <td><strong>Login form has autofilled credentials visible.</strong> The email "admin@leadfarm.dz" and a password are pre-filled (browser autofill). The input fields are stark white against the dark card, creating a jarring contrast.</td>
+      <td><span class="severity-moderate">Moderate</span></td>
+      <td>Style autofill states with <code>input:-webkit-autofill</code> to match the dark theme. Use <code>background: transparent</code> and <code>-webkit-text-fill-color</code> to override browser defaults.</td>
+    </tr>
+    <tr>
+      <td><strong>Movement modal: four quantity fields for one action.</strong> "Entr&eacute;e / Sortie / Retour / Transfert" quantity inputs are all shown even though the user already selected a movement type. Only the relevant field should be active.</td>
+      <td><span class="severity-moderate">Moderate</span></td>
+      <td>Show a single quantity input. The movement type selector above already determines direction. Showing four inputs with three zeroed out adds confusion.</td>
+    </tr>
+    <tr>
+      <td><strong>No "Forgot password" link on login.</strong> The login page has no password recovery option.</td>
+      <td><span class="severity-moderate">Moderate</span></td>
+      <td>Add a "Mot de passe oubli&eacute; ?" link below the password field.</td>
+    </tr>
+    <tr>
+      <td><strong>Search bar in header is decorative.</strong> The global search "Rechercher produits, parcelles, op&eacute;rateurs..." doesn't appear to filter anything globally.</td>
+      <td><span class="severity-minor">Minor</span></td>
+      <td>Wire it up to a command-palette style overlay (Cmd+K) that searches across entities, or remove it to avoid confusion.</td>
+    </tr>
+    <tr>
+      <td><strong>Sidebar has no active low-stock badge on mobile trigger.</strong> Low stock count badge shows in the sidebar, but on mobile (sidebar hidden) there's no indicator in the header.</td>
+      <td><span class="severity-minor">Minor</span></td>
+      <td>Mirror the badge count on the mobile hamburger icon or the notification bell.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- VISUAL HIERARCHY -->
+<h2>Visual Hierarchy</h2>
+<div class="card">
+  <h3>Dashboard</h3>
+  <p><strong>Eye flow:</strong> Title &rarr; KPI cards &rarr; Map &rarr; Sidebar. The map is the correct focal point for an agriculture tool. However, the five KPI cards (Produits, Traitements, Parcelles, Stock Bas, Alertes) all show "0" and have equal visual weight, making them feel like placeholder widgets rather than actionable metrics.</p>
+  <p><strong>Improvement:</strong> Give the most critical KPI (Stock Bas or Alertes) a distinct accent treatment &mdash; red glow for critical alerts, for instance. Make the zero-state meaningful: "0 alertes" could show a green check instead of a warning triangle.</p>
+
+  <h3>Stock Page</h3>
+  <p><strong>Eye flow:</strong> Title &rarr; Action buttons (Inventaire, Exporter, Sortie, Nouvelle Entr&eacute;e) &rarr; Tabs &rarr; Filters &rarr; Empty table. The hierarchy is well-structured with the primary CTA ("Nouvelle Entr&eacute;e") in amber at top-right.</p>
+  <p><strong>Issue:</strong> Five KPI cards + five tabs + four filter buttons + category dropdown = too many navigation layers before content. Consider collapsing the filter pills into the tab content area.</p>
+
+  <h3>Login Page</h3>
+  <p><strong>Eye flow:</strong> Logo icon &rarr; "LeadFarm" title &rarr; Form card &rarr; Submit button. Clean and focused. The golden CTA button is the right anchor point. The footer "LeadFarm v1.0" adds a nice professional touch.</p>
+</div>
+
+<!-- CONSISTENCY -->
+<h2>Consistency</h2>
+
+<table>
+  <thead>
+    <tr><th>Element</th><th>Issue</th><th>Recommendation</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>KPI Card Layout</td>
+      <td>Dashboard KPIs use icon + number + label. Stock page uses the same pattern. Products page uses the same. Good consistency here, but the "54 PARCELLES" card on the dashboard shows a different number style (the "54" doesn't match the "0" pattern of other cards).</td>
+      <td>Standardize: all KPI values should use the same font-size and weight across pages.</td>
+    </tr>
+    <tr>
+      <td>Button Styles</td>
+      <td>Three button variants are used inconsistently: amber filled ("Nouvelle Entr&eacute;e"), amber outlined ("Sortie"), and glass ("Inventaire", "Exporter"). The hierarchy is unclear&mdash;are outlined buttons secondary or tertiary?</td>
+      <td>Establish a clear 3-tier system: Primary (amber filled), Secondary (glass with amber border), Tertiary (glass transparent). Document in a style guide.</td>
+    </tr>
+    <tr>
+      <td>Page Headers</td>
+      <td>Each page has a green icon + title + subtitle card, which is great for wayfinding. But the icon styles vary: some use gradients, others are flat. The parcelles page header has a different padding from the stock page.</td>
+      <td>Extract a shared &lt;PageHeader&gt; component with identical padding, icon treatment, and CTA placement.</td>
+    </tr>
+    <tr>
+      <td>Tab Navigation</td>
+      <td>Stock page uses pill-style tabs. Other pages don't have tabs at all. The active tab style (amber background) is visually strong but the inactive tabs blend into the background too much.</td>
+      <td>Give inactive tabs a subtle hover state and a slightly brighter text color (white/50 &rarr; white/60).</td>
+    </tr>
+    <tr>
+      <td>Typography</td>
+      <td>Section labels use mixed case: "PRINCIPAL" / "STOCK" / "TERRAIN" / "GESTION" in the sidebar are uppercase, but table headers mix uppercase ("PRODUIT", "CAT&Eacute;GORIE") with sentence case subtitles. The font-size for labels (10px) is at the edge of readability.</td>
+      <td>Pick one approach: all-caps for labels at 11px with letter-spacing: 0.05em, or sentence case at 12px. Apply uniformly.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ACCESSIBILITY -->
+<h2>Accessibility</h2>
+
+<table>
+  <thead>
+    <tr><th>Check</th><th>Status</th><th>Detail</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Color Contrast (body text)</td>
+      <td><span class="badge badge-warn">Fails</span></td>
+      <td><code>white/85</code> on dark green ≈ 4.2:1 ratio. WCAG AA requires 4.5:1 for normal text. Bump to <code>white/90</code> or increase text size to 16px+ (where 3:1 suffices for large text).</td>
+    </tr>
+    <tr>
+      <td>Color Contrast (muted text)</td>
+      <td><span class="badge badge-bad">Fails</span></td>
+      <td><code>white/40</code> and <code>white/45</code> used extensively for labels and subtitles. These are well below 3:1. Some labels like "Tlemcen, SBA" and "Precision Agriculture" are nearly invisible. Minimum: <code>white/60</code> for any readable text.</td>
+    </tr>
+    <tr>
+      <td>Color Contrast (sidebar labels)</td>
+      <td><span class="badge badge-bad">Fails</span></td>
+      <td>"PRINCIPAL", "STOCK", "TERRAIN", "GESTION" group labels at <code>white/25</code> are purely decorative-level contrast. If they serve a navigation purpose, they need to be at least <code>white/55</code>.</td>
+    </tr>
+    <tr>
+      <td>Touch Targets</td>
+      <td><span class="badge badge-warn">Partial</span></td>
+      <td>Sidebar links at <code>py-2.5</code> (~40px height) are adequate. Map control buttons (+/-) and icon-only buttons (Layers, Target, Maximize) are small (~32px). WCAG recommends 44x44px minimum.</td>
+    </tr>
+    <tr>
+      <td>ARIA Roles</td>
+      <td><span class="badge badge-good">Good</span></td>
+      <td>Modals have <code>role="dialog"</code> and <code>aria-modal</code>. Dropdowns have <code>role="listbox"</code>. Close buttons have <code>aria-label</code>. Error alerts use <code>role="alert"</code>. Good foundation.</td>
+    </tr>
+    <tr>
+      <td>Keyboard Navigation</td>
+      <td><span class="badge badge-warn">Partial</span></td>
+      <td>Tab focus is visible on form inputs but focus rings on glass-card buttons and sidebar links are hard to see against the dark background. Add a visible <code>focus-visible</code> ring in amber.</td>
+    </tr>
+    <tr>
+      <td>Login: Show/Hide Password</td>
+      <td><span class="badge badge-good">Good</span></td>
+      <td>Has <code>aria-label</code> that changes between "Masquer" and "Afficher". Well implemented.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- WHAT WORKS WELL -->
+<h2>What Works Well</h2>
+<div class="card">
+  <ul class="works-well">
+    <li><strong>Unique visual identity.</strong> The dark agricultural theme with glass-morphism is distinctive. It doesn't look like a generic admin template. The amber + green palette is cohesive and domain-appropriate.</li>
+    <li><strong>Satellite map integration.</strong> Using real ArcGIS World Imagery for Tlemcen parcelles is a powerful feature. The legend (treated, untreated, in-progress) is well-positioned.</li>
+    <li><strong>Movement modal form design.</strong> The four-type selector (Entr&eacute;e/Sortie/Retour/Transfert) with color-coded active state is intuitive. The traceability section (Fournisseur, BL, Lot) is professional.</li>
+    <li><strong>Sidebar information density.</strong> Domain indicator ("Domaine Khelifa"), live/local status, and low-stock badge are all useful at-a-glance signals without cluttering the navigation.</li>
+    <li><strong>Login page atmosphere.</strong> The full-bleed farm backdrop with the centered glass card is visually memorable. It sets the tone before the user even logs in.</li>
+    <li><strong>French localization.</strong> Fully French UI with proper agricultural terminology (phytosanitaire, parcelles, traitements) shows domain expertise.</li>
+    <li><strong>API hardening.</strong> Auth on every route, Zod validation, RLS policies &mdash; the backend is properly secured for production.</li>
+  </ul>
+</div>
+
+<!-- PRIORITY RECOMMENDATIONS -->
+<h2>Priority Recommendations</h2>
+<ol class="priority-list">
+  <li>
+    <strong>Tame the background image on data pages.</strong><br>
+    The farm backdrop is the single biggest readability issue. On the stock, products, and suppliers pages, the tractor/orchard imagery directly underlays data tables. Add a near-opaque overlay (<code>bg-[#0f1a0f]/90</code>) for the main content column, or switch to a subtle CSS gradient for inner pages while keeping the photo on login only. This one change will dramatically improve scanability.
+  </li>
+  <li>
+    <strong>Design meaningful empty states.</strong><br>
+    Every data page (stock, products, suppliers, treatments) currently shows "0" or "Aucun X trouv&eacute;" with no guidance. Create illustrated empty states with: a relevant SVG illustration, a message explaining the benefit of adding data, and a single clear CTA button. First-run experience is make-or-break for adoption.
+  </li>
+  <li>
+    <strong>Fix contrast ratios.</strong><br>
+    Audit every text color. Set a floor of <code>white/60</code> for any text that conveys meaning (currently many labels use <code>white/25</code>-<code>white/40</code>). This is both an accessibility requirement and a readability improvement for users working in bright environments (which farmers frequently are).
+  </li>
+  <li>
+    <strong>Simplify the movement modal.</strong><br>
+    Show one quantity input, not four. The type selector already communicates direction. Remove the disabled inputs and replace with a single "Quantit&eacute; (kg/L)" field. Add inline validation and a confirmation preview before submission.
+  </li>
+  <li>
+    <strong>Add responsive mobile handling.</strong><br>
+    The sidebar CSS has <code>max-lg:-translate-x-full</code> for mobile, but the hamburger menu trigger needs to be verified at real device widths. Test on iPhone SE (375px) and iPad (768px). The KPI card row should stack to 2x2 or 1-column on mobile.
+  </li>
+  <li>
+    <strong>Autofill-compatible login styling.</strong><br>
+    Override browser autofill colors with <code>-webkit-box-shadow: 0 0 0 1000px var(--card) inset</code> and <code>-webkit-text-fill-color: white/85</code> so the pre-filled email/password don't break the dark theme with white input backgrounds.
+  </li>
+  <li>
+    <strong>Global search or remove it.</strong><br>
+    The header search bar currently raises expectations it can't meet. Either implement a Cmd+K command palette that searches products, parcelles, operators, and stock levels, or replace it with page-specific context (breadcrumbs, quick stats).
+  </li>
+</ol>
+
+<div class="card" style="margin-top: 40px; border-color: rgba(232,168,56,0.2);">
+  <p style="text-align: center; color: var(--muted); font-size: 0.85rem;">
+    LeadFarm Design Critique &middot; Generated 28 mars 2026<br>
+    Platform: Next.js 16 + Supabase + Tailwind &middot; Theme: Glass-morphism Dark Agriculture
+  </p>
+</div>
+
+</body>
+</html>

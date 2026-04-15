@@ -170,10 +170,14 @@ function mapOperator(row: any): any {
   return {
     id: row.id,
     name: row.name,
+    fullName: row.name,
+    identifierCode: row.identifier_code || `OP-${String(row.id).slice(0, 3).toUpperCase()}`,
     role: row.role,
     phone: row.phone,
     certificationNumber: row.certification_number,
     active: row.active,
+    totalTreatments: row.total_treatments ?? 0,
+    lastTreatmentDate: row.last_treatment_date ?? null,
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
@@ -564,6 +568,30 @@ export async function fetchOperators() {
   return operators;
 }
 
+export async function insertOperator(data: {
+  name: string;
+  role: string;
+  phone?: string;
+  certificationNumber?: string;
+}) {
+  if (!SUPABASE_CONFIGURED) throw new Error("Supabase non configuré");
+
+  const { data: row, error } = await supabase
+    .from("operators")
+    .insert({
+      name: data.name,
+      role: data.role,
+      phone: data.phone || null,
+      certification_number: data.certificationNumber || null,
+      active: true,
+    })
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return mapOperator(row);
+}
+
 // ============================================================
 // Alerts
 // ============================================================
@@ -593,15 +621,16 @@ export async function fetchDashboardStats() {
       supabase.from("stock_levels").select("status"),
       supabase.from("treatments").select("id, status"),
       supabase.from("alerts").select("id, acknowledged").eq("acknowledged", false),
-      supabase.from("sites").select("id, area_hectares"),
+      supabase.from("regions").select("id, area_hectares, parent_id"),
     ]);
 
     const lowStock = (stockLevels.data || []).filter((s: { status: string }) =>
       s.status === "low" || s.status === "critical" || s.status === "negative"
     );
 
-    const sitesData = sites.data || [];
-    const totalAreaHectares = sitesData.reduce(
+    const regionsData = sites.data || [];
+    const parentRegions = regionsData.filter((r: { parent_id: string | null }) => !r.parent_id);
+    const totalAreaHectares = parentRegions.reduce(
       (sum: number, s: { area_hectares: number | null }) => sum + (s.area_hectares ?? 0),
       0
     );
@@ -612,7 +641,7 @@ export async function fetchDashboardStats() {
       treatmentsThisMonth: (treatments.data || []).length,
       treatmentsTrend: 0,
       totalAreaHectares: Math.round(totalAreaHectares * 100) / 100,
-      totalParcelles: sitesData.length,
+      totalParcelles: parentRegions.length,
       alertsCount: (alertsRes.data || []).length,
     };
   } catch {
