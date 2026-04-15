@@ -609,40 +609,36 @@ export default function LivePage() {
               </div>
             </div>
           ) : (
-            /* No active treatment — start button + demo */
-            <div className="relative flex gap-2">
+            /* No active treatment — Traitement 1 + planned dropdown */
+            <div className="relative">
               <button
-                onClick={startDemoSimulation}
-                className="hud-panel px-3 py-3 flex items-center gap-2 hover:bg-emerald-500/15 transition-all border-emerald-500/30 shrink-0"
-                title="Lancer une simulation de démonstration"
-              >
-                <Play className="w-4 h-4 text-emerald-400" fill="currentColor" />
-                <span className="text-xs font-bold text-emerald-400">DÉMO</span>
-              </button>
-              <div className="flex-1 relative">
-              <button
-                onClick={() => setShowSelector(!showSelector)}
-                className={cn(
-                  "w-full hud-panel px-4 py-3 flex items-center justify-between transition-all",
-                  "hover:bg-white/10 group",
-                  showSelector && "rounded-b-none border-b-0"
-                )}
+                onClick={() => {
+                  if (treatments.length > 0) startTreatment(treatments[0]);
+                  else startDemoSimulation();
+                }}
+                className="w-full hud-panel px-4 py-3 flex items-center justify-between hover:bg-emerald-500/10 transition-all border-emerald-500/30 group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
-                    <Play className="w-4 h-4 text-emerald-400 ml-0.5" />
+                  <div className="w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center group-hover:bg-emerald-500/30">
+                    <Play className="w-4 h-4 text-emerald-400 ml-0.5" fill="currentColor" />
                   </div>
                   <div className="text-left">
-                    <div className="text-xs font-bold text-white/80">Démarrer un traitement</div>
-                    <div className="text-[10px] text-white/40">
-                      {treatments.length} traitement{treatments.length !== 1 ? "s" : ""} planifié{treatments.length !== 1 ? "s" : ""}
-                    </div>
+                    <div className="text-xs font-bold text-white/90">Traitement 1</div>
+                    <div className="text-[10px] text-emerald-400/70">Démarrer le traitement</div>
                   </div>
                 </div>
-                <ChevronDown className={cn(
-                  "w-4 h-4 text-white/40 transition-transform",
-                  showSelector && "rotate-180"
-                )} />
+                {treatments.length > 1 && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowSelector(!showSelector); }}
+                    className="p-1.5 rounded-md hover:bg-white/10"
+                    title="Voir tous les traitements"
+                  >
+                    <ChevronDown className={cn(
+                      "w-4 h-4 text-white/40 transition-transform",
+                      showSelector && "rotate-180"
+                    )} />
+                  </button>
+                )}
               </button>
 
               {/* Treatment selector dropdown */}
@@ -705,7 +701,6 @@ export default function LivePage() {
                   )}
                 </div>
               )}
-              </div>
             </div>
           )}
         </div>
