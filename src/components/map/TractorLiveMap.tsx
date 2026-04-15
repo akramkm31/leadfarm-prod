@@ -297,53 +297,20 @@ export default function TractorLiveMap({
     const latLng = L.latLng(simPosition.lat, simPosition.lon);
     markerRef.current.setLatLng(latLng);
 
-    // Calculate heading from previous position for rotation
-    let heading = 0;
-    if (prevSimPosRef.current) {
-      const dy = simPosition.lat - prevSimPosRef.current.lat;
-      const dx = simPosition.lon - prevSimPosRef.current.lon;
-      heading = (Math.atan2(dx, dy) * 180) / Math.PI;
-    }
     prevSimPosRef.current = { lat: simPosition.lat, lon: simPosition.lon };
 
-    // Creative tractor icon — top-down tractor silhouette with wheels + cabin
+    // Simple glowing dot — color tinted by speed
     const speedKmh = simPosition.speed;
-    const glow = speedKmh > 10 ? "rgba(255,80,80,0.7)" : speedKmh > 5 ? "rgba(0,212,240,0.7)" : "rgba(34,197,94,0.7)";
-    const bodyColor = "#e8a838"; // tractor amber
+    const dotColor = speedKmh > 10 ? "#ef4444" : speedKmh > 5 ? "#06b6d4" : "#22c55e";
     const simIcon = L.divIcon({
       className: "",
       html: `<div style="
-        width: 56px; height: 56px;
-        display: flex; align-items: center; justify-content: center;
-        transform: rotate(${heading}deg); transition: transform 0.3s ease-out;
-        filter: drop-shadow(0 0 12px ${glow}) drop-shadow(0 3px 6px rgba(0,0,0,0.5));
-      ">
-        <svg width="44" height="44" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <!-- Front wheels -->
-          <rect x="8" y="14" width="8" height="14" rx="2" fill="#1a1a1a" stroke="white" stroke-width="1.5"/>
-          <rect x="48" y="14" width="8" height="14" rx="2" fill="#1a1a1a" stroke="white" stroke-width="1.5"/>
-          <!-- Rear wheels (bigger) -->
-          <rect x="4" y="36" width="12" height="20" rx="3" fill="#1a1a1a" stroke="white" stroke-width="1.5"/>
-          <rect x="48" y="36" width="12" height="20" rx="3" fill="#1a1a1a" stroke="white" stroke-width="1.5"/>
-          <!-- Tractor body / chassis -->
-          <rect x="16" y="18" width="32" height="36" rx="4" fill="${bodyColor}" stroke="white" stroke-width="2"/>
-          <!-- Cabin (driver area) -->
-          <rect x="22" y="26" width="20" height="18" rx="2" fill="#1f3a5f" stroke="white" stroke-width="1.5"/>
-          <!-- Windshield highlight -->
-          <rect x="24" y="28" width="16" height="6" rx="1" fill="#7ec8e3" opacity="0.85"/>
-          <!-- Front grille / hood -->
-          <rect x="20" y="10" width="24" height="10" rx="2" fill="#c8902f" stroke="white" stroke-width="1.5"/>
-          <!-- Headlights -->
-          <circle cx="24" cy="14" r="1.8" fill="#fff8b0"/>
-          <circle cx="40" cy="14" r="1.8" fill="#fff8b0"/>
-          <!-- Exhaust pipe -->
-          <rect x="28" y="4" width="3" height="8" rx="1" fill="#666"/>
-          <!-- Direction indicator (front arrow tip) -->
-          <path d="M32 2L28 8h8z" fill="#22c55e" stroke="white" stroke-width="1"/>
-        </svg>
-      </div>`,
-      iconSize: [56, 56],
-      iconAnchor: [28, 28],
+        width: 22px; height: 22px; border-radius: 50%;
+        background: ${dotColor}; border: 3px solid white;
+        box-shadow: 0 0 14px ${dotColor}, 0 2px 6px rgba(0,0,0,0.4);
+      "></div>`,
+      iconSize: [22, 22],
+      iconAnchor: [11, 11],
     });
     markerRef.current.setIcon(simIcon);
     markerRef.current.bindPopup(
