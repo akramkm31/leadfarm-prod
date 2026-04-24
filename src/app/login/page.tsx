@@ -68,7 +68,7 @@ function LoginForm() {
             <Leaf className="w-8 h-8 text-amber-400" />
           </div>
           <h1 className="text-3xl font-bold text-white/90 tracking-tight">LeadFarm</h1>
-          <p className="text-sm text-white/40 mt-2 font-mono">
+          <p className="text-sm text-white/65 mt-2 font-mono">
             Precision Agriculture Platform
           </p>
         </div>
@@ -77,7 +77,7 @@ function LoginForm() {
           <div className="glass-card p-8">
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-white/85">Connexion</h2>
-              <p className="text-xs text-white/40 mt-1">
+              <p className="text-xs text-white/65 mt-1">
                 Accédez au tableau de bord de votre exploitation
               </p>
             </div>
@@ -90,7 +90,7 @@ function LoginForm() {
 
             <div className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-xs font-medium text-white/45 mb-2">
+                <label htmlFor="email" className="block text-xs font-medium text-white/70 mb-2">
                   Adresse email
                 </label>
                 <input
@@ -106,7 +106,7 @@ function LoginForm() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-xs font-medium text-white/45 mb-2">
+                <label htmlFor="password" className="block text-xs font-medium text-white/70 mb-2">
                   Mot de passe
                 </label>
                 <div className="relative">
@@ -137,8 +137,15 @@ function LoginForm() {
                     type="checkbox"
                     className="w-3.5 h-3.5 rounded border border-white/15 bg-white/[0.05] accent-amber-500"
                   />
-                  <span className="text-xs text-white/40">Rester connecté</span>
+                  <span className="text-xs text-white/65">Rester connecté</span>
                 </label>
+                <button
+                  type="button"
+                  onClick={() => setError("Contactez votre administrateur pour réinitialiser le mot de passe.")}
+                  className="text-xs font-medium text-amber-300/85 hover:text-amber-300 underline-offset-2 hover:underline transition-colors"
+                >
+                  Mot de passe oublié ?
+                </button>
               </div>
 
               <button
@@ -160,7 +167,7 @@ function LoginForm() {
         </form>
 
         <div className="mt-6 text-center">
-          <div className="flex items-center justify-center gap-2 text-white/25 text-xs">
+          <div className="flex items-center justify-center gap-2 text-white/55 text-xs">
             <Tractor className="w-3.5 h-3.5" />
             <span>LeadFarm v1.0 — Gestion agricole de précision</span>
           </div>

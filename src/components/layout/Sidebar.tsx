@@ -236,7 +236,8 @@ export default function Sidebar({ collapsed = false, onCollapsedChange, mobileOp
       {/* Collapse toggle */}
       <button
         onClick={() => onCollapsedChange?.(!collapsed)}
-        className="flex items-center justify-center h-12 border-t border-white/[0.08] text-white/30 hover:text-white/60 hover:bg-white/[0.03] transition-all"
+        className="flex items-center justify-center h-12 border-t border-white/[0.08] text-white/55 hover:text-white/85 hover:bg-white/[0.04] transition-all"
+        aria-label={collapsed ? "Étendre la barre latérale" : "Réduire la barre latérale"}
       >
         {collapsed ? (
           <ChevronRight className="w-4 h-4" />
