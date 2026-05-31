@@ -29,12 +29,12 @@ export default class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="glass-card p-8 text-center space-y-4" role="alert">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-red-500/15 border border-red-500/25">
-            <AlertTriangle className="w-6 h-6 text-red-400" />
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/25">
+            <AlertTriangle className="w-6 h-6 text-[var(--color-valley-green)]" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-white/80">Une erreur est survenue</h3>
-            <p className="text-xs text-white/40 mt-1 max-w-md mx-auto">
+            <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/80">Une erreur est survenue</h3>
+            <p className="text-xs text-[var(--color-adaline-ink)]/40 mt-1 max-w-md mx-auto">
               {this.state.error?.message || "Erreur inattendue"}
             </p>
           </div>

@@ -31,14 +31,14 @@ export function formatDuration(minutes: number): string {
 
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
-    active: "text-emerald-400",
-    online: "text-emerald-400",
+    active: "text-[var(--color-valley-green)]",
+    online: "text-[var(--color-valley-green)]",
     completed: "text-green-400",
-    paused: "text-amber-400",
+    paused: "text-[var(--color-valley-green)]",
     created: "text-slate-400",
-    aborted: "text-red-400",
+    aborted: "text-[var(--color-valley-green)]",
     offline: "text-slate-500",
-    maintenance: "text-amber-400",
+    maintenance: "text-[var(--color-valley-green)]",
     inactive: "text-slate-500",
   };
   return colors[status] || "text-slate-400";
@@ -46,14 +46,14 @@ export function getStatusColor(status: string): string {
 
 export function getStatusBg(status: string): string {
   const bgs: Record<string, string> = {
-    active: "bg-emerald-400/10 border-emerald-400/20 text-emerald-400",
-    online: "bg-emerald-400/10 border-emerald-400/20 text-emerald-400",
+    active: "bg-emerald-400/10 border-emerald-400/20 text-[var(--color-valley-green)]",
+    online: "bg-emerald-400/10 border-emerald-400/20 text-[var(--color-valley-green)]",
     completed: "bg-green-400/10 border-green-400/20 text-green-400",
-    paused: "bg-amber-400/10 border-amber-400/20 text-amber-400",
+    paused: "bg-emerald-400/10 border-emerald-400/20 text-[var(--color-valley-green)]",
     created: "bg-slate-400/10 border-slate-400/20 text-slate-400",
-    aborted: "bg-red-400/10 border-red-400/20 text-red-400",
+    aborted: "bg-emerald-400/10 border-emerald-400/20 text-[var(--color-valley-green)]",
     offline: "bg-slate-400/10 border-slate-400/20 text-slate-500",
-    maintenance: "bg-amber-400/10 border-amber-400/20 text-amber-400",
+    maintenance: "bg-emerald-400/10 border-emerald-400/20 text-[var(--color-valley-green)]",
   };
   return bgs[status] || "bg-slate-400/10 border-slate-400/20 text-slate-400";
 }

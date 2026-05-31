@@ -172,7 +172,15 @@ export interface Parcelle {
 
 // --- TREATMENTS ---
 
-export type TreatmentStatus = "planned" | "in_progress" | "completed" | "cancelled";
+export type TreatmentStatus =
+  | "draft"
+  | "pending_approval"
+  | "approved"
+  | "planned"
+  | "in_progress"
+  | "completed"
+  | "evaluated"
+  | "cancelled";
 
 export interface TreatmentProduct {
   productId: string;

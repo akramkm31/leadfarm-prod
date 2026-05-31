@@ -3,14 +3,15 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { ZodSchema, ZodError } from "zod";
+import { can, canApi } from "@/lib/rbac/policy";
+import { loadUserAccessProfile } from "@/lib/rbac/server";
+import type { Feature, UserAccessProfile } from "@/lib/rbac/types";
 
-/**
- * Verify the user is authenticated via Supabase session cookie.
- * Returns the user object or a 401 NextResponse.
- */
-export async function requireAuth(req: NextRequest) {
-  const supabase = createServerClient(
+/** Session-aware Supabase client for Route Handlers (RLS applies). */
+export function createRouteHandlerClient(req: NextRequest): SupabaseClient {
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -18,23 +19,80 @@ export async function requireAuth(req: NextRequest) {
         getAll() {
           return req.cookies.getAll();
         },
-        setAll() {
-          // API routes don't need to set cookies
-        },
+        setAll() {},
       },
     }
   );
+}
 
+export type AuthContext =
+  | { user: User; supabase: SupabaseClient; access: UserAccessProfile; error: null }
+  | { user: null; supabase: null; access: null; error: NextResponse };
+
+/**
+ * Auth + Supabase client in one call — use for all protected API routes (RLS).
+ */
+export async function withAuth(req: NextRequest): Promise<AuthContext> {
+  const supabase = createRouteHandlerClient(req);
   const {
     data: { user },
     error,
   } = await supabase.auth.getUser();
 
   if (error || !user) {
-    return { user: null, error: json({ error: "Non autorisé" }, 401) };
+    return { user: null, supabase: null, access: null, error: json({ error: "Non autorisé" }, 401) };
   }
 
-  return { user, error: null };
+  const access = await loadUserAccessProfile(supabase, user);
+  return { user, supabase, access, error: null };
+}
+
+/** Vérifie une capacité métier — retourne 403 si refusé. */
+export function requireFeature(
+  auth: Extract<AuthContext, { error: null }>,
+  feature: Feature
+): NextResponse | null {
+  if (!can(auth.access, feature)) {
+    return json({ error: "Accès refusé pour ce profil", feature }, 403);
+  }
+  return null;
+}
+
+/** Applique les règles API déclarées dans rbac/matrix (méthode + chemin). */
+export function requireApiAccess(
+  auth: Extract<AuthContext, { error: null }>,
+  req: NextRequest
+): NextResponse | null {
+  const pathname = req.nextUrl.pathname;
+  if (!canApi(auth.access, req.method, pathname)) {
+    return json(
+      { error: "Accès refusé pour ce profil", path: pathname, method: req.method },
+      403
+    );
+  }
+  return null;
+}
+
+/**
+ * Auth + contrôle RBAC API (à appeler en tête de chaque route protégée).
+ */
+export async function withAuthRbac(req: NextRequest): Promise<AuthContext> {
+  const auth = await withAuth(req);
+  if (auth.error) return auth;
+  const denied = requireApiAccess(auth as Extract<AuthContext, { error: null }>, req);
+  if (denied) {
+    return { user: null, supabase: null, access: null, error: denied };
+  }
+  return auth;
+}
+
+/**
+ * @deprecated Prefer `withAuth` when the route queries Supabase.
+ */
+export async function requireAuth(req: NextRequest) {
+  const result = await withAuthRbac(req);
+  if (result.error) return { user: null, access: null, error: result.error };
+  return { user: result.user, access: result.access, error: null };
 }
 
 /**

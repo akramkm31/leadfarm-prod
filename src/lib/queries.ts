@@ -338,3 +338,16 @@ export async function getResteAuto() {
   if (error) throw error;
   return data;
 }
+// ============================================================
+// SCD2 AUDIT & HISTORY
+// ============================================================
+
+export async function getEntityHistory(tableName: string, businessId: string) {
+  const { data, error } = await supabase
+    .from(tableName)
+    .select("*")
+    .eq("identifiant_metier", businessId)
+    .order("date_debut_validite", { ascending: false });
+  if (error) throw error;
+  return data;
+}

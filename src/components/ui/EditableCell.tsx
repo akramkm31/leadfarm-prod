@@ -20,7 +20,7 @@ interface EditableCellProps {
 }
 
 export default function EditableCell({
-  rowId, col, value, className = "text-xs text-white/40",
+  rowId, col, value, className = "text-xs text-[var(--color-adaline-ink)]/40",
   colMap, isEditing, isSaving, editValue, setEditValue,
   editInputRef, startEdit, saveEdit, cancelEdit,
 }: EditableCellProps) {
@@ -36,7 +36,7 @@ export default function EditableCell({
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditValue(e.target.value)}
         onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") cancelEdit(); }}
         onBlur={saveEdit}
-        className="bg-amber-500/10 border border-amber-500/40 rounded px-1.5 py-0.5 text-xs text-white/90 outline-none w-full min-w-[60px] font-mono"
+        className="bg-[var(--color-valley-green)]/10 border border-emerald-500/40 rounded px-1.5 py-0.5 text-xs text-[var(--color-adaline-ink)]/90 outline-none w-full min-w-[60px] font-mono"
         step={colDef?.type === "number" ? "any" : undefined}
       />
     );
@@ -47,7 +47,7 @@ export default function EditableCell({
       onDoubleClick={() => startEdit(rowId, col, display === "—" ? "" : display)}
       className={cn(
         className,
-        "cursor-cell whitespace-nowrap hover:bg-amber-500/[0.06] hover:outline hover:outline-1 hover:outline-amber-500/20 rounded px-0.5 -mx-0.5 transition-colors",
+        "cursor-cell whitespace-nowrap hover:bg-[var(--color-valley-green)]/[0.06] hover:outline hover:outline-1 hover:outline-emerald-500/20 rounded px-0.5 -mx-0.5 transition-colors",
         isSaving && "text-green-400"
       )}
       title="Double-cliquer pour modifier"

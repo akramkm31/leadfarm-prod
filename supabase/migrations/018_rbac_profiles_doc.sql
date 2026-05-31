@@ -1,0 +1,9 @@
+-- RBAC profils applicatifs (référence — logique dans src/lib/rbac/)
+--
+-- user_profiles.role ∈ {
+--   directeur, responsable_technique, magasinier, operateur, auditeur
+-- }
+--
+-- Matrice détaillée : src/lib/rbac/matrix.ts
+-- Routes UI          : src/lib/rbac/routes.ts
+-- APIs sensibles     : src/lib/rbac/matrix.ts → API_FEATURE_RULES

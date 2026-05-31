@@ -113,19 +113,19 @@ export default function ProductsPage() {
       {/* ── Hero Header ── */}
       <div className="glass-card p-5 mb-5 relative overflow-hidden">
         {/* Decorative background accents */}
-        <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-emerald-500/[0.06] blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-amber-500/[0.05] blur-2xl pointer-events-none" />
+        <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-[var(--color-valley-green)]/[0.06] blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-[var(--color-valley-green)]/[0.05] blur-2xl pointer-events-none" />
 
         <div className="relative flex items-start justify-between gap-4">
           {/* Left: Title block */}
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/25 to-cyan-500/15 border border-emerald-500/30 flex items-center justify-center shadow-lg shadow-emerald-500/10 shrink-0">
-              <FlaskConical className="w-7 h-7 text-emerald-400" />
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/25 to-cyan-500/15 border border-[var(--color-valley-green)]/30 flex items-center justify-center shadow-lg shadow-emerald-500/10 shrink-0">
+              <FlaskConical className="w-7 h-7 text-[var(--color-valley-green)]" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">Produits Phytosanitaires</h1>
-              <p className="text-xs text-white/55 mt-0.5 flex items-center gap-2">
-                <Shield className="w-3 h-3 text-white/40" />
+              <h1 className="text-2xl font-bold text-[var(--color-adaline-ink)] tracking-tight">Produits Phytosanitaires</h1>
+              <p className="text-xs text-[var(--color-adaline-ink)]/55 mt-0.5 flex items-center gap-2">
+                <Shield className="w-3 h-3 text-[var(--color-adaline-ink)]/40" />
                 Registre de traçabilité &mdash; Catalogue & conformité phytosanitaire
               </p>
             </div>
@@ -134,7 +134,7 @@ export default function ProductsPage() {
           {/* Right: Action button */}
           <button
             onClick={() => setShowAddModal(true)}
-            className="shrink-0 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600/80 to-emerald-500/60 hover:from-emerald-500/90 hover:to-emerald-400/70 text-white text-sm font-semibold flex items-center gap-2 border border-emerald-400/25 shadow-lg shadow-emerald-500/10 transition-all duration-200 hover:shadow-emerald-400/20 hover:scale-[1.02] active:scale-[0.98]"
+            className="shrink-0 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600/80 to-emerald-500/60 hover:from-emerald-500/90 hover:to-emerald-400/70 text-[var(--color-adaline-ink)] text-sm font-semibold flex items-center gap-2 border border-emerald-400/25 shadow-lg shadow-emerald-500/10 transition-all duration-200 hover:shadow-emerald-400/20 hover:scale-[1.02] active:scale-[0.98]"
           >
             <Plus className="w-4 h-4" />
             Ajouter un produit
@@ -145,23 +145,23 @@ export default function ProductsPage() {
         <div className="relative grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
           {/* Total products */}
           <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.06] transition-colors">
-            <div className="w-9 h-9 rounded-lg bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center">
-              <Package className="w-4 h-4 text-emerald-400" />
+            <div className="w-9 h-9 rounded-lg bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/20 flex items-center justify-center">
+              <Package className="w-4 h-4 text-[var(--color-valley-green)]" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white font-mono tabular-nums leading-none">{products.length}</p>
-              <p className="text-[10px] text-white/50 mt-0.5 uppercase tracking-wider">Produits</p>
+              <p className="text-lg font-bold text-[var(--color-adaline-ink)] font-mono tabular-nums leading-none">{products.length}</p>
+              <p className="text-[10px] text-[var(--color-adaline-ink)]/50 mt-0.5 uppercase tracking-wider">Produits</p>
             </div>
           </div>
 
           {/* Filtered count */}
           <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.06] transition-colors">
-            <div className="w-9 h-9 rounded-lg bg-cyan-500/15 border border-cyan-500/20 flex items-center justify-center">
-              <Layers className="w-4 h-4 text-cyan-400" />
+            <div className="w-9 h-9 rounded-lg bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/20 flex items-center justify-center">
+              <Layers className="w-4 h-4 text-[var(--color-valley-green)]" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white font-mono tabular-nums leading-none">{uniqueCategories.size}</p>
-              <p className="text-[10px] text-white/50 mt-0.5 uppercase tracking-wider">Catégories</p>
+              <p className="text-lg font-bold text-[var(--color-adaline-ink)] font-mono tabular-nums leading-none">{uniqueCategories.size}</p>
+              <p className="text-[10px] text-[var(--color-adaline-ink)]/50 mt-0.5 uppercase tracking-wider">Catégories</p>
             </div>
           </div>
 
@@ -169,23 +169,23 @@ export default function ProductsPage() {
           <div className={cn(
             "flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors",
             expiringSoon.length > 0
-              ? "bg-amber-500/[0.06] border-amber-500/15 hover:bg-amber-500/[0.1]"
+              ? "bg-[var(--color-valley-green)]/[0.06] border-emerald-500/15 hover:bg-[var(--color-valley-green)]/[0.1]"
               : "bg-white/[0.04] border-white/[0.08] hover:bg-white/[0.06]"
           )}>
             <div className={cn(
               "w-9 h-9 rounded-lg flex items-center justify-center",
               expiringSoon.length > 0
-                ? "bg-amber-500/15 border border-amber-500/20"
+                ? "bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/20"
                 : "bg-white/[0.06] border border-white/[0.08]"
             )}>
-              <Clock className={cn("w-4 h-4", expiringSoon.length > 0 ? "text-amber-400" : "text-white/40")} />
+              <Clock className={cn("w-4 h-4", expiringSoon.length > 0 ? "text-[var(--color-valley-green)]" : "text-[var(--color-adaline-ink)]/40")} />
             </div>
             <div>
               <p className={cn(
                 "text-lg font-bold font-mono tabular-nums leading-none",
-                expiringSoon.length > 0 ? "text-amber-400" : "text-white/55"
+                expiringSoon.length > 0 ? "text-[var(--color-valley-green)]" : "text-[var(--color-adaline-ink)]/55"
               )}>{expiringSoon.length}</p>
-              <p className="text-[10px] text-white/50 mt-0.5 uppercase tracking-wider">Expirent bientôt</p>
+              <p className="text-[10px] text-[var(--color-adaline-ink)]/50 mt-0.5 uppercase tracking-wider">Expirent bientôt</p>
             </div>
           </div>
 
@@ -193,23 +193,23 @@ export default function ProductsPage() {
           <div className={cn(
             "flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors",
             lowStock.length > 0
-              ? "bg-red-500/[0.06] border-red-500/15 hover:bg-red-500/[0.1]"
+              ? "bg-[var(--color-valley-green)]/[0.06] border-emerald-500/15 hover:bg-[var(--color-valley-green)]/[0.1]"
               : "bg-white/[0.04] border-white/[0.08] hover:bg-white/[0.06]"
           )}>
             <div className={cn(
               "w-9 h-9 rounded-lg flex items-center justify-center",
               lowStock.length > 0
-                ? "bg-red-500/15 border border-red-500/20"
+                ? "bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/20"
                 : "bg-white/[0.06] border border-white/[0.08]"
             )}>
-              <AlertTriangle className={cn("w-4 h-4", lowStock.length > 0 ? "text-red-400" : "text-white/40")} />
+              <AlertTriangle className={cn("w-4 h-4", lowStock.length > 0 ? "text-[var(--color-valley-green)]" : "text-[var(--color-adaline-ink)]/40")} />
             </div>
             <div>
               <p className={cn(
                 "text-lg font-bold font-mono tabular-nums leading-none",
-                lowStock.length > 0 ? "text-red-400" : "text-white/55"
+                lowStock.length > 0 ? "text-[var(--color-valley-green)]" : "text-[var(--color-adaline-ink)]/55"
               )}>{lowStock.length}</p>
-              <p className="text-[10px] text-white/50 mt-0.5 uppercase tracking-wider">Stock faible</p>
+              <p className="text-[10px] text-[var(--color-adaline-ink)]/50 mt-0.5 uppercase tracking-wider">Stock faible</p>
             </div>
           </div>
         </div>
@@ -218,7 +218,7 @@ export default function ProductsPage() {
       {/* Toolbar */}
       <div className="flex items-center gap-3 mb-4">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-adaline-ink)]/40" />
           <input
             type="text"
             value={search}
@@ -227,7 +227,7 @@ export default function ProductsPage() {
             className="glass-input pl-9 pr-4 py-2 text-sm w-full"
           />
         </div>
-        <div className="flex items-center gap-0.5 p-1 bg-black/40 rounded-xl border border-white/10 flex-wrap">
+        <div className="flex items-center gap-0.5 p-1 bg-black/40 rounded-xl border border-[var(--color-stone-moss)] flex-wrap">
           {categories.map((cat: { value: ProductCategory | "all"; label: string }): React.ReactNode => (
             <button
               key={cat.value}
@@ -235,8 +235,8 @@ export default function ProductsPage() {
               className={cn(
                 "px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all",
                 categoryFilter === cat.value
-                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                  : "text-white/55 hover:text-white/70 border border-transparent"
+                  ? "bg-[var(--color-valley-green)]/20 text-[var(--color-valley-green)] border border-[var(--color-valley-green)]/30"
+                  : "text-[var(--color-adaline-ink)]/55 hover:text-[var(--color-adaline-ink)]/70 border border-transparent"
               )}
             >
               {cat.label}
@@ -272,8 +272,8 @@ export default function ProductsPage() {
                   onClick={() => setSelectedProduct(isSelected ? null : product)}
                   className={cn(
                     "cursor-pointer",
-                    isSelected && "!bg-amber-500/[0.08]",
-                    isNeg && "!bg-red-500/[0.04]"
+                    isSelected && "!bg-[var(--color-valley-green)]/[0.08]",
+                    isNeg && "!bg-[var(--color-valley-green)]/[0.04]"
                   )}
                 >
                   <td>
@@ -283,7 +283,7 @@ export default function ProductsPage() {
                         style={{ backgroundColor: categoryColors[product.category] }}
                       />
                       <EditableCell rowId={product.id} col="tradeName" value={product.tradeName}
-                        className="text-sm font-semibold text-white/90" colMap={productColMap}
+                        className="text-sm font-semibold text-[var(--color-adaline-ink)]/90" colMap={productColMap}
                         isEditing={productEdit.isEditing(product.id, "tradeName")}
                         isSaving={productEdit.isSaving(product.id, "tradeName")}
                         editValue={productEdit.editValue} setEditValue={productEdit.setEditValue}
@@ -306,7 +306,7 @@ export default function ProductsPage() {
                   <td>
                     <EditableCell rowId={product.id} col="activeSubstance"
                       value={product.activeSubstance && product.activeSubstance !== "/" ? product.activeSubstance : null}
-                      className="text-xs text-white/50" colMap={productColMap}
+                      className="text-xs text-[var(--color-adaline-ink)]/50" colMap={productColMap}
                       isEditing={productEdit.isEditing(product.id, "activeSubstance")}
                       isSaving={productEdit.isSaving(product.id, "activeSubstance")}
                       editValue={productEdit.editValue} setEditValue={productEdit.setEditValue}
@@ -316,7 +316,7 @@ export default function ProductsPage() {
                   <td>
                     <EditableCell rowId={product.id} col="formulation"
                       value={product.formulation && String(product.formulation) !== "/" ? product.formulation : null}
-                      className="text-xs text-white/55" colMap={productColMap}
+                      className="text-xs text-[var(--color-adaline-ink)]/55" colMap={productColMap}
                       isEditing={productEdit.isEditing(product.id, "formulation")}
                       isSaving={productEdit.isSaving(product.id, "formulation")}
                       editValue={productEdit.editValue} setEditValue={productEdit.setEditValue}
@@ -326,7 +326,7 @@ export default function ProductsPage() {
                   <td>
                     <EditableCell rowId={product.id} col="familleChimique"
                       value={product.familleChimique && product.familleChimique !== "/" ? product.familleChimique : null}
-                      className="text-xs text-white/55" colMap={productColMap}
+                      className="text-xs text-[var(--color-adaline-ink)]/55" colMap={productColMap}
                       isEditing={productEdit.isEditing(product.id, "familleChimique")}
                       isSaving={productEdit.isSaving(product.id, "familleChimique")}
                       editValue={productEdit.editValue} setEditValue={productEdit.setEditValue}
@@ -336,15 +336,15 @@ export default function ProductsPage() {
                   <td className="text-right">
                     <span className={cn(
                       "text-sm font-mono font-bold tabular-nums",
-                      isNeg ? "text-red-400" :
-                      stock?.status === "low" ? "text-amber-400" :
-                      stock?.status === "critical" ? "text-red-400" : "text-green-400"
+                      isNeg ? "text-[var(--color-valley-green)]" :
+                      stock?.status === "low" ? "text-[var(--color-valley-green)]" :
+                      stock?.status === "critical" ? "text-[var(--color-valley-green)]" : "text-green-400"
                     )}>
                       {stock ? (Math.abs(qty) >= 10000 ? `${(qty / 1000).toFixed(1)}K` : qty.toFixed(qty % 1 ? 1 : 0)) : "—"}
                     </span>
                   </td>
                   <td>
-                    <span className="text-[10px] text-white/40 font-mono">{stock?.unit || product.unit || "L"}</span>
+                    <span className="text-[10px] text-[var(--color-adaline-ink)]/40 font-mono">{stock?.unit || product.unit || "L"}</span>
                   </td>
                 </tr>
               );
@@ -353,22 +353,25 @@ export default function ProductsPage() {
         </table>
 
         {filtered.length === 0 && (
-          <div className="p-12 flex flex-col items-center justify-center text-center">
-            <FlaskConical className="w-10 h-10 text-white/20 mb-3" />
-            <p className="text-sm text-white/55">Aucun produit trouvé</p>
+          <div className="p-16 flex flex-col items-center justify-center text-center">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500/15 to-amber-500/10 border border-[var(--color-stone-moss)] flex items-center justify-center mb-5 empty-state-icon">
+              <FlaskConical className="w-10 h-10 text-[var(--color-adaline-ink)]/35" />
+            </div>
+            <h3 className="text-base font-semibold text-[var(--color-adaline-ink)]/60 mb-2">Aucun produit trouvé</h3>
+            <p className="text-sm text-[var(--color-adaline-ink)]/50 max-w-xs">Essayez avec un autre terme de recherche ou modifiez vos filtres.</p>
           </div>
         )}
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-white/[0.06]">
-            <span className="text-xs text-white/55 font-mono">
+            <span className="text-xs text-[var(--color-adaline-ink)]/55 font-mono">
               {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, filtered.length)} sur {filtered.length}
             </span>
             <div className="flex items-center gap-1">
               <button
                 onClick={(): void => setPage((p: number): number => Math.max(1, p - 1))}
                 disabled={safePage === 1}
-                className="px-3 py-1.5 rounded-lg text-xs border border-white/[0.1] text-white/50 hover:text-white/80 hover:bg-white/[0.05] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="px-3 py-1.5 rounded-lg text-xs border border-white/[0.1] text-[var(--color-adaline-ink)]/50 hover:text-[var(--color-adaline-ink)]/80 hover:bg-white/[0.05] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               >
                 ←
               </button>
@@ -381,8 +384,8 @@ export default function ProductsPage() {
                     className={cn(
                       "w-7 h-7 rounded-lg text-xs font-medium transition-all",
                       p === safePage
-                        ? "bg-amber-500/15 text-amber-400 border border-amber-500/25"
-                        : "text-white/55 hover:text-white/70 hover:bg-white/[0.04]"
+                        ? "bg-[var(--color-valley-green)]/15 text-[var(--color-valley-green)] border border-[var(--color-valley-green)]/25"
+                        : "text-[var(--color-adaline-ink)]/55 hover:text-[var(--color-adaline-ink)]/70 hover:bg-white/[0.04]"
                     )}
                   >
                     {p}
@@ -392,7 +395,7 @@ export default function ProductsPage() {
               <button
                 onClick={(): void => setPage((p: number): number => Math.min(totalPages, p + 1))}
                 disabled={safePage === totalPages}
-                className="px-3 py-1.5 rounded-lg text-xs border border-white/[0.1] text-white/50 hover:text-white/80 hover:bg-white/[0.05] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="px-3 py-1.5 rounded-lg text-xs border border-white/[0.1] text-[var(--color-adaline-ink)]/50 hover:text-[var(--color-adaline-ink)]/80 hover:bg-white/[0.05] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               >
                 →
               </button>
@@ -426,20 +429,20 @@ function AddProductModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50 " onClick={onClose} />
       <div className="glass-card p-6 w-full max-w-md relative z-10">
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-lg font-bold text-white/90">Nouveau Produit</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/[0.08] text-white/40"><X className="w-4 h-4" /></button>
+          <h3 className="text-lg font-bold text-[var(--color-adaline-ink)]/90">Nouveau Produit</h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/[0.08] text-[var(--color-adaline-ink)]/40"><X className="w-4 h-4" /></button>
         </div>
         <div className="space-y-3">
           <div>
-            <label className="text-xs text-white/50 block mb-1">Nom commercial *</label>
+            <label className="text-xs text-[var(--color-adaline-ink)]/50 block mb-1">Nom commercial *</label>
             <input value={form.trade_name} onChange={(e: React.ChangeEvent<HTMLInputElement>): void => set("trade_name", e.target.value)} className="glass-input w-full px-3 py-2 text-sm" placeholder="Ex: ABSOLUTE" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-white/50 block mb-1">Catégorie</label>
+              <label className="text-xs text-[var(--color-adaline-ink)]/50 block mb-1">Catégorie</label>
               <select value={form.category} onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => set("category", e.target.value)} className="glass-input w-full px-3 py-2 text-sm bg-transparent">
                 {["engrais","fongicide","herbicide","insecticide","acaricide","adjuvant","semence","acide_phosphorique","acide_nitrique","acide_sulfurique","acide_humique","matiere_organique","fer","autre"].map((c: string): React.ReactNode => (
                   <option key={c} value={c} className="bg-[#1a2e1a]">{c.replace(/_/g, " ").toUpperCase()}</option>
@@ -447,18 +450,18 @@ function AddProductModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
               </select>
             </div>
             <div>
-              <label className="text-xs text-white/50 block mb-1">Unité</label>
+              <label className="text-xs text-[var(--color-adaline-ink)]/50 block mb-1">Unité</label>
               <select value={form.unit} onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => set("unit", e.target.value)} className="glass-input w-full px-3 py-2 text-sm bg-transparent">
                 {["L","Kg","mL","g"].map((u: string): React.ReactNode => <option key={u} value={u} className="bg-[#1a2e1a]">{u}</option>)}
               </select>
             </div>
           </div>
           <div>
-            <label className="text-xs text-white/50 block mb-1">Matière active</label>
+            <label className="text-xs text-[var(--color-adaline-ink)]/50 block mb-1">Matière active</label>
             <input value={form.active_substance} onChange={(e: React.ChangeEvent<HTMLInputElement>): void => set("active_substance", e.target.value)} className="glass-input w-full px-3 py-2 text-sm" placeholder="Ex: Emmactin Benzoate" />
           </div>
           <div>
-            <label className="text-xs text-white/50 block mb-1">Formulation</label>
+            <label className="text-xs text-[var(--color-adaline-ink)]/50 block mb-1">Formulation</label>
             <input value={form.formulation} onChange={(e: React.ChangeEvent<HTMLInputElement>): void => set("formulation", e.target.value)} className="glass-input w-full px-3 py-2 text-sm" placeholder="Ex: EC, WG, SC..." />
           </div>
         </div>
@@ -473,8 +476,8 @@ function AddProductModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
 function SectionTitle({ icon: Icon, title }: { icon: typeof Info; title: string }) {
   return (
     <div className="flex items-center gap-2 mb-2 pt-3 border-t border-white/[0.08] first:border-t-0 first:pt-0">
-      <Icon className="w-3.5 h-3.5 text-amber-400" />
-      <span className="text-[10px] font-semibold text-white/55 uppercase tracking-wider">{title}</span>
+      <Icon className="w-3.5 h-3.5 text-[var(--color-valley-green)]" />
+      <span className="text-[10px] font-semibold text-[var(--color-adaline-ink)]/55 uppercase tracking-wider">{title}</span>
     </div>
   );
 }
@@ -482,11 +485,11 @@ function SectionTitle({ icon: Icon, title }: { icon: typeof Info; title: string 
 function DetailRow({ label, value, highlight }: { label: string; value: string; highlight?: "amber" | "cyan" }) {
   return (
     <div className="flex items-center justify-between py-1.5 border-b border-white/[0.05] last:border-b-0">
-      <span className="text-[11px] text-white/55">{label}</span>
+      <span className="text-[11px] text-[var(--color-adaline-ink)]/55">{label}</span>
       <span className={cn(
         "text-[11px] font-medium text-right max-w-[55%]",
-        highlight === "amber" ? "text-amber-400 font-mono" :
-        highlight === "cyan" ? "text-cyan-400 font-mono" : "text-white/60"
+        highlight === "amber" ? "text-[var(--color-valley-green)] font-mono" :
+        highlight === "cyan" ? "text-[var(--color-valley-green)] font-mono" : "text-[var(--color-adaline-ink)]/60"
       )}>
         {value}
       </span>

@@ -1,14 +1,14 @@
 import { NextRequest } from "next/server";
-import { supabase } from "@/lib/supabase";
-import { requireAuth, json } from "@/lib/api-helpers";
+import { withAuthRbac, json } from "@/lib/api-helpers";
+import { CANONICAL_PARCELLE_TABLE } from "@/lib/parcelles/constants";
 
 export async function GET(req: NextRequest) {
-  const { error: authErr } = await requireAuth(req);
-  if (authErr) return authErr;
+  const auth = await withAuthRbac(req);
+  if (auth.error) return auth.error;
 
-  const { data, error } = await supabase
-    .from("regions")
-    .select("*, zones(*, sites(*))")
+  const { data, error } = await auth.supabase
+    .from(CANONICAL_PARCELLE_TABLE)
+    .select("*")
     .order("name");
   if (error) return json({ error: error.message }, 500);
   return json(data);

@@ -1,11 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { NextRequest } from "next/server";
 import { movementSchema } from "@/lib/validations";
-import { requireAuth, validateBody, json, parsePagination } from "@/lib/api-helpers";
+import { withAuthRbac, validateBody, json, parsePagination } from "@/lib/api-helpers";
 
 export async function GET(req: NextRequest) {
-  const { error: authErr } = await requireAuth(req);
-  if (authErr) return authErr;
+  const auth = await withAuthRbac(req);
+  if (auth.error) return auth.error;
 
   const sp = req.nextUrl.searchParams;
   const category = sp.get("category");
@@ -17,7 +16,7 @@ export async function GET(req: NextRequest) {
   const to = sp.get("to");
   const { limit, offset } = parsePagination(sp);
 
-  let query = supabase
+  let query = auth.supabase
     .from("movements")
     .select("*, products(trade_name, category, active_substance, unit)", { count: "exact" })
     .order("date", { ascending: false })
@@ -37,14 +36,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { error: authErr } = await requireAuth(req);
-  if (authErr) return authErr;
+  const auth = await withAuthRbac(req);
+  if (auth.error) return auth.error;
 
   const body = await req.json();
   const { data: validated, error: valErr } = validateBody(body, movementSchema);
   if (valErr) return valErr;
 
-  const { data, error } = await supabase.from("movements").insert(validated).select().single();
+  const { data, error } = await auth.supabase.from("movements").insert(validated).select().single();
   if (error) return json({ error: error.message }, 400);
   return json(data, 201);
 }

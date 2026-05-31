@@ -21,8 +21,8 @@ export default function TreatmentActivityChart() {
     <div className="glass-card p-5">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="text-sm font-semibold text-white/85">Activité des Traitements</h3>
-          <p className="text-xs text-white/40 mt-0.5">Traitements cette semaine</p>
+          <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85">Activité des Traitements</h3>
+          <p className="text-xs text-[var(--color-adaline-ink)]/40 mt-0.5">Traitements cette semaine</p>
         </div>
       </div>
 

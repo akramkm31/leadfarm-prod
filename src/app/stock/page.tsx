@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import AppLayout from "@/components/layout/AppLayout";
+import { PageScreen, PageHero, AdalineButton } from "@/components/adaline/PageScreen";
 import { useProducts, useSuppliers, useMovements, useStockLevels, useParcelles } from "@/hooks/useData";
 import {
   categoryLabels,
@@ -83,11 +84,13 @@ import {
   AreaChart,
 } from "recharts";
 import { KpiCard, StockCard, ProductDetailPanel, DetailRow, MovementRow, OperationCard } from "./stock-cards";
-import { NewEntryModal, InventoryModal, ConsommationModal, AjustementModal, ControleModal } from "./stock-modals";
+import { NewEntryModal, ConsommationModal, AjustementModal, ControleModal } from "./stock-modals";
+import InventaireGuideModal from "@/components/stock/InventaireGuideModal";
+import StockConformiteTab from "@/components/stock/StockConformiteTab";
 import { PageSkeleton } from "@/components/ui/Skeleton";
 
 // ── Types ──────────────────────────────────────────────
-type Tab = "overview" | "products" | "movements" | "operations" | "analyses";
+type Tab = "overview" | "products" | "movements" | "operations" | "analyses" | "conformite";
 type ViewMode = "grid" | "list";
 type SortField = "name" | "quantity" | "value" | "status" | "category";
 type SortDir = "asc" | "desc";
@@ -116,12 +119,12 @@ const entryTypeIcons: Record<string, typeof ArrowUpRight> = {
 
 const entryTypeColors: Record<string, string> = {
   entry: "text-green-400 bg-green-400/10 border-emerald-400/20",
-  exit: "text-red-400 bg-red-400/10 border-red-400/20",
-  treatment_consumption: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20",
-  adjustment: "text-amber-400 bg-amber-400/10 border-amber-400/20",
-  transfer: "text-orange-400 bg-orange-400/10 border-orange-400/20",
-  return: "text-purple-400 bg-purple-400/10 border-purple-400/20",
-  stock_initial: "text-blue-400 bg-blue-400/10 border-blue-400/20",
+  exit: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
+  treatment_consumption: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
+  adjustment: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
+  transfer: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
+  return: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
+  stock_initial: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
 };
 
 const statusLabels: Record<string, string> = {
@@ -382,6 +385,7 @@ export default function StockPage() {
     { id: "movements", label: "Mouvements", icon: ArrowRightLeft },
     { id: "operations", label: "Opérations", icon: ClipboardCheck },
     { id: "analyses", label: "Analyses", icon: BarChart3 },
+    { id: "conformite", label: "Conformité local", icon: ShieldCheck },
   ];
 
   function toggleSort(field: SortField) {
@@ -401,87 +405,72 @@ export default function StockPage() {
     <AppLayout>
       {/* Page-level error toast */}
       {pageError && (
-        <div className="fixed top-4 right-4 z-[60] max-w-md animate-in slide-in-from-top-2 p-4 rounded-xl bg-red-500/15 backdrop-blur-xl border border-red-500/25 text-red-400 text-sm shadow-2xl flex items-center gap-3">
+        <div className="fixed top-4 right-4 z-[60] max-w-md animate-in slide-in-from-top-2 p-4 rounded-xl bg-[var(--color-valley-green)]/15  border border-[var(--color-valley-green)]/25 text-[var(--color-valley-green)] text-sm shadow-2xl flex items-center gap-3">
           <span className="flex-1">{pageError}</span>
-          <button onClick={() => setPageError(null)} className="text-red-400/60 hover:text-red-400 text-xs font-bold shrink-0">✕</button>
+          <button onClick={() => setPageError(null)} className="text-[var(--color-valley-green)]/60 hover:text-[var(--color-valley-green)] text-xs font-bold shrink-0">✕</button>
         </div>
       )}
 
-      {/* ── Hero Header ── */}
-      <div className="glass-card p-5 mb-5 relative overflow-hidden">
-        {/* Decorative background accents */}
-        <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-amber-500/[0.06] blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-emerald-500/[0.05] blur-2xl pointer-events-none" />
-
-        <div className="relative flex items-start justify-between gap-4">
-          {/* Left: Title block */}
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/25 to-emerald-500/15 border border-amber-500/30 flex items-center justify-center shadow-lg shadow-amber-500/10 shrink-0">
-              <Warehouse className="w-7 h-7 text-amber-400" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">Gestion de Stock</h1>
-              <p className="text-xs text-white/55 mt-0.5 flex items-center gap-2">
-                <ShieldCheck className="w-3 h-3 text-white/40" />
-                Suivi en temps réel &mdash; Entrées, sorties & traçabilité complète
-              </p>
-            </div>
-          </div>
-
-          {/* Right: Action buttons */}
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => setShowInventoryModal(true)}
-              className="px-3 py-2.5 flex items-center gap-1.5 text-xs font-medium rounded-xl border border-white/[0.1] text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-all"
-            >
+      <PageScreen className="!pt-6 !pb-10">
+      <PageHero
+        eyebrow="OPÉRATIONS · STOCK"
+        title="Gestion de stock phytosanitaire"
+        lede="Suivi en temps réel — entrées, sorties et traçabilité complète."
+        actions={
+          <>
+            <AdalineButton variant="tertiary" onClick={() => setShowInventoryModal(true)}>
               <ClipboardCheck className="w-3.5 h-3.5" />
               Inventaire
-            </button>
-            <button
-              onClick={handleExport}
-              className="px-3 py-2.5 flex items-center gap-1.5 text-xs font-medium rounded-xl border border-white/[0.1] text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-all"
-            >
+            </AdalineButton>
+            <AdalineButton variant="tertiary" onClick={handleExport}>
               <Download className="w-3.5 h-3.5" />
               Exporter
-            </button>
-            <button
-              onClick={() => { setDefaultMovementType("sortie"); setShowNewEntryModal(true); }}
-              className="px-3 py-2.5 flex items-center gap-1.5 text-xs font-semibold rounded-xl border border-red-500/25 text-red-400 hover:bg-red-500/10 transition-all"
+            </AdalineButton>
+            <AdalineButton
+              variant="tertiary"
+              onClick={() => {
+                setDefaultMovementType("sortie");
+                setShowNewEntryModal(true);
+              }}
             >
               <ArrowDownRight className="w-3.5 h-3.5" />
               Sortie
-            </button>
-            <button
-              onClick={() => { setDefaultMovementType("entree"); setShowNewEntryModal(true); }}
-              className="shrink-0 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-600/80 to-amber-500/60 hover:from-amber-500/90 hover:to-amber-400/70 text-white text-sm font-semibold flex items-center gap-2 border border-amber-400/25 shadow-lg shadow-amber-500/10 transition-all duration-200 hover:shadow-amber-400/20 hover:scale-[1.02] active:scale-[0.98]"
+            </AdalineButton>
+            <AdalineButton
+              variant="primary"
+              onClick={() => {
+                setDefaultMovementType("entree");
+                setShowNewEntryModal(true);
+              }}
             >
-              <Plus className="w-4 h-4" />
-              Nouvelle Entrée
-            </button>
-          </div>
-        </div>
+              <Plus className="w-3.5 h-3.5" />
+              Nouvelle entrée
+            </AdalineButton>
+          </>
+        }
+      />
 
         {/* KPI row */}
         <div className="relative grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 mt-5">
           {/* Products count */}
           <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.06] transition-colors">
-            <div className="w-9 h-9 rounded-lg bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center">
-              <Package className="w-4 h-4 text-emerald-400" />
+            <div className="w-9 h-9 rounded-lg bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/20 flex items-center justify-center">
+              <Package className="w-4 h-4 text-[var(--color-valley-green)]" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white font-mono tabular-nums leading-none">{stockLevels.length}</p>
-              <p className="text-[10px] text-white/50 mt-0.5 uppercase tracking-wider">Produits</p>
+              <p className="text-lg font-bold text-[var(--color-adaline-ink)] font-mono tabular-nums leading-none">{stockLevels.length}</p>
+              <p className="text-[10px] text-[var(--color-adaline-ink)]/50 mt-0.5 uppercase tracking-wider">Produits</p>
             </div>
           </div>
 
           {/* Movements */}
           <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.06] transition-colors">
-            <div className="w-9 h-9 rounded-lg bg-cyan-500/15 border border-cyan-500/20 flex items-center justify-center">
-              <ArrowRightLeft className="w-4 h-4 text-cyan-400" />
+            <div className="w-9 h-9 rounded-lg bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/20 flex items-center justify-center">
+              <ArrowRightLeft className="w-4 h-4 text-[var(--color-valley-green)]" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white font-mono tabular-nums leading-none">{stockEntries.length}</p>
-              <p className="text-[10px] text-white/50 mt-0.5 uppercase tracking-wider">Mouvements</p>
+              <p className="text-lg font-bold text-[var(--color-adaline-ink)] font-mono tabular-nums leading-none">{stockEntries.length}</p>
+              <p className="text-[10px] text-[var(--color-adaline-ink)]/50 mt-0.5 uppercase tracking-wider">Mouvements</p>
             </div>
           </div>
 
@@ -491,19 +480,19 @@ export default function StockPage() {
               <ArrowUpRight className="w-4 h-4 text-green-400" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white font-mono tabular-nums leading-none">{totalEntries}</p>
-              <p className="text-[10px] text-white/50 mt-0.5 uppercase tracking-wider">Entrées</p>
+              <p className="text-lg font-bold text-[var(--color-adaline-ink)] font-mono tabular-nums leading-none">{totalEntries}</p>
+              <p className="text-[10px] text-[var(--color-adaline-ink)]/50 mt-0.5 uppercase tracking-wider">Entrées</p>
             </div>
           </div>
 
           {/* Exits */}
           <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.06] transition-colors">
-            <div className="w-9 h-9 rounded-lg bg-orange-500/15 border border-orange-500/20 flex items-center justify-center">
-              <ArrowDownRight className="w-4 h-4 text-orange-400" />
+            <div className="w-9 h-9 rounded-lg bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/20 flex items-center justify-center">
+              <ArrowDownRight className="w-4 h-4 text-[var(--color-valley-green)]" />
             </div>
             <div>
-              <p className="text-lg font-bold text-white font-mono tabular-nums leading-none">{totalExits}</p>
-              <p className="text-[10px] text-white/50 mt-0.5 uppercase tracking-wider">Sorties</p>
+              <p className="text-lg font-bold text-[var(--color-adaline-ink)] font-mono tabular-nums leading-none">{totalExits}</p>
+              <p className="text-[10px] text-[var(--color-adaline-ink)]/50 mt-0.5 uppercase tracking-wider">Sorties</p>
             </div>
           </div>
 
@@ -511,30 +500,29 @@ export default function StockPage() {
           <div className={cn(
             "flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors",
             lowStockItems.length > 0
-              ? "bg-red-500/[0.06] border-red-500/15 hover:bg-red-500/[0.1]"
+              ? "bg-[var(--color-valley-green)]/[0.06] border-emerald-500/15 hover:bg-[var(--color-valley-green)]/[0.1]"
               : "bg-white/[0.04] border-white/[0.08] hover:bg-white/[0.06]"
           )}>
             <div className={cn(
               "w-9 h-9 rounded-lg flex items-center justify-center",
               lowStockItems.length > 0
-                ? "bg-red-500/15 border border-red-500/20"
+                ? "bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/20"
                 : "bg-white/[0.06] border border-white/[0.08]"
             )}>
-              <AlertTriangle className={cn("w-4 h-4", lowStockItems.length > 0 ? "text-red-400" : "text-white/40")} />
+              <AlertTriangle className={cn("w-4 h-4", lowStockItems.length > 0 ? "text-[var(--color-valley-green)]" : "text-[var(--color-adaline-ink)]/40")} />
             </div>
             <div>
               <p className={cn(
                 "text-lg font-bold font-mono tabular-nums leading-none",
-                lowStockItems.length > 0 ? "text-red-400" : "text-white/55"
+                lowStockItems.length > 0 ? "text-[var(--color-valley-green)]" : "text-[var(--color-adaline-ink)]/55"
               )}>{lowStockItems.length}</p>
-              <p className="text-[10px] text-white/50 mt-0.5 uppercase tracking-wider">Critiques</p>
+              <p className="text-[10px] text-[var(--color-adaline-ink)]/50 mt-0.5 uppercase tracking-wider">Critiques</p>
             </div>
           </div>
         </div>
-      </div>
 
       {/* ── Tab navigation ── */}
-      <div className="flex items-center gap-0.5 mb-6 p-1 bg-black/40 backdrop-blur-xl rounded-xl w-fit border border-white/10">
+      <div className="flex items-center gap-0.5 mb-6 p-1 bg-black/40  rounded-xl w-fit border border-[var(--color-stone-moss)]">
         {tabs.map((t: { id: Tab; label: string; icon: typeof Package }) => (
           <button
             key={t.id}
@@ -542,8 +530,8 @@ export default function StockPage() {
             className={cn(
               "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all",
               tab === t.id
-                ? "bg-amber-500/20 text-amber-300 shadow-sm border border-amber-500/30"
-                : "text-white/55 hover:text-white/70 hover:bg-white/[0.06] border border-transparent"
+                ? "bg-[var(--color-valley-green)]/20 text-[var(--color-valley-green)] shadow-sm border border-[var(--color-valley-green)]/30"
+                : "text-[var(--color-adaline-ink)]/55 hover:text-[var(--color-adaline-ink)]/70 hover:bg-white/[0.06] border border-transparent"
             )}
           >
             <t.icon className="w-3.5 h-3.5" />
@@ -559,24 +547,24 @@ export default function StockPage() {
         <>
           {/* Quick summary bar */}
           <div className="flex items-center gap-4 mb-6 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08]">
-            <span className="text-xs text-white/55">Résumé rapide :</span>
-            <span className="text-xs text-white/60"><span className="font-mono font-bold text-emerald-400">{uniqueCategories}</span> catégories</span>
-            <span className="text-white/10">·</span>
-            <span className="text-xs text-white/60"><span className="font-mono font-bold text-white/80">{totalQuantityIn.toFixed(0)}</span> unités entrées</span>
-            <span className="text-white/10">·</span>
-            <span className="text-xs text-white/60"><span className="font-mono font-bold text-white/80">{totalQuantityOut.toFixed(0)}</span> unités sorties</span>
-            <span className="text-white/10">·</span>
-            <span className="text-xs text-white/60"><span className="font-mono font-bold text-amber-400">{totalTransfers}</span> transferts</span>
-            <span className="text-white/10">·</span>
-            <span className="text-xs text-white/60"><span className="font-mono font-bold text-purple-400">{totalReturns}</span> retours</span>
+            <span className="text-xs text-[var(--color-adaline-ink)]/55">Résumé rapide :</span>
+            <span className="text-xs text-[var(--color-adaline-ink)]/60"><span className="font-mono font-bold text-[var(--color-valley-green)]">{uniqueCategories}</span> catégories</span>
+            <span className="text-[var(--color-adaline-ink)]/10">·</span>
+            <span className="text-xs text-[var(--color-adaline-ink)]/60"><span className="font-mono font-bold text-[var(--color-adaline-ink)]/80">{totalQuantityIn.toFixed(0)}</span> unités entrées</span>
+            <span className="text-[var(--color-adaline-ink)]/10">·</span>
+            <span className="text-xs text-[var(--color-adaline-ink)]/60"><span className="font-mono font-bold text-[var(--color-adaline-ink)]/80">{totalQuantityOut.toFixed(0)}</span> unités sorties</span>
+            <span className="text-[var(--color-adaline-ink)]/10">·</span>
+            <span className="text-xs text-[var(--color-adaline-ink)]/60"><span className="font-mono font-bold text-[var(--color-valley-green)]">{totalTransfers}</span> transferts</span>
+            <span className="text-[var(--color-adaline-ink)]/10">·</span>
+            <span className="text-xs text-[var(--color-adaline-ink)]/60"><span className="font-mono font-bold text-[var(--color-valley-green)]">{totalReturns}</span> retours</span>
           </div>
 
           <div className="grid grid-cols-12 gap-6 mb-6">
             {/* Stock by category chart */}
             <div className="col-span-12 xl:col-span-5">
               <div className="glass-card p-5">
-                <h3 className="text-sm font-semibold text-white/85 mb-1">Stock par Catégorie</h3>
-                <p className="text-xs text-white/55 mb-4">Quantité totale par type</p>
+                <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85 mb-1">Stock par Catégorie</h3>
+                <p className="text-xs text-[var(--color-adaline-ink)]/55 mb-4">Quantité totale par type</p>
                 <div className="h-[220px]">
                   {chartsReady && <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <BarChart data={stockByCategory} layout="vertical" barCategoryGap="20%">
@@ -619,8 +607,8 @@ export default function StockPage() {
             {/* Movement trend */}
             <div className="col-span-12 xl:col-span-7">
               <div className="glass-card p-5">
-                <h3 className="text-sm font-semibold text-white/85 mb-1">Flux de Stock</h3>
-                <p className="text-xs text-white/55 mb-4">Entrées vs Sorties par jour</p>
+                <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85 mb-1">Flux de Stock</h3>
+                <p className="text-xs text-[var(--color-adaline-ink)]/55 mb-4">Entrées vs Sorties par jour</p>
                 <div className="h-[220px]">
                   {chartsReady && <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <AreaChart data={movementTrend}>
@@ -660,15 +648,15 @@ export default function StockPage() {
               <div className="glass-card p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-sm font-semibold text-white/85">Alertes Stock</h3>
-                    <p className="text-xs text-white/55 mt-0.5">{lowStockItems.length} produit{lowStockItems.length > 1 ? "s" : ""} sous le seuil</p>
+                    <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85">Alertes Stock</h3>
+                    <p className="text-xs text-[var(--color-adaline-ink)]/55 mt-0.5">{lowStockItems.length} produit{lowStockItems.length > 1 ? "s" : ""} sous le seuil</p>
                   </div>
-                  <AlertTriangle className="w-4 h-4 text-amber-500" />
+                  <AlertTriangle className="w-4 h-4 text-[var(--color-valley-green)]" />
                 </div>
                 {lowStockItems.length === 0 ? (
                   <div className="flex flex-col items-center py-8">
-                    <CheckCircle2 className="w-8 h-8 text-emerald-300 mb-2" />
-                    <p className="text-sm text-white/55">Tous les stocks sont normaux</p>
+                    <CheckCircle2 className="w-8 h-8 text-[var(--color-valley-green)] mb-2" />
+                    <p className="text-sm text-[var(--color-adaline-ink)]/55">Tous les stocks sont normaux</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -682,8 +670,8 @@ export default function StockPage() {
                           className={cn(
                             "p-4 rounded-xl border cursor-pointer transition-all hover:shadow-sm",
                             stock.status === "critical"
-                              ? "bg-red-500/10 border-red-500/25"
-                              : "bg-amber-500/10 border-amber-500/25"
+                              ? "bg-[var(--color-valley-green)]/10 border-[var(--color-valley-green)]/25"
+                              : "bg-[var(--color-valley-green)]/10 border-[var(--color-valley-green)]/25"
                           )}
                         >
                           <div className="flex items-center justify-between mb-2">
@@ -692,7 +680,7 @@ export default function StockPage() {
                                 className="w-2.5 h-2.5 rounded-full"
                                 style={{ backgroundColor: categoryColors[stock.category] }}
                               />
-                              <span className="text-sm font-medium text-white/85">{stock.productName}</span>
+                              <span className="text-sm font-medium text-[var(--color-adaline-ink)]/85">{stock.productName}</span>
                             </div>
                             <span className={cn(
                               "badge text-[10px]",
@@ -706,12 +694,12 @@ export default function StockPage() {
                               <div
                                 className={cn(
                                   "h-full rounded-full",
-                                  stock.status === "critical" ? "bg-red-400" : "bg-amber-400"
+                                  stock.status === "critical" ? "bg-emerald-400" : "bg-emerald-400"
                                 )}
                                 style={{ width: `${fillPercent}%` }}
                               />
                             </div>
-                            <span className="text-xs font-mono font-bold text-white/70">
+                            <span className="text-xs font-mono font-bold text-[var(--color-adaline-ink)]/70">
                               {stock.currentQuantity} {stock.unit}
                             </span>
                           </div>
@@ -728,8 +716,8 @@ export default function StockPage() {
               <div className="glass-card p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-sm font-semibold text-white/85">Derniers Mouvements</h3>
-                    <p className="text-xs text-white/55 mt-0.5">Historique récent</p>
+                    <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85">Derniers Mouvements</h3>
+                    <p className="text-xs text-[var(--color-adaline-ink)]/55 mt-0.5">Historique récent</p>
                   </div>
                   <button
                     onClick={() => setTab("movements")}
@@ -763,7 +751,7 @@ export default function StockPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/55" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-adaline-ink)]/55" />
                 <input
                   type="text"
                   placeholder="Rechercher un produit..."
@@ -772,7 +760,7 @@ export default function StockPage() {
                   className="glass-input pl-9 pr-4 py-2 text-sm w-[260px]"
                 />
               </div>
-              <div className="flex items-center gap-1 p-1 bg-black/30 backdrop-blur-md rounded-lg border border-white/10">
+              <div className="flex items-center gap-1 p-1 bg-black/30  rounded-lg border border-[var(--color-stone-moss)]">
                 {(["all", "critical", "low", "ok"] as const).map((f: StockFilter) => (
                   <button
                     key={f}
@@ -780,8 +768,8 @@ export default function StockPage() {
                     className={cn(
                       "px-3 py-1.5 rounded-md text-xs font-medium transition-all",
                       stockFilter === f
-                        ? "bg-amber-500/15 text-amber-400 shadow-sm border border-amber-500/25"
-                        : "text-white/55 hover:text-white/70"
+                        ? "bg-[var(--color-valley-green)]/15 text-[var(--color-valley-green)] shadow-sm border border-[var(--color-valley-green)]/25"
+                        : "text-[var(--color-adaline-ink)]/55 hover:text-[var(--color-adaline-ink)]/70"
                     )}
                   >
                     {f === "all" ? "Tous" : f === "critical" ? "Critique" : f === "low" ? "Bas" : "Normal"}
@@ -804,7 +792,7 @@ export default function StockPage() {
                 onClick={() => setViewMode("grid")}
                 className={cn(
                   "p-2 rounded-lg transition-all",
-                  viewMode === "grid" ? "bg-amber-500/100/100/10 text-green-400" : "text-white/55 hover:text-white/70"
+                  viewMode === "grid" ? "bg-[var(--color-valley-green)]/100/100/10 text-green-400" : "text-[var(--color-adaline-ink)]/55 hover:text-[var(--color-adaline-ink)]/70"
                 )}
               >
                 <LayoutGrid className="w-4 h-4" />
@@ -813,12 +801,12 @@ export default function StockPage() {
                 onClick={() => setViewMode("list")}
                 className={cn(
                   "p-2 rounded-lg transition-all",
-                  viewMode === "list" ? "bg-amber-500/100/100/10 text-green-400" : "text-white/55 hover:text-white/70"
+                  viewMode === "list" ? "bg-[var(--color-valley-green)]/100/100/10 text-green-400" : "text-[var(--color-adaline-ink)]/55 hover:text-[var(--color-adaline-ink)]/70"
                 )}
               >
                 <List className="w-4 h-4" />
               </button>
-              <span className="text-xs text-white/40 ml-2">{filteredStock.length} produits</span>
+              <span className="text-xs text-[var(--color-adaline-ink)]/40 ml-2">{filteredStock.length} produits</span>
             </div>
           </div>
 
@@ -850,9 +838,9 @@ export default function StockPage() {
                         const isNeg = stock.currentQuantity < 0;
                         const maxCap = stock.maxCapacity > 1 ? stock.maxCapacity : Math.max(stock.currentQuantity * 1.5, 100);
                         const fillPercent = isNeg ? 0 : Math.min((stock.currentQuantity / maxCap) * 100, 100);
-                        const qtyColor = isNeg ? "text-red-400" :
-                          stock.status === "critical" ? "text-red-400" :
-                          stock.status === "low" ? "text-amber-400" : "text-green-400";
+                        const qtyColor = isNeg ? "text-[var(--color-valley-green)]" :
+                          stock.status === "critical" ? "text-[var(--color-valley-green)]" :
+                          stock.status === "low" ? "text-[var(--color-valley-green)]" : "text-green-400";
                         const statusLabel = isNeg ? "Négatif" :
                           stock.status === "critical" ? "Critique" :
                           stock.status === "low" ? "Bas" :
@@ -865,15 +853,15 @@ export default function StockPage() {
                           <tr
                             key={stock.productId}
                             onClick={() => setSelectedProduct(selectedProduct === stock.productId ? null : stock.productId)}
-                            className={cn("cursor-pointer", selectedProduct === stock.productId && "!bg-amber-500/[0.08]", isNeg && "!bg-red-500/[0.04]")}
+                            className={cn("cursor-pointer", selectedProduct === stock.productId && "!bg-[var(--color-valley-green)]/[0.08]", isNeg && "!bg-[var(--color-valley-green)]/[0.04]")}
                           >
                             <td>
                               <div className="flex items-center gap-2">
                                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: categoryColors[stock.category] || "#6b7280" }} />
-                                <span className="text-sm font-medium text-white/85">{stock.productName}</span>
+                                <span className="text-sm font-medium text-[var(--color-adaline-ink)]/85">{stock.productName}</span>
                               </div>
                             </td>
-                            <td><span className="text-xs text-white/55">{categoryLabels[stock.category] || stock.category}</span></td>
+                            <td><span className="text-xs text-[var(--color-adaline-ink)]/55">{categoryLabels[stock.category] || stock.category}</span></td>
                             <td>
                               <span className={cn("text-sm font-mono font-bold", qtyColor)}>
                                 {stock.currentQuantity.toFixed(stock.currentQuantity % 1 ? 1 : 0)} {stock.unit}
@@ -889,9 +877,9 @@ export default function StockPage() {
                                 <div
                                   className={cn(
                                     "h-full rounded-full",
-                                    isNeg ? "bg-red-400" :
-                                    stock.status === "critical" ? "bg-red-400" :
-                                    stock.status === "low" ? "bg-amber-400" : "bg-green-400"
+                                    isNeg ? "bg-emerald-400" :
+                                    stock.status === "critical" ? "bg-emerald-400" :
+                                    stock.status === "low" ? "bg-emerald-400" : "bg-green-400"
                                   )}
                                   style={{ width: `${Math.max(fillPercent, 3)}%` }}
                                 />
@@ -914,6 +902,28 @@ export default function StockPage() {
                       />
                     </div>
                   ))}
+                </div>
+              )}
+              {filteredStock.length === 0 && (
+                <div className="glass-card p-16 flex flex-col items-center justify-center text-center">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500/15 to-emerald-500/10 border border-[var(--color-stone-moss)] flex items-center justify-center mb-5 empty-state-icon">
+                    <Package className="w-10 h-10 text-[var(--color-adaline-ink)]/35" />
+                  </div>
+                  <h3 className="text-base font-semibold text-[var(--color-adaline-ink)]/60 mb-2">Aucun produit en stock</h3>
+                  <p className="text-sm text-[var(--color-adaline-ink)]/50 max-w-xs mb-6">
+                    {search || stockFilter !== "all" || categoryFilter !== "all"
+                      ? "Aucun produit ne correspond à vos critères de recherche ou filtres."
+                      : "Commencez par enregistrer une entrée de stock pour suivre vos produits phytosanitaires."}
+                  </p>
+                  {!search && stockFilter === "all" && categoryFilter === "all" && (
+                    <button
+                      onClick={() => { setDefaultMovementType("entree"); setShowNewEntryModal(true); }}
+                      className="glass-button px-5 py-2.5 flex items-center gap-2 text-sm"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Nouvelle Entrée
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -942,7 +952,7 @@ export default function StockPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/55" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-adaline-ink)]/55" />
                 <input
                   type="text"
                   placeholder="Rechercher par produit ou référence..."
@@ -951,7 +961,7 @@ export default function StockPage() {
                   className="glass-input pl-9 pr-4 py-2 text-sm w-[300px]"
                 />
               </div>
-              <div className="flex items-center gap-1 p-1 bg-black/30 backdrop-blur-md rounded-lg border border-white/10 flex-wrap">
+              <div className="flex items-center gap-1 p-1 bg-black/30  rounded-lg border border-[var(--color-stone-moss)] flex-wrap">
                 {(["all", "entry", "exit", "treatment_consumption", "transfer", "adjustment"] as const).map((t: EntryFilter) => (
                   <button
                     key={t}
@@ -959,8 +969,8 @@ export default function StockPage() {
                     className={cn(
                       "px-3 py-1.5 rounded-md text-xs font-medium transition-all",
                       entryFilter === t
-                        ? "bg-amber-500/15 text-amber-400 shadow-sm border border-amber-500/25"
-                        : "text-white/55 hover:text-white/70"
+                        ? "bg-[var(--color-valley-green)]/15 text-[var(--color-valley-green)] shadow-sm border border-[var(--color-valley-green)]/25"
+                        : "text-[var(--color-adaline-ink)]/55 hover:text-[var(--color-adaline-ink)]/70"
                     )}
                   >
                     {t === "all" ? "Tous" : entryTypeLabels[t]}
@@ -968,7 +978,7 @@ export default function StockPage() {
                 ))}
               </div>
             </div>
-            <span className="text-xs text-white/40">{filteredEntries.length} mouvements</span>
+            <span className="text-xs text-[var(--color-adaline-ink)]/40">{filteredEntries.length} mouvements</span>
           </div>
 
           <div className="glass-card overflow-x-auto">
@@ -1006,7 +1016,7 @@ export default function StockPage() {
                   const isEditing = (col: string) => editingCell?.rowId === entry.id && editingCell?.col === col;
                   const isSaving = (col: string) => savingCell === `${entry.id}-${col}`;
 
-                  const EditableCell = ({ col, value, className: cls = "text-xs text-white/55" }: { col: string; value: string | number | null | undefined; className?: string }) => {
+                  const EditableCell = ({ col, value, className: cls = "text-xs text-[var(--color-adaline-ink)]/55" }: { col: string; value: string | number | null | undefined; className?: string }) => {
                     const display = value != null && value !== "" ? String(value) : "—";
                     if (isEditing(col)) {
                       return (
@@ -1017,7 +1027,7 @@ export default function StockPage() {
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditValue(e.target.value)}
                           onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") cancelEdit(); }}
                           onBlur={saveEdit}
-                          className="bg-amber-500/10 border border-amber-500/40 rounded px-1.5 py-0.5 text-xs text-white/90 outline-none w-full min-w-[60px] font-mono"
+                          className="bg-[var(--color-valley-green)]/10 border border-emerald-500/40 rounded px-1.5 py-0.5 text-xs text-[var(--color-adaline-ink)]/90 outline-none w-full min-w-[60px] font-mono"
                           step={editableColMap[col]?.type === "number" ? "any" : undefined}
                         />
                       );
@@ -1025,7 +1035,7 @@ export default function StockPage() {
                     return (
                       <span
                         onDoubleClick={() => startEdit(entry.id, col, display === "—" ? "" : display)}
-                        className={cn(cls, "cursor-cell whitespace-nowrap hover:bg-amber-500/[0.06] hover:outline hover:outline-1 hover:outline-amber-500/20 rounded px-0.5 -mx-0.5 transition-colors", isSaving(col) && "text-green-400")}
+                        className={cn(cls, "cursor-cell whitespace-nowrap hover:bg-[var(--color-valley-green)]/[0.06] hover:outline hover:outline-1 hover:outline-emerald-500/20 rounded px-0.5 -mx-0.5 transition-colors", isSaving(col) && "text-green-400")}
                         title="Double-cliquer pour modifier"
                       >
                         {display}
@@ -1035,64 +1045,64 @@ export default function StockPage() {
 
                   const qtyValue = entry.quantity;
                   const qtyCol = isTransfert ? "quantity" : isEntree ? "quantity" : isRetour ? "quantity" : isSortie ? "quantity" : null;
-                  const qtyColor = isTransfert ? "text-orange-400" : isEntree ? "text-green-400" : isRetour ? "text-violet-400" : "text-red-400";
+                  const qtyColor = isTransfert ? "text-[var(--color-valley-green)]" : isEntree ? "text-green-400" : isRetour ? "text-[var(--color-valley-green)]" : "text-[var(--color-valley-green)]";
 
                   return (
                     <tr key={entry.id}>
-                      <td><EditableCell col="date" value={new Date(entry.date).toLocaleDateString("fr-FR")} className="text-xs text-white/50" /></td>
+                      <td><EditableCell col="date" value={new Date(entry.date).toLocaleDateString("fr-FR")} className="text-xs text-[var(--color-adaline-ink)]/50" /></td>
                       <td>
                         <span className="inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-md border whitespace-nowrap" style={{ color: catColor, backgroundColor: catColor + "15", borderColor: catColor + "30" }}>
                           {movementCategoryLabels[entry.movementCategory]}
                         </span>
                       </td>
-                      <td><span className="text-sm text-white/70 whitespace-nowrap">{entry.productName}</span></td>
-                      <td><span className="text-xs font-mono text-white/40">{entry.stockInitial ?? "—"}</span></td>
+                      <td><span className="text-sm text-[var(--color-adaline-ink)]/70 whitespace-nowrap">{entry.productName}</span></td>
+                      <td><span className="text-xs font-mono text-[var(--color-adaline-ink)]/40">{entry.stockInitial ?? "—"}</span></td>
                       <td>
                         {isTransfert ? (
                           isEditing("quantity") ? <EditableCell col="quantity" value={qtyValue} className={cn("text-sm font-mono font-bold", qtyColor)} /> :
-                          <span onDoubleClick={() => startEdit(entry.id, "quantity", String(qtyValue))} className={cn("text-sm font-mono font-bold cursor-cell hover:bg-amber-500/[0.06] rounded px-0.5 -mx-0.5", qtyColor)} title="Double-cliquer pour modifier">{qtyValue} {entry.unit}</span>
-                        ) : <span className="text-xs text-white/15">—</span>}
+                          <span onDoubleClick={() => startEdit(entry.id, "quantity", String(qtyValue))} className={cn("text-sm font-mono font-bold cursor-cell hover:bg-[var(--color-valley-green)]/[0.06] rounded px-0.5 -mx-0.5", qtyColor)} title="Double-cliquer pour modifier">{qtyValue} {entry.unit}</span>
+                        ) : <span className="text-xs text-[var(--color-adaline-ink)]/15">—</span>}
                       </td>
                       <td>
                         {isEntree ? (
                           isEditing("quantity") ? <EditableCell col="quantity" value={qtyValue} className={cn("text-sm font-mono font-bold", qtyColor)} /> :
-                          <span onDoubleClick={() => startEdit(entry.id, "quantity", String(qtyValue))} className={cn("text-sm font-mono font-bold cursor-cell hover:bg-amber-500/[0.06] rounded px-0.5 -mx-0.5", qtyColor)} title="Double-cliquer pour modifier">{qtyValue} {entry.unit}</span>
-                        ) : <span className="text-xs text-white/15">—</span>}
+                          <span onDoubleClick={() => startEdit(entry.id, "quantity", String(qtyValue))} className={cn("text-sm font-mono font-bold cursor-cell hover:bg-[var(--color-valley-green)]/[0.06] rounded px-0.5 -mx-0.5", qtyColor)} title="Double-cliquer pour modifier">{qtyValue} {entry.unit}</span>
+                        ) : <span className="text-xs text-[var(--color-adaline-ink)]/15">—</span>}
                       </td>
                       <td>
                         {isRetour ? (
                           isEditing("quantity") ? <EditableCell col="quantity" value={qtyValue} className={cn("text-sm font-mono font-bold", qtyColor)} /> :
-                          <span onDoubleClick={() => startEdit(entry.id, "quantity", String(qtyValue))} className={cn("text-sm font-mono font-bold cursor-cell hover:bg-amber-500/[0.06] rounded px-0.5 -mx-0.5", qtyColor)} title="Double-cliquer pour modifier">{qtyValue} {entry.unit}</span>
-                        ) : <span className="text-xs text-white/15">—</span>}
+                          <span onDoubleClick={() => startEdit(entry.id, "quantity", String(qtyValue))} className={cn("text-sm font-mono font-bold cursor-cell hover:bg-[var(--color-valley-green)]/[0.06] rounded px-0.5 -mx-0.5", qtyColor)} title="Double-cliquer pour modifier">{qtyValue} {entry.unit}</span>
+                        ) : <span className="text-xs text-[var(--color-adaline-ink)]/15">—</span>}
                       </td>
                       <td>
                         {isSortie ? (
                           isEditing("quantity") ? <EditableCell col="quantity" value={qtyValue} className={cn("text-sm font-mono font-bold", qtyColor)} /> :
-                          <span onDoubleClick={() => startEdit(entry.id, "quantity", String(qtyValue))} className={cn("text-sm font-mono font-bold cursor-cell hover:bg-amber-500/[0.06] rounded px-0.5 -mx-0.5", qtyColor)} title="Double-cliquer pour modifier">{qtyValue} {entry.unit}</span>
-                        ) : <span className="text-xs text-white/15">—</span>}
+                          <span onDoubleClick={() => startEdit(entry.id, "quantity", String(qtyValue))} className={cn("text-sm font-mono font-bold cursor-cell hover:bg-[var(--color-valley-green)]/[0.06] rounded px-0.5 -mx-0.5", qtyColor)} title="Double-cliquer pour modifier">{qtyValue} {entry.unit}</span>
+                        ) : <span className="text-xs text-[var(--color-adaline-ink)]/15">—</span>}
                       </td>
                       <td><EditableCell col="culture" value={entry.culture} /></td>
                       <td><EditableCell col="siteName" value={entry.siteName} /></td>
                       <td><EditableCell col="detailsSite" value={entry.detailsSite} /></td>
-                      <td><EditableCell col="observations" value={entry.observations} className="text-xs text-white/40" /></td>
-                      <td><EditableCell col="nUnits" value={entry.nUnits} className="text-xs font-mono text-white/40" /></td>
-                      <td><EditableCell col="pUnits" value={entry.pUnits} className="text-xs font-mono text-white/40" /></td>
-                      <td><EditableCell col="kUnits" value={entry.kUnits} className="text-xs font-mono text-white/40" /></td>
-                      <td><EditableCell col="caUnits" value={entry.caUnits} className="text-xs font-mono text-white/40" /></td>
-                      <td><EditableCell col="zincUnits" value={entry.zincUnits} className="text-xs font-mono text-white/40" /></td>
+                      <td><EditableCell col="observations" value={entry.observations} className="text-xs text-[var(--color-adaline-ink)]/40" /></td>
+                      <td><EditableCell col="nUnits" value={entry.nUnits} className="text-xs font-mono text-[var(--color-adaline-ink)]/40" /></td>
+                      <td><EditableCell col="pUnits" value={entry.pUnits} className="text-xs font-mono text-[var(--color-adaline-ink)]/40" /></td>
+                      <td><EditableCell col="kUnits" value={entry.kUnits} className="text-xs font-mono text-[var(--color-adaline-ink)]/40" /></td>
+                      <td><EditableCell col="caUnits" value={entry.caUnits} className="text-xs font-mono text-[var(--color-adaline-ink)]/40" /></td>
+                      <td><EditableCell col="zincUnits" value={entry.zincUnits} className="text-xs font-mono text-[var(--color-adaline-ink)]/40" /></td>
                       <td>
                         {confirmDeleteId === entry.id ? (
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => handleDeleteMovement(entry.id)}
                               disabled={deletingId === entry.id}
-                              className="p-1 rounded bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 transition-colors text-[10px] font-bold"
+                              className="p-1 rounded bg-[var(--color-valley-green)]/20 border border-[var(--color-valley-green)]/30 text-[var(--color-valley-green)] hover:bg-[var(--color-valley-green)]/30 transition-colors text-[10px] font-bold"
                             >
                               {deletingId === entry.id ? "..." : "Oui"}
                             </button>
                             <button
                               onClick={() => setConfirmDeleteId(null)}
-                              className="p-1 rounded bg-white/[0.06] text-white/55 hover:text-white/70 transition-colors text-[10px]"
+                              className="p-1 rounded bg-white/[0.06] text-[var(--color-adaline-ink)]/55 hover:text-[var(--color-adaline-ink)]/70 transition-colors text-[10px]"
                             >
                               Non
                             </button>
@@ -1100,7 +1110,7 @@ export default function StockPage() {
                         ) : (
                           <button
                             onClick={() => setConfirmDeleteId(entry.id)}
-                            className="p-1 rounded-md text-white/15 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                            className="p-1 rounded-md text-[var(--color-adaline-ink)]/15 hover:text-[var(--color-valley-green)] hover:bg-[var(--color-valley-green)]/10 transition-colors"
                             title="Supprimer ce mouvement"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1112,6 +1122,28 @@ export default function StockPage() {
                 })}
               </tbody>
             </table>
+            {filteredEntries.length === 0 && (
+              <div className="p-16 flex flex-col items-center justify-center text-center">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500/15 to-amber-500/10 border border-[var(--color-stone-moss)] flex items-center justify-center mb-5 empty-state-icon">
+                  <ArrowRightLeft className="w-10 h-10 text-[var(--color-adaline-ink)]/35" />
+                </div>
+                <h3 className="text-base font-semibold text-[var(--color-adaline-ink)]/60 mb-2">Aucun mouvement enregistré</h3>
+                <p className="text-sm text-[var(--color-adaline-ink)]/50 max-w-xs mb-6">
+                  {search || entryFilter !== "all"
+                    ? "Aucun mouvement ne correspond à vos critères de recherche ou filtres."
+                    : "Les mouvements de stock (entrées, sorties, transferts) apparaîtront ici au fur et à mesure."}
+                </p>
+                {!search && entryFilter === "all" && (
+                  <button
+                    onClick={() => { setDefaultMovementType("entree"); setShowNewEntryModal(true); }}
+                    className="glass-button px-5 py-2.5 flex items-center gap-2 text-sm"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Enregistrer un mouvement
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </>
       )}
@@ -1123,9 +1155,9 @@ export default function StockPage() {
         <div className="space-y-6">
           {/* Flux de Stock */}
           <div>
-            <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-black/40 backdrop-blur-sm border border-white/[0.06] w-fit">
+            <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-black/40  border border-white/[0.06] w-fit">
               <div className="w-1 h-4 rounded-full bg-green-400" />
-              <span className="text-xs font-semibold text-white/60 uppercase tracking-wider">Flux de Stock</span>
+              <span className="text-xs font-semibold text-[var(--color-adaline-ink)]/60 uppercase tracking-wider">Flux de Stock</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <OperationCard
@@ -1157,9 +1189,9 @@ export default function StockPage() {
 
           {/* Contrôle & Inventaire */}
           <div>
-            <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-black/40 backdrop-blur-sm border border-white/[0.06] w-fit">
-              <div className="w-1 h-4 rounded-full bg-amber-400" />
-              <span className="text-xs font-semibold text-white/60 uppercase tracking-wider">Contrôle & Inventaire</span>
+            <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-black/40  border border-white/[0.06] w-fit">
+              <div className="w-1 h-4 rounded-full bg-emerald-400" />
+              <span className="text-xs font-semibold text-[var(--color-adaline-ink)]/60 uppercase tracking-wider">Contrôle & Inventaire</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <OperationCard
@@ -1191,9 +1223,9 @@ export default function StockPage() {
 
           {/* Logistique */}
           <div>
-            <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-black/40 backdrop-blur-sm border border-white/[0.06] w-fit">
-              <div className="w-1 h-4 rounded-full bg-blue-400" />
-              <span className="text-xs font-semibold text-white/60 uppercase tracking-wider">Logistique</span>
+            <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-black/40  border border-white/[0.06] w-fit">
+              <div className="w-1 h-4 rounded-full bg-emerald-400" />
+              <span className="text-xs font-semibold text-[var(--color-adaline-ink)]/60 uppercase tracking-wider">Logistique</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <OperationCard
@@ -1229,28 +1261,28 @@ export default function StockPage() {
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className="glass-card p-5">
-              <span className="text-xs text-white/55 uppercase tracking-wider block mb-1">Produits</span>
-              <span className="text-2xl font-bold text-white/90 font-mono">{stockLevels.length}</span>
-              <span className="text-xs text-white/55 block">références en stock</span>
+              <span className="text-xs text-[var(--color-adaline-ink)]/55 uppercase tracking-wider block mb-1">Produits</span>
+              <span className="text-2xl font-bold text-[var(--color-adaline-ink)]/90 font-mono">{stockLevels.length}</span>
+              <span className="text-xs text-[var(--color-adaline-ink)]/55 block">références en stock</span>
             </div>
             <div className="glass-card p-5">
-              <span className="text-xs text-white/55 uppercase tracking-wider block mb-1">Catégories</span>
-              <span className="text-2xl font-bold text-white/90 font-mono">{uniqueCategories}</span>
-              <span className="text-xs text-white/55 block">types de produits</span>
+              <span className="text-xs text-[var(--color-adaline-ink)]/55 uppercase tracking-wider block mb-1">Catégories</span>
+              <span className="text-2xl font-bold text-[var(--color-adaline-ink)]/90 font-mono">{uniqueCategories}</span>
+              <span className="text-xs text-[var(--color-adaline-ink)]/55 block">types de produits</span>
             </div>
             <div className="glass-card p-5">
-              <span className="text-xs text-white/55 uppercase tracking-wider block mb-1">Total Entrées</span>
+              <span className="text-xs text-[var(--color-adaline-ink)]/55 uppercase tracking-wider block mb-1">Total Entrées</span>
               <span className="text-2xl font-bold text-green-400 font-mono">
                 {totalQuantityIn.toFixed(0)}
               </span>
-              <span className="text-xs text-white/55 block">unités (toutes périodes)</span>
+              <span className="text-xs text-[var(--color-adaline-ink)]/55 block">unités (toutes périodes)</span>
             </div>
             <div className="glass-card p-5">
-              <span className="text-xs text-white/55 uppercase tracking-wider block mb-1">Total Sorties</span>
-              <span className="text-2xl font-bold text-red-500 font-mono">
+              <span className="text-xs text-[var(--color-adaline-ink)]/55 uppercase tracking-wider block mb-1">Total Sorties</span>
+              <span className="text-2xl font-bold text-[var(--color-valley-green)] font-mono">
                 {totalQuantityOut.toFixed(0)}
               </span>
-              <span className="text-xs text-white/55 block">unités (toutes périodes)</span>
+              <span className="text-xs text-[var(--color-adaline-ink)]/55 block">unités (toutes périodes)</span>
             </div>
           </div>
 
@@ -1258,7 +1290,7 @@ export default function StockPage() {
             {/* Pie chart */}
             <div className="col-span-12 xl:col-span-5">
               <div className="glass-card p-5">
-                <h3 className="text-sm font-semibold text-white/85 mb-4">Répartition par Catégorie</h3>
+                <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85 mb-4">Répartition par Catégorie</h3>
                 <div className="h-[260px]">
                   {chartsReady && <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <PieChart>
@@ -1293,7 +1325,7 @@ export default function StockPage() {
                     return (
                       <div key={index} className="flex items-center gap-1.5">
                         <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: colors[index % colors.length] }} />
-                        <span className="text-[10px] text-white/55">{entry.name}</span>
+                        <span className="text-[10px] text-[var(--color-adaline-ink)]/55">{entry.name}</span>
                       </div>
                     );
                   })}
@@ -1304,28 +1336,28 @@ export default function StockPage() {
             {/* Rotation rates */}
             <div className="col-span-12 xl:col-span-7">
               <div className="glass-card p-5">
-                <h3 className="text-sm font-semibold text-white/85 mb-1">Taux de Rotation</h3>
-                <p className="text-xs text-white/55 mb-4">Jours de stock restants estimés</p>
+                <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85 mb-1">Taux de Rotation</h3>
+                <p className="text-xs text-[var(--color-adaline-ink)]/55 mb-4">Jours de stock restants estimés</p>
                 <div className="space-y-3">
                   {rotationData.map((item: StockLevel & { totalOut: number; rotationRate: number; daysOfStock: number }) => (
                     <div key={item.productId} className="flex items-center gap-4 p-3 rounded-xl bg-white/[0.04] border border-white/[0.08]">
                       <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: categoryColors[item.category] }} />
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm font-medium text-white/70">{item.productName}</span>
+                        <span className="text-sm font-medium text-[var(--color-adaline-ink)]/70">{item.productName}</span>
                       </div>
                       <div className="text-right">
                         <span className={cn(
                           "text-sm font-mono font-bold",
-                          item.daysOfStock < 15 ? "text-red-500" :
-                          item.daysOfStock < 30 ? "text-amber-500" : "text-green-400"
+                          item.daysOfStock < 15 ? "text-[var(--color-valley-green)]" :
+                          item.daysOfStock < 30 ? "text-[var(--color-valley-green)]" : "text-green-400"
                         )}>
                           {item.daysOfStock > 365 ? "∞" : `${item.daysOfStock}j`}
                         </span>
-                        <span className="text-[10px] text-white/40 block">restants</span>
+                        <span className="text-[10px] text-[var(--color-adaline-ink)]/40 block">restants</span>
                       </div>
                       <div className="text-right">
-                        <span className="text-xs font-mono text-white/50">{item.totalOut.toFixed(1)} {item.unit}</span>
-                        <span className="text-[10px] text-white/40 block">consommé</span>
+                        <span className="text-xs font-mono text-[var(--color-adaline-ink)]/50">{item.totalOut.toFixed(1)} {item.unit}</span>
+                        <span className="text-[10px] text-[var(--color-adaline-ink)]/40 block">consommé</span>
                       </div>
                     </div>
                   ))}
@@ -1337,7 +1369,7 @@ export default function StockPage() {
           {/* Value table */}
           <div className="glass-card overflow-hidden">
             <div className="p-5 border-b border-white/[0.08]">
-              <h3 className="text-sm font-semibold text-white/85">Détail du Stock</h3>
+              <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85">Détail du Stock</h3>
             </div>
             <table className="glass-table">
               <thead>
@@ -1360,11 +1392,11 @@ export default function StockPage() {
                       <td>
                         <div className="flex items-center gap-2">
                           <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: categoryColors[stock.category] }} />
-                          <span className="text-sm font-medium text-white/70">{stock.productName}</span>
+                          <span className="text-sm font-medium text-[var(--color-adaline-ink)]/70">{stock.productName}</span>
                         </div>
                       </td>
-                      <td><span className="text-xs text-white/55">{categoryLabels[stock.category]}</span></td>
-                      <td><span className="text-sm font-mono font-bold text-white/85">{stock.currentQuantity} {stock.unit}</span></td>
+                      <td><span className="text-xs text-[var(--color-adaline-ink)]/55">{categoryLabels[stock.category]}</span></td>
+                      <td><span className="text-sm font-mono font-bold text-[var(--color-adaline-ink)]/85">{stock.currentQuantity} {stock.unit}</span></td>
                       <td>
                         <span className={cn(
                           "badge text-[10px]",
@@ -1380,13 +1412,13 @@ export default function StockPage() {
                             <div
                               className={cn(
                                 "h-full rounded-full",
-                                stock.status === "critical" ? "bg-red-400" :
-                                stock.status === "low" ? "bg-amber-400" : "bg-green-400"
+                                stock.status === "critical" ? "bg-emerald-400" :
+                                stock.status === "low" ? "bg-emerald-400" : "bg-green-400"
                               )}
                               style={{ width: `${fillPercent}%` }}
                             />
                           </div>
-                          <span className="text-xs text-white/55 font-mono">
+                          <span className="text-xs text-[var(--color-adaline-ink)]/55 font-mono">
                             {fillPercent.toFixed(0)}%
                           </span>
                         </div>
@@ -1400,9 +1432,13 @@ export default function StockPage() {
         </>
       )}
 
+      </PageScreen>
+
       {/* ── Modals ── */}
+      {tab === "conformite" && <StockConformiteTab />}
+
       {showNewEntryModal && <NewEntryModal products={products} suppliers={suppliers} defaultType={defaultMovementType} onClose={() => setShowNewEntryModal(false)} onSaved={refetchAll} />}
-      {showInventoryModal && <InventoryModal stockLevels={stockLevels} onClose={() => setShowInventoryModal(false)} onSaved={refetchAll} />}
+      {showInventoryModal && <InventaireGuideModal stockLevels={stockLevels} onClose={() => setShowInventoryModal(false)} onSaved={refetchAll} />}
       {showConsommationModal && <ConsommationModal products={products} parcelles={parcelles} stockLevels={stockLevels} onClose={() => setShowConsommationModal(false)} onSaved={refetchAll} />}
       {showAjustementModal && <AjustementModal stockLevels={stockLevels} onClose={() => setShowAjustementModal(false)} onSaved={refetchAll} />}
       {showControleModal && <ControleModal products={products} onClose={() => setShowControleModal(false)} onSaved={refetchAll} />}

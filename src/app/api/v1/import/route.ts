@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
-import { requireAuth, json } from "@/lib/api-helpers";
+import { withAuthRbac, json } from "@/lib/api-helpers";
 import * as XLSX from "xlsx";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -178,8 +177,9 @@ function parseRows(sheet: XLSX.WorkSheet): ParsedRow[] {
 }
 
 export async function POST(req: NextRequest) {
-  const { error: authErr } = await requireAuth(req);
-  if (authErr) return authErr;
+  const auth = await withAuthRbac(req);
+  if (auth.error) return auth.error;
+  const supabase = auth.supabase;
 
   try {
     const formData = await req.formData();

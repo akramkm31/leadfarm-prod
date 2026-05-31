@@ -48,12 +48,12 @@ const entryTypeIcons: Record<string, typeof ArrowUpRight> = {
 
 const entryTypeColors: Record<string, string> = {
   entry: "text-green-400 bg-green-400/10 border-emerald-400/20",
-  exit: "text-red-400 bg-red-400/10 border-red-400/20",
-  treatment_consumption: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20",
-  adjustment: "text-amber-400 bg-amber-400/10 border-amber-400/20",
-  transfer: "text-orange-400 bg-orange-400/10 border-orange-400/20",
-  return: "text-purple-400 bg-purple-400/10 border-purple-400/20",
-  stock_initial: "text-blue-400 bg-blue-400/10 border-blue-400/20",
+  exit: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
+  treatment_consumption: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
+  adjustment: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
+  transfer: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
+  return: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
+  stock_initial: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
 };
 
 const statusLabels: Record<string, string> = {
@@ -71,14 +71,14 @@ export function KpiCard({ title, value, subtitle, icon, accent, alert }: {
   return (
     <div className={cn(
       "glass-card p-5",
-      alert && "border-amber-500/25 bg-amber-500/10"
+      alert && "border-[var(--color-valley-green)]/25 bg-[var(--color-valley-green)]/10"
     )}>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-white/40 uppercase tracking-wider">{title}</span>
+        <span className="text-xs text-[var(--color-adaline-ink)]/40 uppercase tracking-wider">{title}</span>
         {icon}
       </div>
-      <span className={cn("text-2xl font-bold", alert ? "text-amber-400" : "text-white/90")}>{value}</span>
-      <span className="text-[10px] text-white/30 block mt-0.5">{subtitle}</span>
+      <span className={cn("text-2xl font-bold", alert ? "text-[var(--color-valley-green)]" : "text-[var(--color-adaline-ink)]/90")}>{value}</span>
+      <span className="text-[10px] text-[var(--color-adaline-ink)]/30 block mt-0.5">{subtitle}</span>
     </div>
   );
 }
@@ -94,17 +94,17 @@ export function StockCard({ stock, isSelected, onClick }: {
       onClick={onClick}
       className={cn(
         "glass-card p-5 cursor-pointer",
-        stock.status === "critical" && "border-red-500/25 bg-red-500/10",
-        stock.status === "low" && "border-amber-500/25 bg-amber-500/10",
-        isSelected && "ring-2 ring-amber-400/50 border-amber-500/25"
+        stock.status === "critical" && "border-[var(--color-valley-green)]/25 bg-[var(--color-valley-green)]/10",
+        stock.status === "low" && "border-[var(--color-valley-green)]/25 bg-[var(--color-valley-green)]/10",
+        isSelected && "ring-2 ring-emerald-400/50 border-[var(--color-valley-green)]/25"
       )}
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: categoryColors[stock.category] }} />
           <div>
-            <span className="text-sm font-semibold text-white/85">{stock.productName}</span>
-            <span className="text-[10px] text-white/30 ml-2">{categoryLabels[stock.category]}</span>
+            <span className="text-sm font-semibold text-[var(--color-adaline-ink)]/85">{stock.productName}</span>
+            <span className="text-[10px] text-[var(--color-adaline-ink)]/30 ml-2">{categoryLabels[stock.category]}</span>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -117,9 +117,9 @@ export function StockCard({ stock, isSelected, onClick }: {
               {stock.status === "critical" ? "Critique" : "Stock bas"}
             </span>
           )}
-          <span className="text-lg font-bold text-white/85 font-mono">
+          <span className="text-lg font-bold text-[var(--color-adaline-ink)]/85 font-mono">
             {stock.currentQuantity.toFixed(stock.currentQuantity % 1 ? 1 : 0)}
-            <span className="text-xs text-white/40 ml-1">{stock.unit}</span>
+            <span className="text-xs text-[var(--color-adaline-ink)]/40 ml-1">{stock.unit}</span>
           </span>
         </div>
       </div>
@@ -137,17 +137,17 @@ export function StockCard({ stock, isSelected, onClick }: {
       </div>
 
       <div className="flex items-center justify-between mt-2">
-        <span className="text-[10px] text-white/30">{stock.unit}</span>
+        <span className="text-[10px] text-[var(--color-adaline-ink)]/30">{stock.unit}</span>
       </div>
 
       <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-white/[0.08]">
         <div>
-          <span className="text-[10px] text-white/30 block">Dern. entrée</span>
-          <span className="text-xs text-white/50">{new Date(stock.lastEntryDate).toLocaleDateString("fr-FR")}</span>
+          <span className="text-[10px] text-[var(--color-adaline-ink)]/30 block">Dern. entrée</span>
+          <span className="text-xs text-[var(--color-adaline-ink)]/50">{new Date(stock.lastEntryDate).toLocaleDateString("fr-FR")}</span>
         </div>
         <div>
-          <span className="text-[10px] text-white/30 block">Dern. sortie</span>
-          <span className="text-xs text-white/50">
+          <span className="text-[10px] text-[var(--color-adaline-ink)]/30 block">Dern. sortie</span>
+          <span className="text-xs text-[var(--color-adaline-ink)]/50">
             {stock.lastExitDate ? new Date(stock.lastExitDate).toLocaleDateString("fr-FR") : "—"}
           </span>
         </div>
@@ -176,11 +176,11 @@ export function ProductDetailPanel({ stock, entries, products, rotationData, onC
             <Package className="w-5 h-5" style={{ color: categoryColors[stock.category] }} />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-white/85">{stock.productName}</h3>
-            <span className="text-[10px] text-white/40">{categoryLabels[stock.category]} · {product?.registrationNumber}</span>
+            <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85">{stock.productName}</h3>
+            <span className="text-[10px] text-[var(--color-adaline-ink)]/40">{categoryLabels[stock.category]} · {product?.registrationNumber}</span>
           </div>
         </div>
-        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/[0.06] text-white/40">
+        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/[0.06] text-[var(--color-adaline-ink)]/40">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -188,7 +188,7 @@ export function ProductDetailPanel({ stock, entries, products, rotationData, onC
       {/* Gauge */}
       <div className="p-4 rounded-xl bg-white/[0.04] border border-white/[0.08] mb-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs text-white/40">Niveau actuel</span>
+          <span className="text-xs text-[var(--color-adaline-ink)]/40">Niveau actuel</span>
           <span className={cn(
             "badge text-[10px]",
             stock.status === "critical" ? "badge-danger" :
@@ -198,18 +198,18 @@ export function ProductDetailPanel({ stock, entries, products, rotationData, onC
           </span>
         </div>
         <div className="text-center mb-3">
-          <span className="text-3xl font-bold text-white/90 font-mono">
+          <span className="text-3xl font-bold text-[var(--color-adaline-ink)]/90 font-mono">
             {stock.currentQuantity.toFixed(stock.currentQuantity % 1 ? 1 : 0)}
           </span>
-          <span className="text-sm text-white/40 ml-1">{stock.unit}</span>
-          <span className="text-xs text-white/30 block">{stock.unit}</span>
+          <span className="text-sm text-[var(--color-adaline-ink)]/40 ml-1">{stock.unit}</span>
+          <span className="text-xs text-[var(--color-adaline-ink)]/30 block">{stock.unit}</span>
         </div>
         <div className="relative h-3 rounded-full bg-white/[0.06] overflow-hidden">
           <div
             className={cn(
               "h-full rounded-full transition-all",
-              stock.status === "critical" ? "bg-red-400" :
-              stock.status === "low" ? "bg-amber-400" : "bg-green-400"
+              stock.status === "critical" ? "bg-emerald-400" :
+              stock.status === "low" ? "bg-emerald-400" : "bg-green-400"
             )}
             style={{ width: `${fillPercent}%` }}
           />
@@ -219,25 +219,25 @@ export function ProductDetailPanel({ stock, entries, products, rotationData, onC
       {/* Key metrics */}
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="p-3 rounded-xl bg-white/[0.04] border border-white/[0.08]">
-          <span className="text-[10px] text-white/30 block">Jours de stock</span>
+          <span className="text-[10px] text-[var(--color-adaline-ink)]/30 block">Jours de stock</span>
           <span className={cn(
             "text-sm font-bold font-mono",
-            rotationData && rotationData.daysOfStock < 15 ? "text-red-500" :
-            rotationData && rotationData.daysOfStock < 30 ? "text-amber-500" : "text-green-400"
+            rotationData && rotationData.daysOfStock < 15 ? "text-[var(--color-valley-green)]" :
+            rotationData && rotationData.daysOfStock < 30 ? "text-[var(--color-valley-green)]" : "text-green-400"
           )}>
             {rotationData ? (rotationData.daysOfStock > 365 ? "∞" : `${rotationData.daysOfStock} jours`) : "—"}
           </span>
         </div>
         <div className="p-3 rounded-xl bg-white/[0.04] border border-white/[0.08]">
-          <span className="text-[10px] text-white/30 block">Consommé ce mois</span>
-          <span className="text-sm font-bold text-white/85 font-mono">{rotationData?.totalOut.toFixed(1) || 0} {stock.unit}</span>
+          <span className="text-[10px] text-[var(--color-adaline-ink)]/30 block">Consommé ce mois</span>
+          <span className="text-sm font-bold text-[var(--color-adaline-ink)]/85 font-mono">{rotationData?.totalOut.toFixed(1) || 0} {stock.unit}</span>
         </div>
       </div>
 
       {/* Product info */}
       {product && (
         <div className="mb-4">
-          <h4 className="text-xs font-semibold text-white/60 mb-2">Fiche Produit</h4>
+          <h4 className="text-xs font-semibold text-[var(--color-adaline-ink)]/60 mb-2">Fiche Produit</h4>
           <div className="space-y-2">
             <DetailRow label="Substance active" value={product.activeSubstance ? `${product.activeSubstance}${product.teneurMA ? ` (${product.teneurMA} ${product.teneurMAUnit || ''})` : ''}`.trim() : '—'} />
             <DetailRow label="Formulation" value={[product.formulation, product.familleChimique].filter(Boolean).join(' — ') || '—'} />
@@ -252,10 +252,10 @@ export function ProductDetailPanel({ stock, entries, products, rotationData, onC
 
       {/* Recent movements for this product */}
       <div>
-        <h4 className="text-xs font-semibold text-white/60 mb-2">Mouvements récents</h4>
+        <h4 className="text-xs font-semibold text-[var(--color-adaline-ink)]/60 mb-2">Mouvements récents</h4>
         <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
           {productEntries.length === 0 ? (
-            <p className="text-xs text-white/30 py-4 text-center">Aucun mouvement</p>
+            <p className="text-xs text-[var(--color-adaline-ink)]/30 py-4 text-center">Aucun mouvement</p>
           ) : (
             productEntries.slice(0, 8).map((entry) => (
               <div key={entry.id}>
@@ -272,8 +272,8 @@ export function ProductDetailPanel({ stock, entries, products, rotationData, onC
 export function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between py-1.5 border-b border-black/[0.04] last:border-0">
-      <span className="text-[10px] text-white/40">{label}</span>
-      <span className="text-xs text-white/70 font-medium">{value}</span>
+      <span className="text-[10px] text-[var(--color-adaline-ink)]/40">{label}</span>
+      <span className="text-xs text-[var(--color-adaline-ink)]/70 font-medium">{value}</span>
     </div>
   );
 }
@@ -293,19 +293,19 @@ export function MovementRow({ entry, compact }: { entry: StockEntry; compact?: b
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <span className={cn("font-medium text-white/70 truncate", compact ? "text-[11px]" : "text-xs")}>
+          <span className={cn("font-medium text-[var(--color-adaline-ink)]/70 truncate", compact ? "text-[11px]" : "text-xs")}>
             {compact ? entryTypeLabels[entry.type] : entry.productName}
           </span>
           <span className={cn(
             "font-bold font-mono",
             compact ? "text-[11px]" : "text-xs",
-            isPositive ? "text-green-400" : "text-red-400"
+            isPositive ? "text-green-400" : "text-[var(--color-valley-green)]"
           )}>
             {isPositive ? "+" : ""}{entry.quantity} {entry.unit}
           </span>
         </div>
         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-          <span className="text-[10px] text-white/30">
+          <span className="text-[10px] text-[var(--color-adaline-ink)]/30">
             {new Date(entry.date).toLocaleDateString("fr-FR")}
           </span>
           {!compact && entry.movementCategory && (
@@ -313,14 +313,14 @@ export function MovementRow({ entry, compact }: { entry: StockEntry; compact?: b
               {movementCategoryLabels[entry.movementCategory]}
             </span>
           )}
-          {entry.reference && <span className="text-[10px] text-white/30 font-mono">{entry.reference}</span>}
+          {entry.reference && <span className="text-[10px] text-[var(--color-adaline-ink)]/30 font-mono">{entry.reference}</span>}
           {entry.supplierName && !compact && (
-            <span className="text-[10px] text-white/30 flex items-center gap-1">
+            <span className="text-[10px] text-[var(--color-adaline-ink)]/30 flex items-center gap-1">
               <Truck className="w-2.5 h-2.5" />{entry.supplierName}
             </span>
           )}
           {entry.transferDestination && !compact && (
-            <span className="text-[10px] text-orange-400 flex items-center gap-1">
+            <span className="text-[10px] text-[var(--color-valley-green)] flex items-center gap-1">
               → {entry.transferDestination}
             </span>
           )}
@@ -336,7 +336,7 @@ export function OperationCard({ icon, title, description, color, shortcut, onCli
   return (
     <button
       onClick={onClick}
-      className="group relative flex items-center gap-4 p-4 rounded-xl bg-black/50 backdrop-blur-md border border-white/[0.08] hover:border-white/15 hover:bg-black/60 transition-all duration-200 text-left w-full overflow-hidden"
+      className="group relative flex items-center gap-4 p-4 rounded-xl bg-black/50  border border-white/[0.08] hover:border-white/15 hover:bg-black/60 transition-all duration-200 text-left w-full overflow-hidden"
     >
       <div
         className="absolute left-0 top-0 bottom-0 w-[3px] rounded-r-full opacity-0 group-hover:opacity-100 transition-opacity"
@@ -350,14 +350,14 @@ export function OperationCard({ icon, title, description, color, shortcut, onCli
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <h3 className="text-[13px] font-semibold text-white/85 group-hover:text-white transition-colors truncate">{title}</h3>
+          <h3 className="text-[13px] font-semibold text-[var(--color-adaline-ink)]/85 group-hover:text-[var(--color-adaline-ink)] transition-colors truncate">{title}</h3>
           {shortcut && (
-            <span className="hidden lg:inline-flex text-[9px] font-mono text-white/20 border border-white/10 rounded px-1 py-0.5 leading-none">{shortcut}</span>
+            <span className="hidden lg:inline-flex text-[9px] font-mono text-[var(--color-adaline-ink)]/20 border border-[var(--color-stone-moss)] rounded px-1 py-0.5 leading-none">{shortcut}</span>
           )}
         </div>
-        <p className="text-[11px] text-white/35 mt-0.5 truncate">{description}</p>
+        <p className="text-[11px] text-[var(--color-adaline-ink)]/35 mt-0.5 truncate">{description}</p>
       </div>
-      <ChevronRight className="w-4 h-4 text-white/10 group-hover:text-white/30 shrink-0 transition-all group-hover:translate-x-0.5" />
+      <ChevronRight className="w-4 h-4 text-[var(--color-adaline-ink)]/10 group-hover:text-[var(--color-adaline-ink)]/30 shrink-0 transition-all group-hover:translate-x-0.5" />
     </button>
   );
 }

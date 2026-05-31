@@ -30,17 +30,17 @@ export default function StockOverview() {
     <div className="glass-card p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-semibold text-white/85">Aperçu du Stock</h3>
-          <p className="text-xs text-white/40 mt-0.5">
+          <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85">Aperçu du Stock</h3>
+          <p className="text-xs text-[var(--color-adaline-ink)]/40 mt-0.5">
             {stockLevels.length} produits · {critical.length} alertes
           </p>
         </div>
-        <div className="flex items-center gap-1 p-0.5 bg-black/30 rounded-lg border border-white/10">
+        <div className="flex items-center gap-1 p-0.5 bg-black/30 rounded-lg border border-[var(--color-stone-moss)]">
           <button
             onClick={() => setView("critical")}
             className={cn(
               "px-2 py-1 rounded-md text-[10px] font-medium transition-all",
-              view === "critical" ? "bg-red-500/20 text-red-400 border border-red-500/30" : "text-white/40 hover:text-white/60"
+              view === "critical" ? "bg-[var(--color-valley-green)]/20 text-[var(--color-valley-green)] border border-[var(--color-valley-green)]/30" : "text-[var(--color-adaline-ink)]/40 hover:text-[var(--color-adaline-ink)]/60"
             )}
           >
             <AlertTriangle className="w-3 h-3 inline mr-1" />
@@ -50,7 +50,7 @@ export default function StockOverview() {
             onClick={() => setView("all")}
             className={cn(
               "px-2 py-1 rounded-md text-[10px] font-medium transition-all",
-              view === "all" ? "bg-green-500/20 text-green-400 border border-green-500/30" : "text-white/40 hover:text-white/60"
+              view === "all" ? "bg-green-500/20 text-green-400 border border-green-500/30" : "text-[var(--color-adaline-ink)]/40 hover:text-[var(--color-adaline-ink)]/60"
             )}
           >
             <Package className="w-3 h-3 inline mr-1" />
@@ -70,35 +70,35 @@ export default function StockOverview() {
               key={stock.productId}
               className={cn(
                 "flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all",
-                isCritical ? "bg-red-500/[0.06] border border-red-500/10" :
-                isLow ? "bg-amber-500/[0.06] border border-amber-500/10" :
+                isCritical ? "bg-[var(--color-valley-green)]/[0.06] border border-[var(--color-valley-green)]/10" :
+                isLow ? "bg-[var(--color-valley-green)]/[0.06] border border-[var(--color-valley-green)]/10" :
                 "bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05]"
               )}
             >
               {/* Status indicator */}
               <div className={cn(
                 "w-1.5 h-6 rounded-full shrink-0",
-                isCritical ? "bg-red-400" : isLow ? "bg-amber-400" : "bg-green-400"
+                isCritical ? "bg-emerald-400" : isLow ? "bg-emerald-400" : "bg-green-400"
               )} />
 
               {/* Name */}
-              <span className="text-xs font-medium text-white/70 truncate flex-1 min-w-0">
+              <span className="text-xs font-medium text-[var(--color-adaline-ink)]/70 truncate flex-1 min-w-0">
                 {stock.productName}
               </span>
 
               {/* Quantity */}
               <span className={cn(
                 "text-xs font-mono font-bold shrink-0 tabular-nums",
-                isCritical ? "text-red-400" : isLow ? "text-amber-400" : "text-green-400"
+                isCritical ? "text-[var(--color-valley-green)]" : isLow ? "text-[var(--color-valley-green)]" : "text-green-400"
               )}>
                 {formatQty(stock.currentQuantity, stock.unit)}
               </span>
 
               {/* Icon */}
               {isCritical ? (
-                <ArrowDownRight className="w-3 h-3 text-red-400 shrink-0" />
+                <ArrowDownRight className="w-3 h-3 text-[var(--color-valley-green)] shrink-0" />
               ) : isLow ? (
-                <AlertTriangle className="w-3 h-3 text-amber-400 shrink-0" />
+                <AlertTriangle className="w-3 h-3 text-[var(--color-valley-green)] shrink-0" />
               ) : (
                 <ArrowUpRight className="w-3 h-3 text-green-400/50 shrink-0" />
               )}
@@ -109,10 +109,10 @@ export default function StockOverview() {
 
       {/* Summary footer */}
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/[0.06]">
-        <span className="text-[10px] text-white/30 font-mono">
+        <span className="text-[10px] text-[var(--color-adaline-ink)]/30 font-mono">
           {view === "critical" ? `${critical.length} produits en alerte` : `${positive.length} produits en stock`}
         </span>
-        <span className="text-[10px] text-white/20">
+        <span className="text-[10px] text-[var(--color-adaline-ink)]/20">
           Top 10
         </span>
       </div>

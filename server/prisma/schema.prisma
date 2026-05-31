@@ -1,0 +1,489 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis]
+}
+
+// ============================================================
+// GEO LAYER
+// ============================================================
+
+model Zone {
+  id               Int      @id @default(autoincrement()) @map("identifiant_zone")
+  nom              String   @map("nom_zone")
+  surfaceHectares  Float?   @map("surface_hectares")
+  geometrie        Unsupported("geometry(MultiPolygon, 4326)")?
+  
+  parcelles        Parcelle[]
+  campagnes        Campagne[]
+  meteo            DonneesMeteorologiques[]
+
+  @@map("ZONE")
+}
+
+model Parcelle {
+  id                Int      @id @default(autoincrement()) @map("identifiant_parcelle")
+  zoneId            Int      @map("identifiant_zone")
+  nom               String   @map("nom_parcelle")
+  superficieHectares Float?   @map("superficie_hectares")
+  geometrie         Unsupported("geometry(Polygon, 4326)")?
+  typeSol           String?  @map("type_sol")
+
+  zone              Zone     @relation(fields: [zoneId], references: [id])
+  microZones        MicroZone[]
+  satelliteData     DonneesSatellite[]
+
+  @@map("PARCELLE")
+}
+
+model MicroZone {
+  id                         Int      @id @default(autoincrement()) @map("identifiant_micro_zone")
+  parcelleId                 Int      @map("identifiant_parcelle")
+  geometrie                  Unsupported("geometry(Polygon, 4326)")?
+  humiditePourcentage        Float?   @map("humidite_pourcentage")
+  typeSol                    String?  @map("type_sol")
+  stressHydrique             Float?   @map("stress_hydrique")
+  conductiviteElectrique     Float?   @map("conductivite_electrique_ds_metre")
+
+  parcelle                   Parcelle @relation(fields: [parcelleId], references: [id])
+  plantations                Plantation[]
+  capteurs                   Capteur[]
+
+  @@map("MICRO_ZONE")
+}
+
+// ============================================================
+// CAMPAIGN LAYER
+// ============================================================
+
+model Campagne {
+  id             Int      @id @default(autoincrement()) @map("identifiant_campagne")
+  zoneId         Int      @map("identifiant_zone")
+  nom            String?  @map("nom_campagne")
+  dateDebut      DateTime? @map("date_debut") @db.Date
+  dateFin        DateTime? @map("date_fin") @db.Date
+  statut         String?  @map("statut_campagne")
+
+  zone           Zone     @relation(fields: [zoneId], references: [id])
+  plantations    Plantation[]
+
+  @@map("CAMPAGNE")
+}
+
+model Plantation {
+  id                 Int      @id @default(autoincrement()) @map("identifiant_plantation")
+  microZoneId        Int      @map("identifiant_micro_zone")
+  campagneId         Int      @map("identifiant_campagne")
+  typeCulture        String?  @map("type_culture")
+  varieteCulture     String?  @map("variete_culture")
+  nombrePlants       Int?     @map("nombre_plants")
+  datePlantation     DateTime? @map("date_plantation") @db.Date
+  
+  // SCD2 Columns
+  dateDebutValidite  DateTime @default(now()) @map("date_debut_validite") @db.Timestamptz
+  dateFinValidite    DateTime? @map("date_fin_validite") @db.Timestamptz
+  estActuel          Boolean  @default(true) @map("est_actuel")
+  version            Int      @default(1)
+  actionHistorique   String?  @map("action_historique")
+  modifiePar         Int?     @map("modifie_par")
+  dateModification   DateTime? @default(now()) @map("date_modification") @db.Timestamptz
+
+  microZone          MicroZone @relation(fields: [microZoneId], references: [id])
+  campagne           Campagne  @relation(fields: [campagneId], references: [id])
+  utilisateur        Utilisateur? @relation("PlantationModifiePar", fields: [modifiePar], references: [id])
+  evenements         EvenementAgronomique[]
+
+  @@map("PLANTATION")
+}
+
+// ============================================================
+// IOT LAYER
+// ============================================================
+
+model TypeMesure {
+  id             Int      @id @default(autoincrement()) @map("identifiant_type_mesure")
+  code           String   @unique @map("code_mesure")
+  libelle        String?  @map("libelle_mesure")
+  uniteParDefaut String?  @map("unite_par_defaut")
+
+  mesures        MesureIot[]
+
+  @@map("TYPE_MESURE")
+}
+
+model Capteur {
+  id                     Int      @id @default(autoincrement()) @map("identifiant_capteur")
+  microZoneId            Int      @map("identifiant_micro_zone")
+  type                   String?  @map("type_capteur")
+  modele                 String?  @map("modele_capteur")
+  statut                 String?  @map("statut_capteur")
+  derniereSynchronisation DateTime? @map("derniere_synchronisation") @db.Timestamptz
+
+  microZone              MicroZone @relation(fields: [microZoneId], references: [id])
+  mesures                MesureIot[]
+
+  @@map("CAPTEUR")
+}
+
+model MesureIot {
+  id             Int      @id @default(autoincrement()) @map("identifiant_mesure")
+  capteurId      Int      @map("identifiant_capteur")
+  typeMesureId   Int      @map("identifiant_type_mesure")
+  horodatage     DateTime? @db.Timestamptz
+  valeur         Float?   @map("valeur_mesuree")
+  unite          String?  @map("unite_mesure")
+
+  capteur        Capteur    @relation(fields: [capteurId], references: [id])
+  typeMesure     TypeMesure @relation(fields: [typeMesureId], references: [id])
+
+  @@map("MESURE_IOT")
+}
+
+// ============================================================
+// SATELLITE & METEO
+// ============================================================
+
+model DonneesSatellite {
+  id                  Int      @id @default(autoincrement()) @map("identifiant_satellite")
+  parcelleId          Int      @map("identifiant_parcelle")
+  dateAcquisition     DateTime? @map("date_acquisition") @db.Date
+  ndvi                Float?   @map("indice_vegetation_ndvi")
+  ndwi                Float?   @map("indice_eau_ndwi")
+  source              String?  @map("source_satellite")
+  geometrie           Unsupported("geometry(Polygon, 4326)")?
+
+  parcelle            Parcelle @relation(fields: [parcelleId], references: [id])
+
+  @@map("DONNEES_SATELLITE")
+}
+
+model DonneesMeteorologiques {
+  id                  Int      @id @default(autoincrement()) @map("identifiant_meteo")
+  zoneId              Int      @map("identifiant_zone")
+  dateMesure          DateTime? @map("date_mesure") @db.Date
+  tempMin             Float?   @map("temperature_minimale_celsius")
+  tempMax             Float?   @map("temperature_maximale_celsius")
+  humidite            Float?   @map("humidite_pourcentage")
+  pluviometrie        Float?   @map("pluviometrie_millimetres")
+  vitesseVent         Float?   @map("vitesse_vent_km_heure")
+  geometrie           Unsupported("geometry(Point, 4326)")?
+
+  zone                Zone     @relation(fields: [zoneId], references: [id])
+
+  @@map("DONNEES_METEOROLOGIQUES")
+}
+
+// ============================================================
+// USERS & PROTOCOLS
+// ============================================================
+
+model Utilisateur {
+  id               Int      @id @default(autoincrement()) @map("identifiant_utilisateur")
+  nomComplet       String?  @map("nom_complet")
+  email            String?  @unique @map("adresse_email")
+  passwordHash     String?  @map("mot_de_passe_hash")
+  role             String?  @map("role_utilisateur")
+  telephone        String?  @map("numero_telephone")
+
+  plantationsModifiees Plantation[] @relation("PlantationModifiePar")
+  evenements       EvenementAgronomique[]
+  evenementsModifies EvenementAgronomique[] @relation("EventModifiePar")
+
+  @@map("UTILISATEUR")
+}
+
+model Protocole {
+  id             Int      @id @default(autoincrement()) @map("identifiant_protocole")
+  typeCulture    String?  @map("type_culture")
+  varieteCulture String?  @map("variete_culture")
+  description    String?  @map("description_protocole")
+
+  etapes         EtapeProtocole[]
+  evenements     EvenementAgronomique[]
+
+  @@map("PROTOCOLE")
+}
+
+model EtapeProtocole {
+  id             Int      @id @default(autoincrement()) @map("identifiant_etape")
+  protocoleId    Int      @map("identifiant_protocole")
+  dateDebut      DateTime? @map("date_debut_etape") @db.Date
+  dateFin        DateTime? @map("date_fin_etape") @db.Date
+  typeAction     String?  @map("type_action")
+  description    String?  @map("description_action")
+  uniteAction    String?  @map("unite_action")
+
+  protocole      Protocole @relation(fields: [protocoleId], references: [id])
+
+  @@map("ETAPE_PROTOCOLE")
+}
+
+// ============================================================
+// CENTRAL EVENT HUB (SCD2)
+// ============================================================
+
+model EvenementAgronomique {
+  id                 Int      @id @default(autoincrement()) @map("identifiant_evenement")
+  plantationId       Int      @map("identifiant_plantation")
+  utilisateurId      Int      @map("identifiant_utilisateur")
+  protocoleId        Int?     @map("identifiant_protocole")
+  dateEvenement      DateTime? @map("date_evenement") @db.Timestamptz
+  sourceEvenement    String?  @map("source_evenement")
+  typeEvenement      String?  @map("type_evenement")
+  geometrie          Unsupported("geometry(Point, 4326)")?
+  
+  // SCD2 Columns
+  dateDebutValidite  DateTime @default(now()) @map("date_debut_validite") @db.Timestamptz
+  dateFinValidite    DateTime? @map("date_fin_validite") @db.Timestamptz
+  estActuel          Boolean  @default(true) @map("est_actuel")
+  version            Int      @default(1)
+  actionHistorique   String?  @map("action_historique")
+  modifiePar         Int?     @map("modifie_par")
+  dateModification   DateTime? @default(now()) @map("date_modification") @db.Timestamptz
+
+  plantation         Plantation @relation(fields: [plantationId], references: [id])
+  utilisateur        Utilisateur @relation(fields: [utilisateurId], references: [id])
+  protocole          Protocole?  @relation(fields: [protocoleId], references: [id])
+  modifieParUser     Utilisateur? @relation("EventModifiePar", fields: [modifiePar], references: [id])
+  
+  maladies           EvenementMaladie[]
+  produits           EvenementProduit[]
+  depenses           Depense[]
+  recoltes           Recolte[]
+  resultats          Resultat[]
+  alertes            Alerte[]
+  decisions          DecisionEvenement[]
+  revenus            Revenu[]
+
+  @@map("EVENEMENT_AGRONOMIQUE")
+}
+
+// ============================================================
+// EVENT EXTENSIONS
+// ============================================================
+
+model Maladie {
+  id             Int      @id @default(autoincrement()) @map("identifiant_maladie")
+  nom            String?  @map("nom_maladie")
+  description    String?  @map("description_maladie")
+  typePathogene  String?  @map("type_pathogene")
+
+  evenements     EvenementMaladie[]
+
+  @@map("MALADIE")
+}
+
+model EvenementMaladie {
+  evenementId    Int      @map("identifiant_evenement")
+  maladieId      Int      @map("identifiant_maladie")
+  severite       String?  @map("severite_maladie")
+
+  // SCD2 Columns
+  dateDebutValidite  DateTime @default(now()) @map("date_debut_validite") @db.Timestamptz
+  dateFinValidite    DateTime? @map("date_fin_validite") @db.Timestamptz
+  estActuel          Boolean  @default(true) @map("est_actuel")
+  version            Int      @default(1)
+  actionHistorique   String?  @map("action_historique")
+  modifiePar         Int?     @map("modifie_par")
+  dateModification   DateTime? @default(now()) @map("date_modification") @db.Timestamptz
+
+  evenement      EvenementAgronomique @relation(fields: [evenementId], references: [id])
+  maladie        Maladie              @relation(fields: [maladieId], references: [id])
+
+  @@id([evenementId, maladieId])
+  @@map("EVENEMENT_MALADIE")
+}
+
+model ProduitPhytosanitaire {
+  id                    Int      @id @default(autoincrement()) @map("identifiant_produit")
+  nom                   String?  @map("nom_produit")
+  type                  String?  @map("type_produit")
+  impactEnvironnemental Float?   @map("impact_environnemental")
+  uniteDosage           String?  @map("unite_dosage")
+  matiereActive         String?  @map("matiere_active")
+
+  evenements            EvenementProduit[]
+
+  @@map("PRODUIT_PHYTOSANITAIRE")
+}
+
+model EvenementProduit {
+  evenementId    Int      @map("identifiant_evenement")
+  produitId      Int      @map("identifiant_produit")
+  doseAppliquee  Float?   @map("dose_appliquee")
+  uniteDose      String?  @map("unite_dose")
+
+  // SCD2 Columns
+  dateDebutValidite  DateTime @default(now()) @map("date_debut_validite") @db.Timestamptz
+  dateFinValidite    DateTime? @map("date_fin_validite") @db.Timestamptz
+  estActuel          Boolean  @default(true) @map("est_actuel")
+  version            Int      @default(1)
+  actionHistorique   String?  @map("action_historique")
+  modifiePar         Int?     @map("modifie_par")
+  dateModification   DateTime? @default(now()) @map("date_modification") @db.Timestamptz
+
+  evenement      EvenementAgronomique @relation(fields: [evenementId], references: [id])
+  produit        ProduitPhytosanitaire @relation(fields: [produitId], references: [id])
+
+  @@id([evenementId, produitId])
+  @@map("EVENEMENT_PRODUIT")
+}
+
+// ============================================================
+// FINANCE
+// ============================================================
+
+model Depense {
+  id                 Int      @id @default(autoincrement()) @map("identifiant_depense")
+  evenementId        Int      @map("identifiant_evenement")
+  type               String?  @map("type_depense")
+  montant            Float?   @map("montant_depense")
+  devise             String?  @default("DZD")
+
+  // SCD2 Columns
+  dateDebutValidite  DateTime @default(now()) @map("date_debut_validite") @db.Timestamptz
+  dateFinValidite    DateTime? @map("date_fin_validite") @db.Timestamptz
+  estActuel          Boolean  @default(true) @map("est_actuel")
+  version            Int      @default(1)
+  actionHistorique   String?  @map("action_historique")
+  modifiePar         Int?     @map("modifie_par")
+  dateModification   DateTime? @default(now()) @map("date_modification") @db.Timestamptz
+
+  evenement          EvenementAgronomique @relation(fields: [evenementId], references: [id])
+
+  @@map("DEPENSE")
+}
+
+model Recolte {
+  id                 Int      @id @default(autoincrement()) @map("identifiant_recolte")
+  evenementId        Int      @map("identifiant_evenement")
+  quantite           Float?   @map("quantite_recoltee")
+  unite              String?  @map("unite_recolte")
+  qualite            String?  @map("qualite_recolte")
+  lotId              String?  @map("identifiant_lot")
+
+  // SCD2 Columns
+  dateDebutValidite  DateTime @default(now()) @map("date_debut_validite") @db.Timestamptz
+  dateFinValidite    DateTime? @map("date_fin_validite") @db.Timestamptz
+  estActuel          Boolean  @default(true) @map("est_actuel")
+  version            Int      @default(1)
+  actionHistorique   String?  @map("action_historique")
+  modifiePar         Int?     @map("modifie_par")
+  dateModification   DateTime? @default(now()) @map("date_modification") @db.Timestamptz
+
+  evenement          EvenementAgronomique @relation(fields: [evenementId], references: [id])
+  revenus            Revenu[]
+
+  @@map("RECOLTE")
+}
+
+model Revenu {
+  id                 Int      @id @default(autoincrement()) @map("identifiant_revenu")
+  evenementId        Int      @map("identifiant_evenement")
+  recolteId          Int      @map("identifiant_recolte")
+  montant            Float?   @map("montant_revenu")
+  prixMarche         Float?   @map("prix_marche")
+  devise             String?  @default("DZD")
+
+  evenement          EvenementAgronomique @relation(fields: [evenementId], references: [id])
+  recolte            Recolte              @relation(fields: [recolteId], references: [id])
+
+  @@map("REVENU")
+}
+
+model Resultat {
+  id                 Int      @id @default(autoincrement()) @map("identifiant_resultat")
+  evenementId        Int      @map("identifiant_evenement")
+  tauxEfficacite     Float?   @map("taux_efficacite")
+  rendement          Float?   @map("rendement_culture")
+  uniteRendement     String?  @map("unite_rendement")
+
+  // SCD2 Columns
+  dateDebutValidite  DateTime @default(now()) @map("date_debut_validite") @db.Timestamptz
+  dateFinValidite    DateTime? @map("date_fin_validite") @db.Timestamptz
+  estActuel          Boolean  @default(true) @map("est_actuel")
+  version            Int      @default(1)
+  actionHistorique   String?  @map("action_historique")
+  modifiePar         Int?     @map("modifie_par")
+  dateModification   DateTime? @default(now()) @map("date_modification") @db.Timestamptz
+
+  evenement          EvenementAgronomique @relation(fields: [evenementId], references: [id])
+  apprentissage      Apprentissage[]
+
+  @@map("RESULTAT")
+}
+
+// ============================================================
+// ALERTS
+// ============================================================
+
+model Alerte {
+  id                 Int      @id @default(autoincrement()) @map("identifiant_alerte")
+  evenementId        Int      @map("identifiant_evenement")
+  canal              String?  @map("canal_notification")
+  message            String?  @map("message_alerte")
+  statut             String?  @map("statut_alerte")
+  dateEnvoi          DateTime? @map("date_envoi") @db.Timestamptz
+
+  evenement          EvenementAgronomique @relation(fields: [evenementId], references: [id])
+
+  @@map("ALERTE")
+}
+
+// ============================================================
+// AI / ML LAYER
+// ============================================================
+
+model Decision {
+  id                 Int      @id @default(autoincrement()) @map("identifiant_decision")
+  recommandation     String?  @map("recommandation_agronomique")
+  scoreConfiance     Float?   @map("score_confiance")
+  type               String?  @map("type_decision")
+  statut             String?  @map("statut_decision")
+
+  // SCD2 Columns
+  dateDebutValidite  DateTime @default(now()) @map("date_debut_validite") @db.Timestamptz
+  dateFinValidite    DateTime? @map("date_fin_validite") @db.Timestamptz
+  estActuel          Boolean  @default(true) @map("est_actuel")
+  version            Int      @default(1)
+  actionHistorique   String?  @map("action_historique")
+  modifiePar         Int?     @map("modifie_par")
+  dateModification   DateTime? @default(now()) @map("date_modification") @db.Timestamptz
+
+  evenements         DecisionEvenement[]
+  apprentissage      Apprentissage[]
+
+  @@map("DECISION")
+}
+
+model DecisionEvenement {
+  decisionId   Int @map("identifiant_decision")
+  evenementId  Int @map("identifiant_evenement")
+
+  decision     Decision             @relation(fields: [decisionId], references: [id])
+  evenement    EvenementAgronomique @relation(fields: [evenementId], references: [id])
+
+  @@id([decisionId, evenementId])
+  @@map("DECISION_EVENEMENT")
+}
+
+model Apprentissage {
+  id                   Int      @id @default(autoincrement()) @map("identifiant_apprentissage")
+  decisionId           Int      @map("identifiant_decision")
+  resultatId           Int      @map("identifiant_resultat")
+  scorePerformance     Float?   @map("score_performance")
+  horodatage           DateTime? @db.Timestamptz
+  sourceFeedback       String?  @map("source_feedback")
+  typeAjustement       String?  @map("type_ajustement_modele")
+  versionModeleIa      String?  @map("version_modele_ia")
+
+  decision             Decision @relation(fields: [decisionId], references: [id])
+  resultat             Resultat @relation(fields: [resultatId], references: [id])
+
+  @@map("APPRENTISSAGE")
+}

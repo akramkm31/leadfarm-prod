@@ -8,11 +8,12 @@ import {
   fetchMovements,
   fetchStockLevels,
   fetchParcelles,
-  fetchTreatments,
   fetchOperators,
   fetchAlerts,
   fetchDashboardStats,
 } from "@/lib/data-provider";
+import { fetchTreatments } from "@/lib/data-provider";
+import { getTreatments } from "@/lib/repositories/treatment.repository";
 
 export { SUPABASE_CONFIGURED };
 
@@ -82,7 +83,18 @@ export function useParcelles() {
 }
 
 export function useTreatments(status?: string) {
-  return useAsyncData(() => fetchTreatments(status), [status]);
+  return useAsyncData(async () => {
+    if (!SUPABASE_CONFIGURED) {
+      return fetchTreatments(status);
+    }
+    try {
+      const rows = await getTreatments(status ? { status: status as any } : {});
+      if (rows.length > 0) return rows;
+      return fetchTreatments(status);
+    } catch {
+      return fetchTreatments(status);
+    }
+  }, [status]);
 }
 
 export function useOperators() {

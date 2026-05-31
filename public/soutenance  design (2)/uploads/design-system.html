@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adaline — Design System</title>
+<link href="https://fonts.googleapis.com/css2?family=Fragment+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --color-canvas-ice:    #fbfdf6;
+  --color-adaline-ink:   #0a1d08;
+  --color-mist-gray:     #c5ccb6;
+  --color-deep-earth:    #31200b;
+  --color-valley-green:  #203b14;
+  --color-stone-moss:    #e0e5d5;
+  --color-amber-seed:    #4a3212;
+  --color-forest-dew:    #d7e8b5;
+  --color-blackest-night:#000000;
+
+  --font-akkurat:       'akkurat', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-fragmentmono:  'Fragment Mono', 'fragmentMono', ui-monospace, Menlo, Consolas, monospace;
+
+  --text-caption:    12px;
+  --text-body-sm:    14px;
+  --text-body:       18px;
+  --text-body-lg:    47px;
+  --text-heading-sm: 53px;
+
+  --spacing-8:   8px;
+  --spacing-16:  16px;
+  --spacing-24:  24px;
+  --spacing-32:  32px;
+  --spacing-40:  40px;
+  --spacing-48:  48px;
+  --spacing-64:  64px;
+  --spacing-128: 128px;
+  --spacing-160: 160px;
+
+  --section-gap:    48px;
+  --card-padding:   24px;
+  --element-gap:    4px;
+
+  --radius-images:   8px;
+  --radius-buttons:  20px;
+  --radius-navitems: 20px;
+
+  --shadow-subtle: rgba(99, 143, 61, 0.1) 0px 0px 0px 1px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--color-canvas-ice);
+  color: var(--color-adaline-ink);
+  font-family: var(--font-akkurat);
+  font-size: var(--text-body-sm);
+  line-height: 1.43;
+  letter-spacing: -0.04em;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Layout ── */
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 var(--spacing-48); }
+
+.section {
+  padding: var(--spacing-64) 0;
+  border-bottom: 1px solid var(--color-stone-moss);
+}
+.section:last-child { border-bottom: none; }
+
+/* ── Meta labels ── */
+.meta {
+  font-family: var(--font-fragmentmono);
+  font-size: var(--text-caption);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-mist-gray);
+  display: block;
+  margin-bottom: var(--spacing-24);
+}
+
+.section-hed {
+  font-size: var(--text-body);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  margin-bottom: var(--spacing-40);
+}
+
+/* ══════════════════════════════
+   HEADER
+══════════════════════════════ */
+.header {
+  padding: var(--spacing-64) 0 var(--spacing-48);
+  border-bottom: 1px solid var(--color-stone-moss);
+}
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--spacing-32);
+}
+.brand-wordmark {
+  font-size: var(--text-heading-sm);
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: -0.04em;
+  color: var(--color-adaline-ink);
+}
+.brand-sub {
+  margin-top: var(--spacing-8);
+  font-family: var(--font-fragmentmono);
+  font-size: var(--text-caption);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-mist-gray);
+}
+.header-meta {
+  text-align: right;
+  font-family: var(--font-fragmentmono);
+  font-size: var(--text-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-mist-gray);
+  line-height: 1.8;
+}
+.header-meta .accent { color: var(--color-valley-green); }
+
+/* ══════════════════════════════
+   COLORS
+══════════════════════════════ */
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--spacing-16);
+}
+.color-swatch {
+  border-radius: var(--radius-images);
+  overflow: hidden;
+  box-shadow: var(--shadow-subtle);
+}
+.swatch-fill { height: 88px; }
+.swatch-body {
+  padding: var(--spacing-16);
+  background: white;
+  border-top: 1px solid var(--color-stone-moss);
+}
+.swatch-name {
+  font-size: var(--text-caption);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: block;
+}
+.swatch-hex {
+  font-family: var(--font-fragmentmono);
+  font-size: var(--text-caption);
+  color: var(--color-mist-gray);
+  letter-spacing: 0.04em;
+  display: block;
+  margin-top: 4px;
+}
+.swatch-token {
+  font-family: var(--font-fragmentmono);
+  font-size: 10px;
+  color: var(--color-mist-gray);
+  letter-spacing: 0.02em;
+  display: block;
+  margin-top: 2px;
+}
+.swatch-role {
+  font-size: 11px;
+  color: var(--color-mist-gray);
+  line-height: 1.4;
+  display: block;
+  margin-top: var(--spacing-8);
+}
+
+/* ══════════════════════════════
+   TYPOGRAPHY
+══════════════════════════════ */
+.type-block + .type-block {
+  margin-top: var(--spacing-48);
+  padding-top: var(--spacing-48);
+  border-top: 1px solid var(--color-stone-moss);
+}
+.type-specimen-label {
+  font-family: var(--font-fragmentmono);
+  font-size: var(--text-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-mist-gray);
+  margin-bottom: var(--spacing-16);
+}
+.type-display-sample {
+  font-family: var(--font-akkurat);
+  font-size: var(--text-heading-sm);
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: -0.04em;
+  color: var(--color-adaline-ink);
+}
+.type-body-sample {
+  font-family: var(--font-akkurat);
+  font-size: var(--text-body);
+  font-weight: 400;
+  line-height: 1.43;
+  letter-spacing: -0.04em;
+  color: var(--color-adaline-ink);
+  max-width: 600px;
+  margin-top: var(--spacing-16);
+}
+.type-mono-sample {
+  font-family: var(--font-fragmentmono);
+  font-size: var(--text-body-sm);
+  font-weight: 400;
+  line-height: 1.0;
+  letter-spacing: 0.02em;
+  color: var(--color-adaline-ink);
+  margin-top: var(--spacing-16);
+}
+
+.type-scale {
+  margin-top: var(--spacing-32);
+  border: 1px solid var(--color-stone-moss);
+  border-radius: var(--radius-images);
+  overflow: hidden;
+}
+.scale-row {
+  display: grid;
+  grid-template-columns: 120px 80px 80px 100px 1fr;
+  gap: var(--spacing-16);
+  padding: var(--spacing-16) var(--spacing-24);
+  border-bottom: 1px solid var(--color-stone-moss);
+  align-items: center;
+}
+.scale-row:last-child { border-bottom: none; }
+.scale-row.header-row {
+  background: var(--color-stone-moss);
+  font-family: var(--font-fragmentmono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-mist-gray);
+}
+.scale-token { font-family: var(--font-fragmentmono); font-size: 10px; color: var(--color-mist-gray); }
+.scale-num   { font-family: var(--font-fragmentmono); font-size: 10px; color: var(--color-mist-gray); }
+
+/* ══════════════════════════════
+   SPACING & SHAPES
+══════════════════════════════ */
+.spacing-rows { display: flex; flex-direction: column; gap: var(--spacing-8); }
+.spacing-row-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-16);
+  height: 28px;
+}
+.spacing-bar {
+  background: var(--color-valley-green);
+  opacity: 0.45;
+  height: 20px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.spacing-info {
+  font-family: var(--font-fragmentmono);
+  font-size: var(--text-caption);
+  color: var(--color-mist-gray);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.shapes-grid { display: flex; gap: var(--spacing-32); align-items: flex-end; flex-wrap: wrap; }
+.shape-demo { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-8); }
+.shape-box {
+  width: 64px; height: 40px;
+  background: var(--color-valley-green);
+  opacity: 0.5;
+}
+.shape-label {
+  font-family: var(--font-fragmentmono);
+  font-size: var(--text-caption);
+  color: var(--color-mist-gray);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.shadow-demo-wrap { display: flex; gap: var(--spacing-24); align-items: center; margin-top: var(--spacing-24); }
+.shadow-box {
+  width: 96px; height: 56px;
+  background: var(--color-canvas-ice);
+  border-radius: var(--radius-images);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-fragmentmono);
+  font-size: 10px;
+  color: var(--color-mist-gray);
+  letter-spacing: 0.06em;
+}
+.shadow-box.subtle { box-shadow: var(--shadow-subtle); }
+
+/* ══════════════════════════════
+   COMPONENTS
+══════════════════════════════ */
+.component-block { margin-bottom: var(--spacing-48); }
+.component-block + .component-block {
+  padding-top: var(--spacing-48);
+  border-top: 1px solid var(--color-stone-moss);
+}
+.component-hed {
+  font-family: var(--font-fragmentmono);
+  font-size: var(--text-caption);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-mist-gray);
+  margin-bottom: var(--spacing-16);
+}
+.component-preview {
+  padding: var(--spacing-40);
+  background: var(--color-canvas-ice);
+  border: 1px solid var(--color-stone-moss);
+  border-radius: var(--radius-images);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-16);
+  align-items: center;
+}
+.component-spec {
+  margin-top: var(--spacing-16);
+  font-size: var(--text-caption);
+  color: var(--color-mist-gray);
+  line-height: 1.6;
+  font-family: var(--font-fragmentmono);
+  letter-spacing: 0.02em;
+}
+
+/* Button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 var(--spacing-24);
+  border-radius: var(--radius-buttons);
+  font-family: var(--font-akkurat);
+  font-size: var(--text-body-sm);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.btn-primary {
+  background: var(--color-amber-seed);
+  color: var(--color-canvas-ice);
+}
+.btn-secondary {
+  background: var(--color-canvas-ice);
+  color: var(--color-adaline-ink);
+  border: 1px solid var(--color-adaline-ink);
+}
+.btn-tertiary {
+  background: var(--color-canvas-ice);
+  color: var(--color-valley-green);
+  border: 1px solid var(--color-stone-moss);
+}
+
+/* Card styles */
+.card-demo {
+  background: var(--color-canvas-ice);
+  border: 1px solid var(--color-mist-gray);
+  border-radius: var(--radius-images);
+  padding: var(--card-padding);
+  max-width: 340px;
+}
+.card-demo-title {
+  font-size: var(--text-body);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  color: var(--color-adaline-ink);
+}
+.card-demo-body {
+  font-size: var(--text-body-sm);
+  color: var(--color-adaline-ink);
+  margin-top: var(--spacing-16);
+  line-height: 1.43;
+}
+
+/* Nav bar */
+.nav-demo {
+  width: 100%;
+  padding: var(--spacing-16) var(--spacing-24);
+  background: var(--color-canvas-ice);
+  border: 1px solid var(--color-stone-moss);
+  border-radius: var(--radius-images);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-16);
+}
+.nav-demo-links {
+  display: flex;
+  align-items: center;
+  gap: var(--element-gap);
+}
+.nav-demo-link {
+  font-size: var(--text-body-sm);
+  color: var(--color-adaline-ink);
+  padding: var(--spacing-8) var(--spacing-16);
+  border-radius: var(--radius-navitems);
+  letter-spacing: -0.04em;
+  text-decoration: none;
+}
+.nav-demo-link.active {
+  background: var(--color-forest-dew);
+  color: var(--color-valley-green);
+}
+.nav-demo-actions { display: flex; gap: var(--spacing-8); }
+
+/* Logo card */
+.logo-card-demo {
+  background: var(--color-canvas-ice);
+  border: 1px solid var(--color-mist-gray);
+  border-radius: var(--radius-images);
+  padding: var(--spacing-24) var(--spacing-32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  min-width: 160px;
+}
+.logo-card-demo-name {
+  font-size: var(--text-body);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--color-blackest-night);
+}
+
+/* ══════════════════════════════
+   PRINCIPLES
+══════════════════════════════ */
+.principles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--spacing-16);
+}
+.principle-card {
+  background: var(--color-canvas-ice);
+  border: 1px solid var(--color-stone-moss);
+  border-radius: var(--radius-images);
+  padding: var(--card-padding);
+  box-shadow: var(--shadow-subtle);
+}
+.principle-num {
+  font-family: var(--font-fragmentmono);
+  font-size: var(--text-caption);
+  color: var(--color-mist-gray);
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: var(--spacing-8);
+}
+.principle-rule {
+  font-weight: 700;
+  font-size: var(--text-body-sm);
+  letter-spacing: -0.04em;
+  color: var(--color-valley-green);
+  margin-bottom: var(--spacing-8);
+  display: block;
+}
+.principle-desc {
+  font-size: var(--text-body-sm);
+  color: var(--color-adaline-ink);
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════
+   DOS & DON'TS
+══════════════════════════════ */
+.dos-donts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-32); }
+.dd-col h4 {
+  font-size: var(--text-body-sm);
+  font-weight: 700;
+  margin-bottom: var(--spacing-16);
+  letter-spacing: -0.04em;
+  padding-bottom: var(--spacing-8);
+  border-bottom: 1px solid var(--color-stone-moss);
+}
+.dd-col.dos h4 { color: var(--color-valley-green); }
+.dd-col.donts h4 { color: var(--color-deep-earth); }
+.dd-list { list-style: none; display: flex; flex-direction: column; gap: var(--spacing-8); }
+.dd-list li {
+  font-size: var(--text-body-sm);
+  line-height: 1.5;
+  padding-left: var(--spacing-24);
+  position: relative;
+  color: var(--color-adaline-ink);
+}
+.dd-col.dos .dd-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--color-valley-green);
+  font-weight: 700;
+}
+.dd-col.donts .dd-list li::before {
+  content: '✗';
+  position: absolute;
+  left: 0;
+  color: var(--color-deep-earth);
+  font-weight: 700;
+}
+
+/* ══════════════════════════════
+   WORDMARKS
+══════════════════════════════ */
+.wordmark-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-16);
+}
+.wordmark-tile {
+  border: 1px solid var(--color-stone-moss);
+  border-radius: var(--radius-images);
+  padding: var(--spacing-32) var(--spacing-24);
+  min-height: 128px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-8);
+}
+.wm-light { background: var(--color-canvas-ice); }
+.wm-dark  { background: var(--color-adaline-ink); }
+.wm-seed  { background: var(--color-amber-seed); }
+
+.wm-primary {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--color-adaline-ink);
+}
+.wm-dark .wm-primary { color: var(--color-canvas-ice); }
+.wm-seed .wm-primary { color: var(--color-canvas-ice); }
+
+.wm-sub {
+  font-family: var(--font-fragmentmono);
+  font-size: var(--text-caption);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-mist-gray);
+}
+.wm-dark .wm-sub  { color: var(--color-mist-gray); }
+.wm-seed .wm-sub  { color: rgba(251,253,246,0.5); }
+
+.wm-tile-label {
+  font-family: var(--font-fragmentmono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-mist-gray);
+  margin-top: auto;
+}
+.wm-dark .wm-tile-label { color: rgba(197,204,182,0.5); }
+.wm-seed .wm-tile-label { color: rgba(251,253,246,0.4); }
+
+/* ══════════════════════════════
+   IMAGERY GUIDE
+══════════════════════════════ */
+.imagery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-16);
+}
+.imagery-tile {
+  border: 1px solid var(--color-stone-moss);
+  border-radius: var(--radius-images);
+  padding: var(--spacing-24);
+  background: var(--color-canvas-ice);
+}
+.imagery-icon { margin-bottom: var(--spacing-16); }
+.imagery-title {
+  font-size: var(--text-body-sm);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  margin-bottom: var(--spacing-8);
+}
+.imagery-desc { font-size: var(--text-caption); color: var(--color-mist-gray); line-height: 1.5; }
+
+/* ══════════════════════════════
+   CSS QUICK START
+══════════════════════════════ */
+.code-block {
+  background: var(--color-adaline-ink);
+  color: var(--color-forest-dew);
+  font-family: var(--font-fragmentmono);
+  font-size: var(--text-caption);
+  line-height: 1.67;
+  letter-spacing: 0.02em;
+  padding: var(--spacing-32);
+  border-radius: var(--radius-images);
+  overflow-x: auto;
+  white-space: pre;
+}
+.code-comment { color: var(--color-mist-gray); }
+.code-prop    { color: var(--color-forest-dew); }
+.code-value   { color: var(--color-valley-green); }
+
+/* ══════════════════════════════
+   FOOTER
+══════════════════════════════ */
+.footer {
+  padding: var(--spacing-32) 0;
+}
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-path {
+  font-family: var(--font-fragmentmono);
+  font-size: var(--text-caption);
+  color: var(--color-mist-gray);
+  letter-spacing: 0.04em;
+}
+.footer-mark {
+  font-size: var(--text-body);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--color-mist-gray);
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     HEADER
+════════════════════════════════════════ -->
+<div class="header">
+  <div class="wrap">
+    <div class="header-inner">
+      <div>
+        <div class="brand-wordmark">Adaline</div>
+        <div class="brand-sub">Design System · v1 · Mist-Shrouded Valley</div>
+      </div>
+      <div class="header-meta">
+        Light Theme<br>
+        v1 · 2026<br>
+        <span class="accent">Fonts: Akkurat + Fragment Mono</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     01 · COLORS
+════════════════════════════════════════ -->
+<div class="section">
+  <div class="wrap">
+    <span class="meta">01 · Colors</span>
+    <div class="section-hed">Color Hierarchy</div>
+
+    <div class="color-grid">
+      <div class="color-swatch">
+        <div class="swatch-fill" style="background:#fbfdf6; border-bottom:1px solid var(--color-stone-moss);"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Canvas Ice</span>
+          <span class="swatch-hex">#fbfdf6</span>
+          <span class="swatch-token">--color-canvas-ice</span>
+          <span class="swatch-role">Page backgrounds, elevated surfaces, neutral button fills, focus rings</span>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-fill" style="background:#0a1d08;"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Adaline Ink</span>
+          <span class="swatch-hex">#0a1d08</span>
+          <span class="swatch-token">--color-adaline-ink</span>
+          <span class="swatch-role">Primary text, headings, strong borders, brand accents, button text</span>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-fill" style="background:#203b14;"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Valley Green</span>
+          <span class="swatch-hex">#203b14</span>
+          <span class="swatch-token">--color-valley-green</span>
+          <span class="swatch-role">Brand accent — active states, link hover, icon fills, ghost button text/borders</span>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-fill" style="background:#4a3212;"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Amber Seed</span>
+          <span class="swatch-hex">#4a3212</span>
+          <span class="swatch-token">--color-amber-seed</span>
+          <span class="swatch-role">Primary action button background — warm muted brown for interactive elements</span>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-fill" style="background:#c5ccb6;"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Mist Gray</span>
+          <span class="swatch-hex">#c5ccb6</span>
+          <span class="swatch-token">--color-mist-gray</span>
+          <span class="swatch-role">Subtle borders, secondary text, muted backgrounds, list item delimiters</span>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-fill" style="background:#e0e5d5; border-bottom:1px solid var(--color-stone-moss);"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Stone Moss</span>
+          <span class="swatch-hex">#e0e5d5</span>
+          <span class="swatch-token">--color-stone-moss</span>
+          <span class="swatch-role">Secondary button borders, separator lines, card dividers</span>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-fill" style="background:#d7e8b5; border-bottom:1px solid var(--color-stone-moss);"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Forest Dew</span>
+          <span class="swatch-hex">#d7e8b5</span>
+          <span class="swatch-token">--color-forest-dew</span>
+          <span class="swatch-role">Light fill for subtle elements, active navigation item backgrounds</span>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-fill" style="background:#31200b;"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Deep Earth</span>
+          <span class="swatch-hex">#31200b</span>
+          <span class="swatch-token">--color-deep-earth</span>
+          <span class="swatch-role">Decorative fills and strokes in illustrations, occasional text accents</span>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-fill" style="background:#000000;"></div>
+        <div class="swatch-body">
+          <span class="swatch-name">Blackest Night</span>
+          <span class="swatch-hex">#000000</span>
+          <span class="swatch-token">--color-blackest-night</span>
+          <span class="swatch-role">Rare strong contrast elements, graphic fills for brand logos</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     02 · TYPOGRAPHY
+════════════════════════════════════════ -->
+<div class="section">
+  <div class="wrap">
+    <span class="meta">02 · Typography</span>
+    <div class="section-hed">Type System</div>
+
+    <!-- Akkurat -->
+    <div class="type-block">
+      <div class="type-specimen-label">Akkurat — Primary Brand Typeface · --font-akkurat</div>
+      <div class="type-display-sample">Calm authority.</div>
+      <div class="type-body-sample">Adaline employs a serene, naturally-inspired aesthetic. Its slightly condensed and precise forms define the system's clarity. Consistent subtle negative letter spacing provides legibility while maintaining a focused visual presence.</div>
+      <div style="margin-top:var(--spacing-24); display:flex; gap:var(--spacing-24); flex-wrap:wrap;">
+        <div>
+          <div style="font-family:var(--font-akkurat);font-size:var(--text-body-sm);font-weight:400;letter-spacing:-0.04em;">Regular 400 · 14px</div>
+          <div style="font-family:var(--font-akkurat);font-size:var(--text-body);font-weight:400;letter-spacing:-0.04em;">Regular 400 · 18px</div>
+          <div style="font-family:var(--font-akkurat);font-size:var(--text-body);font-weight:700;letter-spacing:-0.04em;">Bold 700 · 18px</div>
+          <div style="font-family:var(--font-akkurat);font-size:var(--text-body-lg);font-weight:700;letter-spacing:-0.04em;line-height:1.0;">47px</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fragment Mono -->
+    <div class="type-block">
+      <div class="type-specimen-label">Fragment Mono — Monospaced UI Labels · --font-fragmentmono</div>
+      <div class="type-mono-sample">FRAGMENT MONO · v1 · design-system · 14px · 0.02em tracking · labels, metadata, captions</div>
+    </div>
+
+    <!-- Type scale table -->
+    <div class="type-block">
+      <div class="type-specimen-label">Type Scale</div>
+      <div class="type-scale">
+        <div class="scale-row header-row">
+          <span>Role</span>
+          <span>Size</span>
+          <span>Line Height</span>
+          <span>Letter Spacing</span>
+          <span>Token</span>
+        </div>
+        <div class="scale-row">
+          <span style="font-size:12px;letter-spacing:-0.04em;">Caption</span>
+          <span class="scale-num">12px</span>
+          <span class="scale-num">1.43</span>
+          <span class="scale-num">—</span>
+          <span class="scale-token">--text-caption</span>
+        </div>
+        <div class="scale-row">
+          <span style="font-size:14px;letter-spacing:-0.04em;">Body Small</span>
+          <span class="scale-num">14px</span>
+          <span class="scale-num">1.43</span>
+          <span class="scale-num">—</span>
+          <span class="scale-token">--text-body-sm</span>
+        </div>
+        <div class="scale-row">
+          <span style="font-size:18px;letter-spacing:-0.04em;">Body</span>
+          <span class="scale-num">18px</span>
+          <span class="scale-num">1.43</span>
+          <span class="scale-num">—</span>
+          <span class="scale-token">--text-body</span>
+        </div>
+        <div class="scale-row">
+          <span style="font-size:24px;letter-spacing:-0.04em;line-height:1;">Body Lg</span>
+          <span class="scale-num">47px</span>
+          <span class="scale-num">1.3</span>
+          <span class="scale-num">-0.04em</span>
+          <span class="scale-token">--text-body-lg</span>
+        </div>
+        <div class="scale-row">
+          <span style="font-size:26px;letter-spacing:-0.04em;font-weight:700;line-height:1;">Heading Sm</span>
+          <span class="scale-num">53px</span>
+          <span class="scale-num">1.3</span>
+          <span class="scale-num">-0.04em</span>
+          <span class="scale-token">--text-heading-sm</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     03 · SPACING & SHAPES
+════════════════════════════════════════ -->
+<div class="section">
+  <div class="wrap">
+    <span class="meta">03 · Spacing &amp; Shapes</span>
+    <div class="section-hed">Spacing Scale · Base Unit 8px · Density: Comfortable</div>
+
+    <div class="spacing-rows">
+      <div class="spacing-row-item">
+        <span class="spacing-info">--spacing-8</span>
+        <div class="spacing-bar" style="width:8px;"></div>
+        <span class="spacing-info">8px</span>
+      </div>
+      <div class="spacing-row-item">
+        <span class="spacing-info">--spacing-16</span>
+        <div class="spacing-bar" style="width:16px;"></div>
+        <span class="spacing-info">16px</span>
+      </div>
+      <div class="spacing-row-item">
+        <span class="spacing-info">--spacing-24</span>
+        <div class="spacing-bar" style="width:24px;"></div>
+        <span class="spacing-info">24px — card-padding</span>
+      </div>
+      <div class="spacing-row-item">
+        <span class="spacing-info">--spacing-32</span>
+        <div class="spacing-bar" style="width:32px;"></div>
+        <span class="spacing-info">32px</span>
+      </div>
+      <div class="spacing-row-item">
+        <span class="spacing-info">--spacing-40</span>
+        <div class="spacing-bar" style="width:40px;"></div>
+        <span class="spacing-info">40px</span>
+      </div>
+      <div class="spacing-row-item">
+        <span class="spacing-info">--spacing-48</span>
+        <div class="spacing-bar" style="width:48px;"></div>
+        <span class="spacing-info">48px — section-gap</span>
+      </div>
+      <div class="spacing-row-item">
+        <span class="spacing-info">--spacing-64</span>
+        <div class="spacing-bar" style="width:64px;"></div>
+        <span class="spacing-info">64px</span>
+      </div>
+      <div class="spacing-row-item">
+        <span class="spacing-info">--spacing-128</span>
+        <div class="spacing-bar" style="width:128px;"></div>
+        <span class="spacing-info">128px</span>
+      </div>
+      <div class="spacing-row-item">
+        <span class="spacing-info">--spacing-160</span>
+        <div class="spacing-bar" style="width:160px;"></div>
+        <span class="spacing-info">160px</span>
+      </div>
+    </div>
+
+    <div style="margin-top:var(--spacing-48);">
+      <div style="font-family:var(--font-fragmentmono);font-size:var(--text-caption);letter-spacing:0.08em;text-transform:uppercase;color:var(--color-mist-gray);margin-bottom:var(--spacing-24);">Border Radius</div>
+      <div class="shapes-grid">
+        <div class="shape-demo">
+          <div class="shape-box" style="border-radius:8px;"></div>
+          <span class="shape-label">images · 8px<br>--radius-images</span>
+        </div>
+        <div class="shape-demo">
+          <div class="shape-box" style="border-radius:20px;"></div>
+          <span class="shape-label">buttons · 20px<br>--radius-buttons</span>
+        </div>
+        <div class="shape-demo">
+          <div class="shape-box" style="border-radius:20px;"></div>
+          <span class="shape-label">navItems · 20px<br>--radius-navitems</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:var(--spacing-48);">
+      <div style="font-family:var(--font-fragmentmono);font-size:var(--text-caption);letter-spacing:0.08em;text-transform:uppercase;color:var(--color-mist-gray);margin-bottom:var(--spacing-16);">Shadows</div>
+      <div class="shadow-demo-wrap">
+        <div class="shadow-box subtle">--shadow-subtle</div>
+        <span style="font-family:var(--font-fragmentmono);font-size:var(--text-caption);color:var(--color-mist-gray);">rgba(99, 143, 61, 0.1) 0px 0px 0px 1px</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     04 · COMPONENTS
+════════════════════════════════════════ -->
+<div class="section">
+  <div class="wrap">
+    <span class="meta">04 · Components</span>
+    <div class="section-hed">UI Components</div>
+
+    <!-- Buttons -->
+    <div class="component-block">
+      <div class="component-hed">Buttons — Three variants</div>
+      <div class="component-preview">
+        <button class="btn btn-primary">Start for free</button>
+        <button class="btn btn-secondary">Watch Demo</button>
+        <button class="btn btn-tertiary">Learn more</button>
+      </div>
+      <div class="component-spec">
+        Primary: background #4a3212 (Amber Seed) · text #fbfdf6 (Canvas Ice) · radius 20px · padding 0 24px<br>
+        Secondary: background #fbfdf6 · text #0a1d08 · border 1px #0a1d08 · hover → Valley Green text &amp; border<br>
+        Tertiary: background #fbfdf6 · text #203b14 (Valley Green) · border 1px #e0e5d5 (Stone Moss)
+      </div>
+    </div>
+
+    <!-- Navigation bar -->
+    <div class="component-block">
+      <div class="component-hed">Navigation Bar</div>
+      <div class="component-preview" style="padding:var(--spacing-24);flex-direction:column;align-items:stretch;">
+        <nav class="nav-demo">
+          <div class="nav-demo-links">
+            <a class="nav-demo-link active" href="#">Products</a>
+            <a class="nav-demo-link" href="#">Pricing</a>
+            <a class="nav-demo-link" href="#">Blog</a>
+          </div>
+          <div class="nav-demo-actions">
+            <button class="btn btn-tertiary" style="height:36px;">Watch Demo</button>
+            <button class="btn btn-primary" style="height:36px;">Start for free</button>
+          </div>
+        </nav>
+      </div>
+      <div class="component-spec">
+        Background: Canvas Ice · Links: Akkurat 14px 400 Adaline Ink · Active: Forest Dew bg + Valley Green text<br>
+        radius 20px · horizontal padding 16px · element-gap 4px
+      </div>
+    </div>
+
+    <!-- Feature card -->
+    <div class="component-block">
+      <div class="component-hed">Feature Card</div>
+      <div class="component-preview">
+        <div class="card-demo">
+          <div class="card-demo-title">Seamless integration</div>
+          <div class="card-demo-body">Connect your tools in minutes. Adaline works with your existing stack, adapting to how your team actually operates — not the other way around.</div>
+        </div>
+      </div>
+      <div class="component-spec">
+        Background: Canvas Ice #fbfdf6 · border: 1px Mist Gray #c5ccb6 · radius: 8px · padding: 24px<br>
+        Title: Akkurat 18px weight 400 Adaline Ink · Body: Akkurat 14px weight 400 Adaline Ink · margin-top: 16px
+      </div>
+    </div>
+
+    <!-- Client logo card -->
+    <div class="component-block">
+      <div class="component-hed">Client Logo Card</div>
+      <div class="component-preview">
+        <div class="logo-card-demo">
+          <span class="logo-card-demo-name">Acme Corp</span>
+        </div>
+        <div class="logo-card-demo">
+          <span class="logo-card-demo-name">Studio Nine</span>
+        </div>
+        <div class="logo-card-demo">
+          <span class="logo-card-demo-name">Watershed</span>
+        </div>
+      </div>
+      <div class="component-spec">
+        Background: Canvas Ice · border: 1px Mist Gray · radius: 8px · logos: Blackest Night #000000
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     05 · PRINCIPLES
+════════════════════════════════════════ -->
+<div class="section">
+  <div class="wrap">
+    <span class="meta">05 · Principles</span>
+    <div class="section-hed">Design Principles</div>
+    <div class="principles-grid">
+      <div class="principle-card">
+        <span class="principle-num">01</span>
+        <span class="principle-rule">Canvas Ice for all backgrounds</span>
+        <span class="principle-desc">Prioritize #fbfdf6 as the primary page surface to maintain the light, airy feel that defines Adaline's visual tone.</span>
+      </div>
+      <div class="principle-card">
+        <span class="principle-num">02</span>
+        <span class="principle-rule">Akkurat with -0.04em always</span>
+        <span class="principle-desc">Apply consistent negative letter spacing across all sizes. This is the signature precision that makes Adaline's typography immediately recognizable.</span>
+      </div>
+      <div class="principle-card">
+        <span class="principle-num">03</span>
+        <span class="principle-rule">20px radius on interactive elements</span>
+        <span class="principle-desc">All buttons and navigation items use 20px border-radius. This creates a softer, more approachable interaction surface throughout the product.</span>
+      </div>
+      <div class="principle-card">
+        <span class="principle-num">04</span>
+        <span class="principle-rule">Amber Seed for primary CTAs only</span>
+        <span class="principle-desc">Reserve the warm brown #4a3212 exclusively for primary action button backgrounds. Its uniqueness is what makes it work as a hierarchy signal.</span>
+      </div>
+      <div class="principle-card">
+        <span class="principle-num">05</span>
+        <span class="principle-rule">Valley Green as the accent</span>
+        <span class="principle-desc">Use #203b14 for interactive states, icon fills, and subtle brand highlights. It is the single accent color — using it sparingly preserves its impact.</span>
+      </div>
+      <div class="principle-card">
+        <span class="principle-num">06</span>
+        <span class="principle-rule">Flat surfaces, minimal elevation</span>
+        <span class="principle-desc">Avoid harsh shadows or strong elevation. Depth comes from layered flat surfaces and subtle border treatment, not drop shadows.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     06 · DOS & DON'TS
+════════════════════════════════════════ -->
+<div class="section">
+  <div class="wrap">
+    <span class="meta">06 · Do's &amp; Don'ts</span>
+    <div class="section-hed">Usage Guidelines</div>
+    <div class="dos-donts">
+      <div class="dd-col dos">
+        <h4>✓ Do</h4>
+        <ul class="dd-list">
+          <li>Prioritize Canvas Ice (#fbfdf6) for all primary backgrounds</li>
+          <li>Use Adaline Ink (#0a1d08) for headings and body text</li>
+          <li>Apply Akkurat with -0.04em letter spacing consistently</li>
+          <li>Use 20px border-radius on all interactive elements</li>
+          <li>Reserve Amber Seed (#4a3212) for primary CTA backgrounds only</li>
+          <li>Maintain 48px sectional gaps and 24px inner padding for cards</li>
+          <li>Use Valley Green (#203b14) for interactive states and icons</li>
+        </ul>
+      </div>
+      <div class="dd-col donts">
+        <h4>✗ Don't</h4>
+        <ul class="dd-list">
+          <li>Don't use highly saturated or vivid colors outside brand accent areas</li>
+          <li>Avoid harsh shadows or strong elevation — keep surfaces flat and layered</li>
+          <li>Don't introduce new typefaces beyond Akkurat and fragmentMono</li>
+          <li>Don't use square or minimal radius on buttons or nav items</li>
+          <li>Avoid dense packing — maintain comfortable element gaps (4px)</li>
+          <li>Don't use light text on light backgrounds for interactive elements</li>
+          <li>Don't use any solid button background color other than Amber Seed</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     07 · WORDMARKS
+════════════════════════════════════════ -->
+<div class="section">
+  <div class="wrap">
+    <span class="meta">07 · Wordmarks &amp; Lockups</span>
+    <div class="section-hed">Name Treatments</div>
+    <div class="wordmark-grid">
+      <div class="wordmark-tile wm-light">
+        <span class="wm-primary">Adaline</span>
+        <span class="wm-sub">Design System</span>
+        <span class="wm-tile-label">Light · Primary</span>
+      </div>
+      <div class="wordmark-tile wm-dark">
+        <span class="wm-primary">Adaline</span>
+        <span class="wm-sub">Design System</span>
+        <span class="wm-tile-label">Dark · Reversed</span>
+      </div>
+      <div class="wordmark-tile wm-seed">
+        <span class="wm-primary">Adaline</span>
+        <span class="wm-sub">Design System</span>
+        <span class="wm-tile-label">Amber · Brand</span>
+      </div>
+    </div>
+    <p style="margin-top:var(--spacing-16);font-family:var(--font-fragmentmono);font-size:var(--text-caption);color:var(--color-mist-gray);letter-spacing:0.04em;">
+      Note: Logo SVG not provided — above treatments use typographic lockups only. Provide the brand's SVG mark for production lockups.
+    </p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     08 · IMAGERY
+════════════════════════════════════════ -->
+<div class="section">
+  <div class="wrap">
+    <span class="meta">08 · Imagery</span>
+    <div class="section-hed">Visual Language</div>
+    <div class="imagery-grid">
+      <div class="imagery-tile">
+        <div class="imagery-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="4" fill="var(--color-stone-moss)"/>
+            <path d="M4 22 L12 14 L18 20 L24 12 L28 16" stroke="var(--color-valley-green)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="8" cy="10" r="3" fill="var(--color-mist-gray)"/>
+          </svg>
+        </div>
+        <div class="imagery-title">Hero Backgrounds</div>
+        <div class="imagery-desc">Abstract digital-nature illustrations — rendered landscapes with misty mountains and serene lakes. Full-bleed, atmospheric, calm and contemplative.</div>
+      </div>
+      <div class="imagery-tile">
+        <div class="imagery-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect x="2" y="6" width="28" height="20" rx="4" fill="var(--color-stone-moss)"/>
+            <rect x="6" y="10" width="20" height="12" rx="2" fill="var(--color-canvas-ice)"/>
+            <rect x="8" y="12" width="16" height="2" rx="1" fill="var(--color-mist-gray)"/>
+            <rect x="8" y="16" width="10" height="2" rx="1" fill="var(--color-mist-gray)"/>
+          </svg>
+        </div>
+        <div class="imagery-title">Product Screenshots</div>
+        <div class="imagery-desc">UI screenshots as contained elements with slight rounding and minimal borders. Spacious, low-density presentation.</div>
+      </div>
+      <div class="imagery-tile">
+        <div class="imagery-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <circle cx="16" cy="16" r="6" stroke="var(--color-valley-green)" stroke-width="1.5" fill="none"/>
+            <path d="M16 8V6M16 26V24M8 16H6M26 16H24" stroke="var(--color-valley-green)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="imagery-title">Icons</div>
+        <div class="imagery-desc">Minimal, monochromatic, outlined. Clean and functional. No filled or overly decorated icons — maintains the system's visual restraint.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     09 · QUICK START CSS
+════════════════════════════════════════ -->
+<div class="section">
+  <div class="wrap">
+    <span class="meta">09 · Quick Start</span>
+    <div class="section-hed">CSS Custom Properties</div>
+    <pre class="code-block"><span class="code-comment">/* Adaline Design System — CSS Custom Properties */</span>
+:root {
+  <span class="code-comment">/* Colors */</span>
+  <span class="code-prop">--color-canvas-ice</span>:    <span class="code-value">#fbfdf6</span>;
+  <span class="code-prop">--color-adaline-ink</span>:   <span class="code-value">#0a1d08</span>;
+  <span class="code-prop">--color-mist-gray</span>:     <span class="code-value">#c5ccb6</span>;
+  <span class="code-prop">--color-deep-earth</span>:    <span class="code-value">#31200b</span>;
+  <span class="code-prop">--color-valley-green</span>:  <span class="code-value">#203b14</span>;
+  <span class="code-prop">--color-stone-moss</span>:    <span class="code-value">#e0e5d5</span>;
+  <span class="code-prop">--color-amber-seed</span>:    <span class="code-value">#4a3212</span>;
+  <span class="code-prop">--color-forest-dew</span>:    <span class="code-value">#d7e8b5</span>;
+  <span class="code-prop">--color-blackest-night</span>:<span class="code-value">#000000</span>;
+
+  <span class="code-comment">/* Typography */</span>
+  <span class="code-prop">--font-akkurat</span>:      <span class="code-value">'akkurat', ui-sans-serif, system-ui, sans-serif</span>;
+  <span class="code-prop">--font-fragmentmono</span>: <span class="code-value">'Fragment Mono', ui-monospace, Consolas, monospace</span>;
+
+  <span class="code-comment">/* Type Scale */</span>
+  <span class="code-prop">--text-caption</span>:    <span class="code-value">12px</span>;
+  <span class="code-prop">--text-body-sm</span>:    <span class="code-value">14px</span>;
+  <span class="code-prop">--text-body</span>:       <span class="code-value">18px</span>;
+  <span class="code-prop">--text-body-lg</span>:    <span class="code-value">47px</span>;
+  <span class="code-prop">--text-heading-sm</span>: <span class="code-value">53px</span>;
+
+  <span class="code-comment">/* Spacing */</span>
+  <span class="code-prop">--spacing-8</span>: <span class="code-value">8px</span>;  <span class="code-prop">--spacing-16</span>: <span class="code-value">16px</span>;  <span class="code-prop">--spacing-24</span>: <span class="code-value">24px</span>;
+  <span class="code-prop">--spacing-32</span>: <span class="code-value">32px</span>; <span class="code-prop">--spacing-40</span>: <span class="code-value">40px</span>;  <span class="code-prop">--spacing-48</span>: <span class="code-value">48px</span>;
+  <span class="code-prop">--spacing-64</span>: <span class="code-value">64px</span>; <span class="code-prop">--spacing-128</span>: <span class="code-value">128px</span>; <span class="code-prop">--spacing-160</span>: <span class="code-value">160px</span>;
+
+  <span class="code-comment">/* Layout */</span>
+  <span class="code-prop">--section-gap</span>:  <span class="code-value">48px</span>;
+  <span class="code-prop">--card-padding</span>: <span class="code-value">24px</span>;
+  <span class="code-prop">--element-gap</span>:  <span class="code-value">4px</span>;
+
+  <span class="code-comment">/* Border Radius */</span>
+  <span class="code-prop">--radius-images</span>:   <span class="code-value">8px</span>;
+  <span class="code-prop">--radius-buttons</span>:  <span class="code-value">20px</span>;
+  <span class="code-prop">--radius-navitems</span>: <span class="code-value">20px</span>;
+
+  <span class="code-comment">/* Shadows */</span>
+  <span class="code-prop">--shadow-subtle</span>: <span class="code-value">rgba(99, 143, 61, 0.1) 0px 0px 0px 1px</span>;
+}</pre>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<div class="footer">
+  <div class="wrap">
+    <div class="footer-inner">
+      <span class="footer-path">design/design-system.html · v1 · 2026 · Adaline Design System</span>
+      <span class="footer-mark">Adaline</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

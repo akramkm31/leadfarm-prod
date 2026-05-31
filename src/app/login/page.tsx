@@ -2,8 +2,65 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Leaf, Eye, EyeOff, ArrowRight, Tractor } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, Tractor, Leaf, ShieldCheck, Wrench, Package, HardHat, ClipboardList, UserCog } from "lucide-react";
 import { getSupabaseBrowser } from "@/lib/supabase-browser";
+
+const PROFILES = [
+  {
+    role: "directeur",
+    label: "Directeur",
+    sub: "Accès complet + admin",
+    icon: ShieldCheck,
+    color: "#0071e3",
+    bg: "#eff6ff",
+    border: "#bfdbfe",
+  },
+  {
+    role: "responsable_technique",
+    label: "Resp. Technique",
+    sub: "Pilotage agronomique",
+    icon: Wrench,
+    color: "#7c3aed",
+    bg: "#f5f3ff",
+    border: "#ddd6fe",
+  },
+  {
+    role: "magasinier",
+    label: "Magasinier",
+    sub: "Stock phytosanitaire",
+    icon: Package,
+    color: "#d97706",
+    bg: "#fffbeb",
+    border: "#fde68a",
+  },
+  {
+    role: "operateur",
+    label: "Opérateur",
+    sub: "Terrain & traitements",
+    icon: HardHat,
+    color: "#059669",
+    bg: "#ecfdf5",
+    border: "#a7f3d0",
+  },
+  {
+    role: "auditeur",
+    label: "Auditeur",
+    sub: "Conformité & rapports",
+    icon: ClipboardList,
+    color: "#7424b5",
+    bg: "#faf5ff",
+    border: "#e9d5ff",
+  },
+  {
+    role: "consultant",
+    label: "Consultant",
+    sub: "Plans cross-tenant",
+    icon: UserCog,
+    color: "#0891b2",
+    bg: "#ecfeff",
+    border: "#a5f3fc",
+  },
+] as const;
 
 export default function LoginPage() {
   return (
@@ -18,159 +75,192 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/dashboard";
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(process.env.NEXT_PUBLIC_DEMO_EMAIL ?? "");
   const [password, setPassword] = useState("");
+  const [selectedRole, setSelectedRole] = useState<string>("directeur");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [quickLoading, setQuickLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const doLogin = async (emailVal: string, passwordVal: string, role: string) => {
     setError("");
-
-    if (!email || !password) {
-      setError("Identifiants requis");
-      return;
-    }
-
-    setLoading(true);
     const supabase = getSupabaseBrowser();
-
     const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+      email: emailVal,
+      password: passwordVal,
     });
-
     if (authError) {
       setError(
         authError.message === "Invalid login credentials"
           ? "Email ou mot de passe incorrect"
           : authError.message
       );
-      setLoading(false);
-      return;
+      return false;
     }
-
+    if (typeof window !== "undefined") {
+      localStorage.setItem("leadfarm_mock_role", role);
+    }
     router.push(redirect);
     router.refresh();
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) { setError("Identifiants requis"); return; }
+    setLoading(true);
+    await doLogin(email, password, selectedRole);
+    setLoading(false);
+  };
+
+  const handleQuickLogin = async (role: string) => {
+    const demoEmail = process.env.NEXT_PUBLIC_DEMO_EMAIL;
+    const demoPassword = process.env.NEXT_PUBLIC_DEMO_PASSWORD;
+    if (!demoEmail || !demoPassword) {
+      // No demo creds — pre-fill role and let user type password
+      setSelectedRole(role);
+      setError("");
+      return;
+    }
+    setQuickLoading(role);
+    await doLogin(demoEmail, demoPassword, role);
+    setQuickLoading(null);
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center overflow-hidden">
-      <div className="farm-backdrop" />
+    <div className="min-h-screen relative flex items-center justify-center overflow-hidden" style={{ background: "var(--color-canvas-ice)" }}>
+      <div className="relative z-10 w-full max-w-lg mx-4 py-10">
 
-      <div className="absolute top-20 left-20 w-72 h-72 rounded-full bg-green-600/10 blur-[100px] animate-pulse" />
-      <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-amber-500/8 blur-[120px] animate-pulse" style={{ animationDelay: "1s" }} />
-
-      <div className="relative z-10 w-full max-w-md mx-4">
+        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/25 to-green-600/20 border border-amber-500/30 mb-4 glow-amber">
-            <Leaf className="w-8 h-8 text-amber-400" />
+          <div className="inline-flex items-center justify-center gap-2 mb-3">
+            <Leaf className="w-5 h-5 text-[var(--color-valley-green)]" />
+            <h1 className="text-3xl font-bold text-[var(--color-adaline-ink)] tracking-tight">LeadFarm</h1>
           </div>
-          <h1 className="text-3xl font-bold text-white/90 tracking-tight">LeadFarm</h1>
-          <p className="text-sm text-white/65 mt-2 font-mono">
-            Precision Agriculture Platform
+          <p className="mono text-[11px] text-[var(--color-mist-gray)] uppercase tracking-widest">
+            Precision Agriculture · Adaline
           </p>
         </div>
 
+        {/* Profile cards */}
+        <div className="card-soft p-6 mb-4">
+          <p className="text-xs font-semibold text-[var(--color-adaline-ink)]/50 uppercase tracking-widest mb-4">
+            Connexion rapide par profil
+          </p>
+          <div className="grid grid-cols-3 gap-2.5">
+            {PROFILES.map((p) => {
+              const Icon = p.icon;
+              const isActive = selectedRole === p.role;
+              const isSpinning = quickLoading === p.role;
+              return (
+                <button
+                  key={p.role}
+                  type="button"
+                  onClick={() => handleQuickLogin(p.role)}
+                  disabled={!!quickLoading || loading}
+                  style={{
+                    background: isActive ? p.bg : "white",
+                    borderColor: isActive ? p.color : p.border,
+                    borderWidth: isActive ? "2px" : "1px",
+                  }}
+                  className="relative flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all hover:shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isSpinning ? (
+                    <div className="w-5 h-5 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin" />
+                  ) : (
+                    <Icon className="w-5 h-5" style={{ color: p.color }} />
+                  )}
+                  <span className="text-[11px] font-semibold text-[var(--color-adaline-ink)]/80 leading-tight text-center">{p.label}</span>
+                  <span className="text-[9px] text-[var(--color-mist-gray)] leading-tight text-center">{p.sub}</span>
+                  {isActive && (
+                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full" style={{ background: p.color }} />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          {!process.env.NEXT_PUBLIC_DEMO_PASSWORD && (
+            <p className="text-[10px] text-[var(--color-mist-gray)] text-center mt-3">
+              Sélectionnez un profil puis saisissez vos identifiants ci-dessous
+            </p>
+          )}
+        </div>
+
+        {/* Credentials form */}
         <form onSubmit={handleSubmit}>
-          <div className="glass-card p-8">
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold text-white/85">Connexion</h2>
-              <p className="text-xs text-white/65 mt-1">
-                Accédez au tableau de bord de votre exploitation
-              </p>
+          <div className="card-soft p-6">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h2 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85">Identifiants</h2>
+                <p className="text-xs text-[var(--color-adaline-ink)]/50 mt-0.5">
+                  Profil sélectionné : <span className="font-medium text-[var(--color-adaline-ink)]/70">{PROFILES.find(p => p.role === selectedRole)?.label}</span>
+                </p>
+              </div>
+              <select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+                className="glass-input px-3 py-1.5 text-xs bg-white text-gray-700 font-medium rounded-lg"
+              >
+                {PROFILES.map(p => (
+                  <option key={p.role} value={p.role}>{p.label}</option>
+                ))}
+              </select>
             </div>
 
             {error && (
-              <div className="mb-4 p-3 rounded-xl bg-red-500/15 border border-red-500/25 text-sm text-red-300" role="alert">
+              <div className="mb-4 p-3 rounded-xl bg-[rgba(107,31,10,0.06)] border border-[rgba(107,31,10,0.35)] text-sm text-[var(--c-danger)]" role="alert">
                 {error}
               </div>
             )}
 
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="email" className="block text-xs font-medium text-white/70 mb-2">
-                  Adresse email
-                </label>
+            <div className="space-y-3">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="akram@leadfarm.dz"
+                className="glass-input w-full px-4 py-3 text-sm"
+                autoComplete="email"
+                required
+              />
+              <div className="relative">
                 <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                  placeholder="akram@leadfarm.dz"
-                  className="glass-input w-full px-4 py-3 text-sm"
-                  autoComplete="email"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="glass-input w-full px-4 py-3 pr-10 text-sm"
+                  autoComplete="current-password"
                   required
                 />
-              </div>
-
-              <div>
-                <label htmlFor="password" className="block text-xs font-medium text-white/70 mb-2">
-                  Mot de passe
-                </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="glass-input w-full px-4 py-3 pr-10 text-sm"
-                    autoComplete="current-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
-                    aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="w-3.5 h-3.5 rounded border border-white/15 bg-white/[0.05] accent-amber-500"
-                  />
-                  <span className="text-xs text-white/65">Rester connecté</span>
-                </label>
                 <button
                   type="button"
-                  onClick={() => setError("Contactez votre administrateur pour réinitialiser le mot de passe.")}
-                  className="text-xs font-medium text-amber-300/85 hover:text-amber-300 underline-offset-2 hover:underline transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-adaline-ink)]/30 hover:text-[var(--color-adaline-ink)]/60 transition-colors"
                 >
-                  Mot de passe oublié ?
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
 
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full glass-button py-3.5 text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading || !!quickLoading}
+                className="w-full lf-btn lf-btn-primary py-3 text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
-                  <div className="w-4 h-4 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+                  <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Connexion…</>
                 ) : (
-                  <>
-                    Se connecter
-                    <ArrowRight className="w-4 h-4" />
-                  </>
+                  <>Se connecter <ArrowRight className="w-4 h-4" /></>
                 )}
               </button>
             </div>
           </div>
         </form>
 
-        <div className="mt-6 text-center">
-          <div className="flex items-center justify-center gap-2 text-white/55 text-xs">
-            <Tractor className="w-3.5 h-3.5" />
-            <span>LeadFarm v1.0 — Gestion agricole de précision</span>
-          </div>
+        <div className="mt-5 text-center flex items-center justify-center gap-2 text-[var(--color-adaline-ink)]/40 text-xs">
+          <Tractor className="w-3.5 h-3.5" />
+          <span>LeadFarm v1.0 — KHELIFA LTD · USTO-MB 2026</span>
         </div>
       </div>
     </div>

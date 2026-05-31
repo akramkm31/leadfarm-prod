@@ -73,7 +73,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         suppliers: suppliersRes.data as unknown as Supplier[] || null,
         stockEntries: movementsRes.data as unknown as StockEntry[] || null,
         stockLevels: stockRes.data as unknown as StockLevel[] || null,
-        treatments: treatmentsRes.data as unknown as Treatment[] || null,
+        treatments: treatmentsRes.data as unknown as any[] || null,
         operators: operatorsRes.data as unknown as Operator[] || null,
         alerts: alertsRes.data as unknown as Alert[] || null,
       });

@@ -5,10 +5,10 @@
 
 export const STATUS_COLORS = {
   ok: { bg: "bg-green-400/10", text: "text-green-400", border: "border-green-400/25", dot: "bg-green-400" },
-  low: { bg: "bg-amber-400/10", text: "text-amber-400", border: "border-amber-400/25", dot: "bg-amber-400" },
-  critical: { bg: "bg-red-400/10", text: "text-red-400", border: "border-red-400/25", dot: "bg-red-400" },
-  negative: { bg: "bg-red-500/10", text: "text-red-500", border: "border-red-500/25", dot: "bg-red-500" },
-  over: { bg: "bg-blue-400/10", text: "text-blue-400", border: "border-blue-400/25", dot: "bg-blue-400" },
+  low: { bg: "bg-emerald-400/10", text: "text-[var(--color-valley-green)]", border: "border-emerald-400/25", dot: "bg-emerald-400" },
+  critical: { bg: "bg-emerald-400/10", text: "text-[var(--color-valley-green)]", border: "border-emerald-400/25", dot: "bg-emerald-400" },
+  negative: { bg: "bg-[var(--color-valley-green)]/10", text: "text-[var(--color-valley-green)]", border: "border-[var(--color-valley-green)]/25", dot: "bg-[var(--color-valley-green)]" },
+  over: { bg: "bg-emerald-400/10", text: "text-[var(--color-valley-green)]", border: "border-emerald-400/25", dot: "bg-emerald-400" },
 } as const;
 
 export const STATUS_LABELS: Record<string, string> = {
@@ -20,21 +20,21 @@ export const STATUS_LABELS: Record<string, string> = {
 };
 
 export const SEVERITY_COLORS = {
-  critical: { bg: "bg-red-500/15", text: "text-red-400", border: "border-red-500/25", dot: "bg-red-500" },
-  high: { bg: "bg-orange-500/15", text: "text-orange-400", border: "border-orange-500/25", dot: "bg-orange-500" },
-  medium: { bg: "bg-amber-500/15", text: "text-amber-400", border: "border-amber-500/25", dot: "bg-amber-400" },
-  low: { bg: "bg-blue-500/15", text: "text-blue-400", border: "border-blue-500/25", dot: "bg-blue-400" },
-  info: { bg: "bg-white/5", text: "text-white/50", border: "border-white/10", dot: "bg-white/40" },
+  critical: { bg: "bg-[var(--color-valley-green)]/15", text: "text-[var(--color-valley-green)]", border: "border-[var(--color-valley-green)]/25", dot: "bg-[var(--color-valley-green)]" },
+  high: { bg: "bg-[var(--color-valley-green)]/15", text: "text-[var(--color-valley-green)]", border: "border-[var(--color-valley-green)]/25", dot: "bg-[var(--color-valley-green)]" },
+  medium: { bg: "bg-[var(--color-valley-green)]/15", text: "text-[var(--color-valley-green)]", border: "border-[var(--color-valley-green)]/25", dot: "bg-emerald-400" },
+  low: { bg: "bg-[var(--color-valley-green)]/15", text: "text-[var(--color-valley-green)]", border: "border-[var(--color-valley-green)]/25", dot: "bg-emerald-400" },
+  info: { bg: "bg-[var(--color-canvas-ice)]", text: "text-[var(--color-adaline-ink)]/50", border: "border-[var(--color-stone-moss)]", dot: "bg-white/40" },
 } as const;
 
 export const MOVEMENT_TYPE_COLORS: Record<string, { bg: string; text: string }> = {
   entry: { bg: "bg-green-400/10", text: "text-green-400" },
-  exit: { bg: "bg-red-400/10", text: "text-red-400" },
-  treatment_consumption: { bg: "bg-purple-400/10", text: "text-purple-400" },
-  adjustment: { bg: "bg-amber-400/10", text: "text-amber-400" },
-  transfer: { bg: "bg-orange-400/10", text: "text-orange-400" },
-  return: { bg: "bg-blue-400/10", text: "text-blue-400" },
-  stock_initial: { bg: "bg-white/5", text: "text-white/50" },
+  exit: { bg: "bg-emerald-400/10", text: "text-[var(--color-valley-green)]" },
+  treatment_consumption: { bg: "bg-emerald-400/10", text: "text-[var(--color-valley-green)]" },
+  adjustment: { bg: "bg-emerald-400/10", text: "text-[var(--color-valley-green)]" },
+  transfer: { bg: "bg-emerald-400/10", text: "text-[var(--color-valley-green)]" },
+  return: { bg: "bg-emerald-400/10", text: "text-[var(--color-valley-green)]" },
+  stock_initial: { bg: "bg-[var(--color-canvas-ice)]", text: "text-[var(--color-adaline-ink)]/50" },
 };
 
 export const MOVEMENT_TYPE_LABELS: Record<string, string> = {

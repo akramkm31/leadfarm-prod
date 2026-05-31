@@ -40,15 +40,15 @@ export default function FertilizerCalculator() {
         className="flex items-center justify-between w-full"
       >
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-cyan-500/15 border border-cyan-500/25 flex items-center justify-center">
-            <Calculator className="w-4.5 h-4.5 text-cyan-400" />
+          <div className="w-9 h-9 rounded-xl bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/25 flex items-center justify-center">
+            <Calculator className="w-4.5 h-4.5 text-[var(--color-valley-green)]" />
           </div>
           <div className="text-left">
-            <h3 className="text-sm font-semibold text-white/85">Calcul des Unités d&apos;Engrais</h3>
-            <p className="text-[10px] text-white/40">NPK — Unités fertilisantes par parcelle</p>
+            <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85">Calcul des Unités d&apos;Engrais</h3>
+            <p className="text-[10px] text-[var(--color-adaline-ink)]/40">NPK — Unités fertilisantes par parcelle</p>
           </div>
         </div>
-        {expanded ? <ChevronUp className="w-4 h-4 text-white/30" /> : <ChevronDown className="w-4 h-4 text-white/30" />}
+        {expanded ? <ChevronUp className="w-4 h-4 text-[var(--color-adaline-ink)]/30" /> : <ChevronDown className="w-4 h-4 text-[var(--color-adaline-ink)]/30" />}
       </button>
 
       {expanded && (
@@ -56,7 +56,7 @@ export default function FertilizerCalculator() {
           {/* Calculator inputs */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
             <div>
-              <label className="text-[10px] font-medium text-white/50 uppercase tracking-wider block mb-1.5">
+              <label className="text-[10px] font-medium text-[var(--color-adaline-ink)]/50 uppercase tracking-wider block mb-1.5">
                 <FlaskConical className="w-3 h-3 inline mr-1" />Engrais
               </label>
               <select
@@ -70,7 +70,7 @@ export default function FertilizerCalculator() {
               </select>
             </div>
             <div>
-              <label className="text-[10px] font-medium text-white/50 uppercase tracking-wider block mb-1.5">
+              <label className="text-[10px] font-medium text-[var(--color-adaline-ink)]/50 uppercase tracking-wider block mb-1.5">
                 <MapPin className="w-3 h-3 inline mr-1" />Parcelle
               </label>
               <select
@@ -86,7 +86,7 @@ export default function FertilizerCalculator() {
               </select>
             </div>
             <div>
-              <label className="text-[10px] font-medium text-white/50 uppercase tracking-wider block mb-1.5">
+              <label className="text-[10px] font-medium text-[var(--color-adaline-ink)]/50 uppercase tracking-wider block mb-1.5">
                 <Leaf className="w-3 h-3 inline mr-1" />Dose (kg/ha)
               </label>
               <input
@@ -103,10 +103,10 @@ export default function FertilizerCalculator() {
           {/* Product composition */}
           {product && (
             <div className="mb-4 p-3 rounded-xl bg-white/[0.04] border border-white/[0.06]">
-              <span className="text-[10px] text-white/40 uppercase tracking-wider block mb-2">Composition</span>
+              <span className="text-[10px] text-[var(--color-adaline-ink)]/40 uppercase tracking-wider block mb-2">Composition</span>
               <div className="flex items-center gap-4 flex-wrap">
                 {product.composition.map((c: any, i: number) => (
-                  <span key={i} className="text-xs text-cyan-400 font-mono">
+                  <span key={i} className="text-xs text-[var(--color-valley-green)] font-mono">
                     {c.name}: {c.concentration}{c.unit}
                   </span>
                 ))}
@@ -126,7 +126,7 @@ export default function FertilizerCalculator() {
 
           {/* Formula explanation */}
           <div className="mt-4 p-3 rounded-xl bg-white/[0.03] border border-white/[0.05]">
-            <span className="text-[10px] text-white/30">
+            <span className="text-[10px] text-[var(--color-adaline-ink)]/30">
               Formule: Unités = Dose (kg/ha) × Teneur (%) / 100 × Surface (ha)
               {parcelle && ` · Surface: ${formatHectares(parcelle.areaHectares)}`}
             </span>
@@ -135,22 +135,22 @@ export default function FertilizerCalculator() {
           {/* History */}
           {fertilizerCalculations.length > 0 && (
             <div className="mt-5 pt-4 border-t border-white/[0.08]">
-              <h4 className="text-[10px] font-semibold text-white/40 uppercase tracking-wider mb-3">
+              <h4 className="text-[10px] font-semibold text-[var(--color-adaline-ink)]/40 uppercase tracking-wider mb-3">
                 Historique des apports
               </h4>
               <div className="space-y-2">
                 {fertilizerCalculations.map((fc: any, i: number) => (
                   <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.04] border border-white/[0.06]">
                     <div>
-                      <span className="text-xs text-white/60">{fc.productName}</span>
-                      <span className="text-[10px] text-white/30 block">
+                      <span className="text-xs text-[var(--color-adaline-ink)]/60">{fc.productName}</span>
+                      <span className="text-[10px] text-[var(--color-adaline-ink)]/30 block">
                         {fc.parcelleName} · {new Date(fc.date).toLocaleDateString("fr-FR")}
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-right">
                       {fc.unitsN > 0 && <span className="text-[10px] font-mono text-green-400">{fc.unitsN.toFixed(1)} N</span>}
-                      {fc.unitsP > 0 && <span className="text-[10px] font-mono text-cyan-400">{fc.unitsP.toFixed(1)} P</span>}
-                      {fc.unitsK > 0 && <span className="text-[10px] font-mono text-amber-400">{fc.unitsK.toFixed(1)} K</span>}
+                      {fc.unitsP > 0 && <span className="text-[10px] font-mono text-[var(--color-valley-green)]">{fc.unitsP.toFixed(1)} P</span>}
+                      {fc.unitsK > 0 && <span className="text-[10px] font-mono text-[var(--color-valley-green)]">{fc.unitsK.toFixed(1)} K</span>}
                     </div>
                   </div>
                 ))}
@@ -171,11 +171,11 @@ function NPKCard({ label, value, color, unit, isTotal }: {
       "p-3 rounded-xl border text-center",
       isTotal ? "bg-white/[0.06] border-white/[0.12]" : "bg-white/[0.03] border-white/[0.06]"
     )}>
-      <span className="text-[9px] text-white/35 uppercase tracking-wider block mb-1">{label}</span>
+      <span className="text-[9px] text-[var(--color-adaline-ink)]/35 uppercase tracking-wider block mb-1">{label}</span>
       <span className="text-lg font-bold font-mono block" style={{ color }}>
         {value.toFixed(1)}
       </span>
-      <span className="text-[9px] text-white/25">{unit}</span>
+      <span className="text-[9px] text-[var(--color-adaline-ink)]/25">{unit}</span>
     </div>
   );
 }

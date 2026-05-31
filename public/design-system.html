@@ -1,0 +1,540 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rooted Growth — Design System · LeadFarm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet" />
+<style>
+/* ════════════════════════════════════════════════════════════════
+   ROOTED GROWTH — Design System
+   Agricultural Technology · White Canvas · Warm Minimalism
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Reset ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--font-sans);background:var(--color-bg);color:var(--color-text-primary);line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+/* ── Design Tokens ── */
+:root{
+  /* Brand Primitives */
+  --color-brand: #2B8C4A;
+  --color-brand-hover: #1B5E2D;
+  --color-soil: #6B4E3D;
+  --color-accent: #F4A91F;
+
+  /* Neutrals */
+  --color-bg: #FFFFFF;
+  --color-surface: #F7F6F3;
+  --color-border: #E6E4E0;
+
+  /* Text */
+  --color-text-primary: #141414;
+  --color-text-secondary: #5B6650;
+  --color-text-on-dark: #F2EFE9;
+
+  /* Status */
+  --color-success: #2D7A45;
+  --color-error: #C44536;
+
+  /* Spacing (4px grid) */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-2xl: 64px;
+  --space-3xl: 96px;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Shadows — green-tinted */
+  --shadow-card: 0 4px 12px rgba(43,140,74,0.06);
+  --shadow-card-hover: 0 8px 24px rgba(43,140,74,0.10);
+  --shadow-elevated: 0 8px 24px rgba(0,0,0,0.08);
+  --shadow-focus: 0 0 0 3px #FFFFFF, 0 0 0 5px var(--color-accent);
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Transitions */
+  --transition-fast: 150ms ease-out;
+  --transition-base: 200ms ease-out;
+  --transition-smooth: 300ms cubic-bezier(0.4,0,0.2,1);
+}
+/* ── Focus (WCAG AA gold ring) ── */
+:focus-visible{outline:none;box-shadow:var(--shadow-focus);border-radius:var(--radius-sm)}
+
+/* ── Typography ── */
+h1{font-size:clamp(2rem,4vw,3rem);font-weight:700;letter-spacing:-0.03em;line-height:1.15}
+h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:600;letter-spacing:-0.02em;line-height:1.25}
+h3{font-size:1.25rem;font-weight:600;letter-spacing:-0.01em;line-height:1.3}
+p{color:var(--color-text-secondary);max-width:65ch}
+small{font-size:0.875rem}
+
+/* ── Containers ── */
+.container{max-width:1200px;margin-inline:auto;padding-inline:var(--space-lg)}
+.section{padding-block:var(--space-2xl)}
+.section-sm{padding-block:var(--space-xl)}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--space-sm);
+  padding:var(--space-sm) var(--space-lg);border-radius:var(--radius-md);
+  font-family:var(--font-sans);font-size:0.9375rem;font-weight:600;
+  cursor:pointer;border:none;line-height:1;
+  transition:all var(--transition-base);text-decoration:none;
+  white-space:nowrap;user-select:none;position:relative;overflow:hidden;
+}
+.btn:active{transform:scale(0.97)}.btn:disabled{opacity:0.5;pointer-events:none}
+
+.btn-primary{background:var(--color-brand);color:#FFFFFF}
+.btn-primary:hover{background:var(--color-brand-hover);transform:translateY(-1px);box-shadow:var(--shadow-elevated)}
+
+.btn-cta{background:var(--color-accent);color:var(--color-text-primary)}
+.btn-cta:hover{filter:brightness(0.92);transform:translateY(-1px);box-shadow:var(--shadow-elevated)}
+
+.btn-ghost{background:transparent;color:var(--color-text-primary);border:2px solid var(--color-accent)}
+.btn-ghost:hover{background:var(--color-accent);color:var(--color-text-primary);transform:translateY(-1px)}
+
+.btn-soil{background:var(--color-soil);color:var(--color-text-on-dark)}
+.btn-soil:hover{filter:brightness(1.15);transform:translateY(-1px)}
+
+.btn-sm{padding:var(--space-xs) var(--space-md);font-size:0.8125rem}
+.btn-lg{padding:var(--space-md) var(--space-xl);font-size:1.0625rem}
+.btn-icon{padding:var(--space-sm);width:40px;height:40px}
+
+/* ── Cards ── */
+.card{
+  background:var(--color-surface);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-card);transition:all var(--transition-smooth);
+  padding:var(--space-lg);border:1px solid var(--color-border);
+}
+.card:hover{box-shadow:var(--shadow-card-hover);transform:translateY(-3px);border-color:var(--color-brand)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space-lg)}
+.card-icon{width:48px;height:48px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;margin-block-end:var(--space-md)}
+
+/* ── Navigation ── */
+.navbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-block:var(--space-md);border-block-end:1px solid var(--color-border);
+  position:sticky;top:0;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);
+  z-index:100;
+}
+.nav-brand{display:flex;align-items:center;gap:var(--space-sm);text-decoration:none;color:var(--color-text-primary);font-weight:700;font-size:1.125rem}
+.nav-brand-logo{width:36px;height:36px;border-radius:var(--radius-sm);background:var(--color-brand);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1.125rem}
+.nav-links{display:flex;align-items:center;gap:var(--space-lg)}.nav-links a{text-decoration:none;color:var(--color-text-secondary);font-size:0.9375rem;font-weight:500;transition:color var(--transition-fast);padding-block:var(--space-xs);border-block-end:2px solid transparent}
+.nav-links a:hover,.nav-links a.active{color:var(--color-text-primary);border-block-end-color:var(--color-accent)}
+.nav-toggle{display:none;background:none;border:none;cursor:pointer;padding:var(--space-sm);color:var(--color-text-primary)}.nav-toggle svg{width:24px;height:24px}
+
+/* ── Hero ── */
+.hero{text-align:center;padding-block:var(--space-3xl)}.hero h1{margin-block-end:var(--space-md)}.hero p{font-size:1.125rem;margin-inline:auto;margin-block-end:var(--space-xl)}
+.hero-actions{display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap}
+.hero-stats{display:flex;justify-content:center;gap:var(--space-2xl);margin-block-start:var(--space-2xl);flex-wrap:wrap}
+.stat{text-align:center}.stat-value{font-size:2rem;font-weight:700;color:var(--color-brand)}.stat-label{font-size:0.875rem;color:var(--color-text-secondary);margin-block-start:var(--space-xs)}
+
+/* ── Form Elements ── */
+.form-group{margin-block-end:var(--space-lg)}
+.form-label{display:block;font-size:0.875rem;font-weight:600;color:var(--color-text-primary);margin-block-end:var(--space-sm)}
+.form-input,.form-select{
+  width:100%;padding:var(--space-sm) var(--space-md);border:1.5px solid var(--color-border);
+  border-radius:var(--radius-md);font-family:var(--font-sans);font-size:0.9375rem;
+  background:var(--color-bg);color:var(--color-text-primary);transition:all var(--transition-fast);outline:none;
+}
+.form-input:hover,.form-select:hover{border-color:var(--color-text-secondary)}
+.form-input:focus,.form-select:focus{border-color:var(--color-brand);box-shadow:0 0 0 3px rgba(43,140,74,0.12)}
+.form-input.has-error,.form-select.has-error{border-color:var(--color-error);box-shadow:0 0 0 3px rgba(196,69,54,0.12)}
+.form-error{font-size:0.8125rem;color:var(--color-error);margin-block-start:var(--space-xs)}.form-error::before{content:"⚠ ";font-size:0.75rem}
+.form-hint{font-size:0.8125rem;color:var(--color-text-secondary);margin-block-start:var(--space-xs)}
+.checkbox-group{display:flex;align-items:center;gap:var(--space-sm);cursor:pointer}
+.checkbox-group input[type=checkbox]{width:18px;height:18px;accent-color:var(--color-brand);border-radius:4px;cursor:pointer}
+.toggle-group{display:flex;align-items:center;gap:var(--space-sm);cursor:pointer}
+.toggle{position:relative;width:44px;height:24px;background:var(--color-border);border-radius:12px;transition:background var(--transition-fast);flex-shrink:0}
+.toggle.active{background:var(--color-brand)}.toggle::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:white;transition:transform var(--transition-fast);box-shadow:0 1px 3px rgba(0,0,0,0.15)}
+.toggle.active::after{transform:translateX(20px)}
+
+/* ── Table ── */
+.table-wrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--color-border)}
+table{width:100%;border-collapse:collapse;font-size:0.9375rem}
+thead{background:var(--color-surface)}th{padding:var(--space-md) var(--space-md);text-align:left;font-weight:600;font-size:0.8125rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--color-text-secondary);border-block-end:1px solid var(--color-border);cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--color-text-primary)}th .sort{display:inline-block;margin-inline-start:var(--space-xs);opacity:0.3}th:hover .sort{opacity:1}th .sort.active{opacity:1;color:var(--color-brand)}
+td{padding:var(--space-sm) var(--space-md);border-block-end:1px solid var(--color-border);color:var(--color-text-primary)}
+tbody tr{transition:background var(--transition-fast)}tbody tr:hover{background:var(--color-surface)}tbody tr:last-child td{border-block-end:none}
+
+/* ── Status Badge ── */
+.badge{display:inline-flex;align-items:center;gap:var(--space-xs);padding:2px var(--space-sm);border-radius:999px;font-size:0.8125rem;font-weight:500;white-space:nowrap}
+.badge-success{background:rgba(45,122,69,0.10);color:var(--color-success)}
+.badge-error{background:rgba(196,69,54,0.10);color:var(--color-error)}
+.badge-neutral{background:var(--color-surface);color:var(--color-text-secondary);border:1px solid var(--color-border)}
+.badge-dot{width:7px;height:7px;border-radius:50%}.badge-dot.success{background:var(--color-success)}.badge-dot.error{background:var(--color-error)}
+
+/* ── Toast / Notification ── */
+.toast{
+  position:fixed;bottom:var(--space-lg);right:var(--space-lg);z-index:9999;
+  padding:var(--space-md) var(--space-lg);border-radius:var(--radius-md);
+  background:var(--color-text-primary);color:var(--color-text-on-dark);
+  box-shadow:var(--shadow-elevated);display:flex;align-items:center;gap:var(--space-sm);
+  font-size:0.9375rem;font-weight:500;animation:toastIn var(--transition-smooth) forwards;
+  max-width:400px;
+}
+.toast-success{background:var(--color-success);color:white}
+.toast-error{background:var(--color-error);color:white}
+.toast-brand{background:var(--color-brand);color:white}
+.toast-close{background:none;border:none;color:inherit;cursor:pointer;opacity:0.7;padding:2px;margin-inline-start:auto;font-size:1.125rem;line-height:1}
+.toast-close:hover{opacity:1}
+@keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(20px)}}
+
+/* ── Section Decor ── */
+.section-divider{width:48px;height:3px;background:var(--color-accent);border-radius:2px;margin-block-end:var(--space-md)}
+.section-label{font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-brand);margin-block-end:var(--space-sm)}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:var(--color-bg);border-block-end:1px solid var(--color-border);flex-direction:column;padding:var(--space-md);gap:var(--space-sm)}
+  .nav-links.open{display:flex}.nav-toggle{display:block}
+  .hero-stats{gap:var(--space-xl)}.card-grid{grid-template-columns:1fr}
+  .table-wrap{font-size:0.8125rem}
+  :root{--space-3xl:48px;--space-2xl:40px}
+}
+
+/* ── Utility ── */
+.mt-sm{margin-block-start:var(--space-sm)}.mt-md{margin-block-start:var(--space-md)}.mt-lg{margin-block-start:var(--space-lg)}
+.mb-md{margin-block-end:var(--space-md)}.mb-lg{margin-block-end:var(--space-lg)}.mb-xl{margin-block-end:var(--space-xl)}
+.flex{display:flex}.flex-wrap{flex-wrap:wrap}.gap-sm{gap:var(--space-sm)}.gap-md{gap:var(--space-md)}.gap-lg{gap:var(--space-lg)}
+.items-center{align-items:center}.justify-between{justify-content:space-between}
+.text-center{text-align:center}.text-secondary{color:var(--color-text-secondary)}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- NAVIGATION -->
+<!-- ════════════════════════════════════════════ -->
+<nav class="navbar container" role="navigation" aria-label="Navigation principale">
+  <a href="#" class="nav-brand" aria-label="LeadFarm accueil">
+    <div class="nav-brand-logo">LF</div>
+    <span>LeadFarm</span>
+  </a>
+  <div class="nav-links" id="navLinks">
+    <a href="#" class="active">Accueil</a>
+    <a href="#cards">Solutions</a>
+    <a href="#forms">Données</a>
+    <a href="#table">Suivi</a>
+    <a href="#tokens">Design&nbsp;System</a>
+  </div>
+  <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+</nav>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- HERO -->
+<!-- ════════════════════════════════════════════ -->
+<section class="hero container" aria-label="Présentation">
+  <div class="section-label">Plateforme de gestion agricole</div>
+  <h1>L'agriculture de précision<br/>à portée de main</h1>
+  <p>LeadFarm réunit vos parcelles, stocks, traitements et données IoT dans un tableau de bord unique. Une vue claire pour des décisions plus justes.</p>
+  <div class="hero-actions">
+    <a href="#cards" class="btn btn-cta btn-lg">Découvrir les solutions</a>
+    <a href="#forms" class="btn btn-ghost btn-lg">Voir la démo</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-value">12 400 ha</div><div class="stat-label">Parcelles suivies</div></div>
+    <div class="stat"><div class="stat-value">2 800+</div><div class="stat-label">Agriculteurs</div></div>
+    <div class="stat"><div class="stat-value">98,6 %</div><div class="stat-label">Disponibilité</div></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- CARDS -->
+<!-- ════════════════════════════════════════════ -->
+<section id="cards" class="section container" aria-label="Solutions">
+  <div class="section-label">Nos solutions</div>
+  <h2 class="mb-xl">Modules conçus pour le terrain</h2>
+  <div class="card-grid">
+    <article class="card" tabindex="0">
+      <div class="card-icon" style="background:rgba(43,140,74,0.10)"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#2B8C4A" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg></div>
+      <h3 class="mb-md">Analytics terrain</h3>
+      <p>Visualisez vos indicateurs clés en temps réel. Humidité, température, NDVI, tout est centralisé.</p>
+    </article>
+    <article class="card" tabindex="0">
+      <div class="card-icon" style="background:rgba(244,169,31,0.10)"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#F4A91F" stroke-width="1.5"><path d="M12 2l2.4 7.2L22 9l-6 5 2 8-6-5-6 5 2-8-6-5 7.6-.2L12 2z"/></svg></div>
+      <h3 class="mb-md">Qualité & rendement</h3>
+      <p>Suivez vos traitements phytosanitaires et analysez l'impact sur vos rendements parcelle par parcelle.</p>
+    </article>
+    <article class="card" tabindex="0">
+      <div class="card-icon" style="background:rgba(107,78,61,0.10)"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#6B4E3D" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
+      <h3 class="mb-md">IoT Live</h3>
+      <p>Connectez vos capteurs et drones. Données en continu, alertes intelligentes, historique complet.</p>
+    </article>
+    <article class="card" tabindex="0">
+      <div class="card-icon" style="background:rgba(43,140,74,0.10)"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#2B8C4A" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M12 22V12"/><path d="M2 8l10 6 10-6"/></svg></div>
+      <h3 class="mb-md">Gestion des stocks</h3>
+      <p>Inventaire précis, alertes de seuil, traçabilité complète des intrants conformément au registre SBA.</p>
+    </article>
+  </div>
+</section>
+<!-- ════════════════════════════════════════════ -->
+<!-- FORM SECTION -->
+<!-- ════════════════════════════════════════════ -->
+<section id="forms" class="section" style="background:var(--color-surface)">
+  <div class="container">
+    <div class="section-label">Formulaire de saisie</div>
+    <h2 class="mb-xl">Traçabilité parcellaire</h2>
+    <div class="flex gap-lg flex-wrap" style="--gap:var(--space-lg)">
+      <!-- Form -->
+      <form style="flex:1;min-width:300px" novalidate onsubmit="return false">
+        <div class="form-group">
+          <label class="form-label" for="culture">Culture *</label>
+          <select class="form-select" id="culture" required>
+            <option value="">Sélectionner une culture</option>
+            <option>Blé dur</option><option>Blé tendre</option><option>Orge</option><option>Mais</option><option>Colza</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="parcelle">Parcelle *</label>
+          <select class="form-select" id="parcelle">
+            <option value="">Sélectionner une parcelle</option>
+            <option>Parcelle A7 — 12,4 ha</option>
+            <option>Parcelle B3 — 8,2 ha</option>
+            <option>Parcelle C1 — 15,0 ha</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="produit">Produit utilisé *</label>
+          <input class="form-input" id="produit" type="text" placeholder="Ex. Fongicide X, Dose Y" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dose">Dose (L/ha)</label>
+          <input class="form-input" id="dose" type="number" step="0.1" placeholder="2.5" />
+          <span class="form-hint">Respecter les préconisations du registre SBA 2025</span>
+        </div>
+        <div class="form-group flex gap-md">
+          <label class="checkbox-group">
+            <input type="checkbox" /> <span>Conforme au registre</span>
+          </label>
+          <label class="toggle-group">
+            <span class="toggle" id="toggleDemo" role="switch" aria-checked="false" tabindex="0"></span>
+            <span>Suivi temps réel</span>
+          </label>
+        </div>
+        <button class="btn btn-primary btn-lg" style="width:100%">Enregistrer le traitement</button>
+        <div class="form-error mt-sm" id="formError" style="display:none">Veuillez remplir tous les champs obligatoires.</div>
+      </form>
+      <!-- Preview card -->
+      <div style="flex:1;min-width:280px">
+        <div class="card" style="height:100%">
+          <div class="section-label">Aperçu</div>
+          <h3 class="mb-md">Dernier enregistrement</h3>
+          <div class="mb-md" style="padding:var(--space-md);background:var(--color-bg);border-radius:var(--radius-md);border:1px solid var(--color-border)">
+            <div class="flex justify-between items-center">
+              <span style="font-weight:600">Blé dur — Parcelle A7</span>
+              <span class="badge badge-success"><span class="badge-dot success"></span> Conforme</span>
+            </div>
+            <p class="mt-sm" style="font-size:0.875rem">Fongicide X · 2,5 L/ha<br/>12 avril 2025 — 08:34</p>
+          </div>
+          <button class="btn btn-ghost btn-sm">Voir l'historique →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- TABLE SECTION -->
+<!-- ════════════════════════════════════════════ -->
+<section id="table" class="section container" aria-label="Suivi des traitements">
+  <div class="section-label">Suivi des traitements</div>
+  <h2 class="mb-xl">Registre phytosanitaire</h2>
+  <div class="table-wrap">
+    <table role="table">
+      <thead>
+        <tr>
+          <th tabindex="0">Date <span class="sort active">&#9650;</span></th>
+          <th tabindex="0">Parcelle <span class="sort">&#9650;</span></th>
+          <th tabindex="0">Culture <span class="sort">&#9650;</span></th>
+          <th tabindex="0">Produit <span class="sort">&#9650;</span></th>
+          <th tabindex="0">Dose <span class="sort">&#9650;</span></th>
+          <th tabindex="0">Statut <span class="sort">&#9650;</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>12/04/2025</td><td>A7</td><td>Blé dur</td><td>Fongicide X</td><td>2,5 L/ha</td><td><span class="badge badge-success"><span class="badge-dot success"></span> Conforme</span></td></tr>
+        <tr><td>11/04/2025</td><td>B3</td><td>Orge</td><td>Herbicide Y</td><td>1,8 L/ha</td><td><span class="badge badge-success"><span class="badge-dot success"></span> Conforme</span></td></tr>
+        <tr><td>10/04/2025</td><td>C1</td><td>Colza</td><td>Insecticide Z</td><td>0,75 L/ha</td><td><span class="badge badge-error"><span class="badge-dot error"></span> Alerte seuil</span></td></tr>
+        <tr><td>09/04/2025</td><td>A7</td><td>Blé dur</td><td>Fertilisant NPK</td><td>120 kg/ha</td><td><span class="badge badge-success"><span class="badge-dot success"></span> Conforme</span></td></tr>
+        <tr><td>08/04/2025</td><td>B3</td><td>Orge</td><td>Régulateur W</td><td>0,4 L/ha</td><td><span class="badge badge-neutral">Planifié</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="flex justify-between items-center mt-lg">
+    <span class="text-secondary" style="font-size:0.875rem">5 traitements · Registre SBA 2025</span>
+    <button class="btn btn-ghost btn-sm" onclick="showToast('Rapport exporté au format PDF.','brand')">Exporter le registre</button>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- DESIGN TOKENS SHOWCASE -->
+<!-- ════════════════════════════════════════════ -->
+<section id="tokens" class="section" style="background:var(--color-surface)">
+  <div class="container">
+    <div class="section-label">Design System</div>
+    <h2 class="mb-xl">Palette « Rooted Growth »</h2>
+    <!-- Colors -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--space-md);margin-block-end:var(--space-2xl)">
+      <div><div style="height:80px;border-radius:var(--radius-md);background:var(--color-brand);border:2px solid var(--color-border)"></div><div style="padding:var(--space-sm) 0"><strong style="font-size:0.875rem">Brand Green</strong><br/><small class="text-secondary">#2B8C4A</small></div></div>
+      <div><div style="height:80px;border-radius:var(--radius-md);background:var(--color-brand-hover);border:2px solid var(--color-border)"></div><div style="padding:var(--space-sm) 0"><strong style="font-size:0.875rem">Brand Hover</strong><br/><small class="text-secondary">#1B5E2D</small></div></div>
+      <div><div style="height:80px;border-radius:var(--radius-md);background:var(--color-accent);border:2px solid var(--color-border)"></div><div style="padding:var(--space-sm) 0"><strong style="font-size:0.875rem">Golden Accent</strong><br/><small class="text-secondary">#F4A91F</small></div></div>
+      <div><div style="height:80px;border-radius:var(--radius-md);background:var(--color-soil);border:2px solid var(--color-border)"></div><div style="padding:var(--space-sm) 0"><strong style="font-size:0.875rem">Soil Brown</strong><br/><small class="text-secondary">#6B4E3D</small></div></div>
+      <div><div style="height:80px;border-radius:var(--radius-md);background:var(--color-surface);border:2px solid var(--color-border)"></div><div style="padding:var(--space-sm) 0"><strong style="font-size:0.875rem">Surface</strong><br/><small class="text-secondary">#F7F6F3</small></div></div>
+      <div><div style="height:80px;border-radius:var(--radius-md);background:var(--color-bg);border:2px solid var(--color-border)"></div><div style="padding:var(--space-sm) 0"><strong style="font-size:0.875rem">Background</strong><br/><small class="text-secondary">#FFFFFF</small></div></div>
+      <div><div style="height:80px;border-radius:var(--radius-md);background:var(--color-success);border:2px solid var(--color-border)"></div><div style="padding:var(--space-sm) 0"><strong style="font-size:0.875rem">Success</strong><br/><small class="text-secondary">#2D7A45</small></div></div>
+      <div><div style="height:80px;border-radius:var(--radius-md);background:var(--color-error);border:2px solid var(--color-border)"></div><div style="padding:var(--space-sm) 0"><strong style="font-size:0.875rem">Error</strong><br/><small class="text-secondary">#C44536</small></div></div>
+    </div>
+    <!-- Buttons showcase -->
+    <h3 class="mb-md">Boutons</h3>
+    <div class="flex gap-md flex-wrap mb-xl">
+      <button class="btn btn-primary">Primary</button>
+      <button class="btn btn-cta">CTA</button>
+      <button class="btn btn-ghost">Ghost</button>
+      <button class="btn btn-soil">Soil</button>
+      <button class="btn btn-primary btn-sm">Small</button>
+      <button class="btn btn-primary btn-lg">Large</button>
+      <button class="btn btn-primary" disabled>Disabled</button>
+    </div>
+    <!-- Badges -->
+    <h3 class="mb-md">Badges</h3>
+    <div class="flex gap-md flex-wrap mb-xl">
+      <span class="badge badge-success"><span class="badge-dot success"></span> Conforme</span>
+      <span class="badge badge-error"><span class="badge-dot error"></span> Alerte</span>
+      <span class="badge badge-neutral">Planifié</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- TOAST CONTAINER -->
+<!-- ════════════════════════════════════════════ -->
+<div id="toastContainer" style="position:fixed;bottom:var(--space-lg);right:var(--space-lg);z-index:9999;display:flex;flex-direction:column;gap:var(--space-sm)"></div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ════════════════════════════════════════════ -->
+<footer style="padding-block:var(--space-xl);border-block-start:1px solid var(--color-border);text-align:center">
+  <p style="font-size:0.875rem">Rooted Growth Design System &mdash; LeadFarm &copy; 2025 &middot; Agriculture de précision</p>
+</footer>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- JAVASCRIPT -->
+<!-- ════════════════════════════════════════════ -->
+<script>
+(function(){
+  'use strict';
+
+  // ── Mobile nav toggle ──
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+  if(navToggle){
+    navToggle.addEventListener('click',function(){
+      const open=navLinks.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded',open);
+    });
+    document.addEventListener('click',function(e){
+      if(!navToggle.contains(e.target)&&!navLinks.contains(e.target)){
+        navLinks.classList.remove('open');
+        navToggle.setAttribute('aria-expanded','false');
+      }
+    });
+  }
+
+  // ── Toggle switch ──
+  const toggle=document.getElementById('toggleDemo');
+  if(toggle){
+    toggle.addEventListener('click',function(){
+      const active=this.classList.toggle('active');
+      this.setAttribute('aria-checked',active);
+      showToast(active?'Suivi temps réel activé.' : 'Suivi temps réel désactivé.', active?'success':'neutral');
+    });
+    toggle.addEventListener('keydown',function(e){
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();this.click();}
+    });
+  }
+
+  // ── Checkbox demo ──
+  document.querySelector('.checkbox-group input')?.addEventListener('change',function(){
+    showToast(this.checked ? 'Conformité cochée.' : 'Conformité décochée.', this.checked?'success':'neutral');
+  });
+
+  // ── Form validation demo ──
+  const formError=document.getElementById('formError');
+  document.querySelector('form button')?.addEventListener('click',function(e){
+    const inputs=document.querySelectorAll('#culture,#parcelle,#produit');
+    let valid=true;
+    inputs.forEach(inp=>{
+      if(!inp.value){inp.classList.add('has-error');valid=false;}
+      else inp.classList.remove('has-error');
+    });
+    if(!valid){
+      formError.style.display='block';
+      showToast('Veuillez remplir les champs obligatoires.','error');
+    }else{
+      formError.style.display='none';
+      showToast('Traitement enregistré avec succès !','success');
+      inputs.forEach(inp=>inp.classList.remove('has-error'));
+    }
+  });
+
+  // ── Table sort demo ──
+  document.querySelectorAll('th').forEach(th=>{
+    th.addEventListener('click',function(){
+      this.querySelector('.sort').classList.toggle('active');
+      showToast('Colonne triée : '+this.textContent.trim().replace(/▲|▼/g,'').trim(),'neutral');
+    });
+  });
+
+  // ── Card click toast ──
+  document.querySelectorAll('.card').forEach(card=>{
+    card.addEventListener('click',function(){
+      const title=this.querySelector('h3')?.textContent||'Carte';
+      showToast('Module « '+title+' » sélectionné.','neutral');
+    });
+  });
+
+  // ── Toast system ──
+  window.showToast=function(message,type){
+    type=type||'neutral';
+    const container=document.getElementById('toastContainer');
+    const toast=document.createElement('div');
+    toast.className='toast';
+    const types={success:'toast-success',error:'toast-error',brand:'toast-brand',neutral:''};
+    if(types[type])toast.classList.add(types[type]);
+    if(!types[type]){toast.style.background='var(--color-text-primary)';toast.style.color='var(--color-text-on-dark)';}
+    const icons={success:'✓',error:'✕',brand:'●',neutral:'i'};
+    toast.innerHTML='<span style="font-weight:700;flex-shrink:0">'+icons[type||'neutral']+'</span><span>'+message+'</span><button class="toast-close" onclick="this.parentElement.remove()">×</button>';
+    container.appendChild(toast);
+    setTimeout(()=>{if(toast.parentElement){toast.style.animation='toastOut 200ms ease-in forwards';setTimeout(()=>toast.remove(),200);}},3500);
+  };
+
+  // ── Smooth scroll ──
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',function(e){
+      const id=this.getAttribute('href');
+      if(id==='#')return;
+      const el=document.querySelector(id);
+      if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth',block:'start'});}
+    });
+  });
+
+  // ── Show welcome toast ──
+  setTimeout(()=>showToast('Bienvenue sur le Design System Rooted Growth.','brand'),800);
+})();
+</script>
+</body>
+</html>
