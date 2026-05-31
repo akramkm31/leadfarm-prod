@@ -17,7 +17,12 @@ export function getHomeMaquette(): { css: string; html: string } {
 
   html = patchHomeMaquetteHtml(html);
 
-  return { css, html };
+  const scrollShellCss = `
+html.lf-page-home,body.lf-page-home{height:100%;overflow:hidden!important}
+.lf-home-page{height:100dvh;max-height:100dvh;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
+`;
+
+  return { css: `${css}\n${scrollShellCss}`, html };
 }
 
 function patchHomeMaquetteHtml(html: string): string {

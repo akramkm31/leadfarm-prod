@@ -1,5 +1,6 @@
 import { getHomeMaquette } from "@/lib/home-maquette";
 import HomeMaquetteVideo from "./HomeMaquetteVideo";
+import HomePageScroll from "./HomePageScroll";
 
 /**
  * Rendu copie-conforme de public/soutenance design (2)/Home.html
@@ -9,7 +10,7 @@ export default function HomeMaquette() {
   const { css, html } = getHomeMaquette();
 
   return (
-    <>
+    <HomePageScroll>
       <link
         href="https://fonts.googleapis.com/css2?family=Fragment+Mono&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet"
@@ -17,6 +18,6 @@ export default function HomeMaquette() {
       <style dangerouslySetInnerHTML={{ __html: css }} />
       <div dangerouslySetInnerHTML={{ __html: html }} />
       <HomeMaquetteVideo />
-    </>
+    </HomePageScroll>
   );
 }

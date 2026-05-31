@@ -1,0 +1,276 @@
+html:has(.lf-login-shell),
+body:has(.lf-login-shell) {
+  height: auto;
+  min-height: 100%;
+  overflow: auto !important;
+}
+
+.lf-login {
+  --color-void: #000000;
+  --color-fog-border: #e5e7eb;
+  --color-chalk: #f1f1f1;
+  --color-graphite: #666666;
+  --color-ash: #8f8f8f;
+  --color-canvas: #ffffff;
+
+  --text-caption: 13px;
+  --leading-caption: 1.64;
+  --text-heading: 22px;
+  --leading-heading: 1.26;
+  --text-heading-lg: 28px;
+  --leading-heading-lg: 1.21;
+  --text-display: 48px;
+  --leading-display: 1.16;
+  --tracking-display: -1.44px;
+
+  --radius-md: 4px;
+  --radius-cards: 6.08px;
+  --radius-softbutton: 40px;
+  --radius-full: 9999px;
+
+  --shadow-sm: rgba(0, 0, 0, 0.02) 0px 4px 6px 0px, rgba(0, 0, 0, 0.05) 0px 0px 2px 0px;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  width: 100%;
+  background: var(--color-canvas);
+  color: var(--color-void);
+  font-family: var(--font-ui-sans), Inter, "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "calt", "liga";
+}
+
+.lf-login__form-col {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.lf-login__inner {
+  width: 100%;
+  max-width: 420px;
+}
+
+.lf-login__hero-col {
+  display: none;
+  flex: 1;
+  position: relative;
+  padding: 16px;
+}
+
+.lf-login__hero {
+  position: absolute;
+  inset: 16px;
+  border-radius: var(--radius-cards);
+  background-size: cover;
+  background-position: center;
+}
+
+.lf-login__brand {
+  text-align: left;
+  margin-bottom: 40px;
+}
+
+.lf-login__wordmark {
+  margin: 0 0 12px;
+  font-size: var(--text-heading-lg);
+  font-weight: 600;
+  line-height: var(--leading-heading-lg);
+  color: var(--color-void);
+}
+
+.lf-login__headline {
+  margin: 0 0 8px;
+  font-size: var(--text-display);
+  font-weight: 600;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  color: var(--color-void);
+}
+
+.lf-login__caption {
+  margin: 0;
+  font-size: var(--text-caption);
+  font-weight: 400;
+  line-height: var(--leading-caption);
+  color: var(--color-graphite);
+}
+
+.lf-login__alert {
+  margin-bottom: 16px;
+  padding: 10px 16px;
+  border: 1px solid var(--color-fog-border);
+  border-radius: var(--radius-full);
+  background: var(--color-chalk);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-void);
+}
+
+.lf-login__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lf-login__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lf-login__label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--color-graphite);
+}
+
+.lf-login__field-wrap {
+  position: relative;
+}
+
+.lf-login__input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--color-fog-border);
+  border-radius: var(--radius-full);
+  background: var(--color-canvas);
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-void);
+  transition: border-color 0.15s ease;
+}
+
+.lf-login__input--password {
+  padding-right: 52px;
+}
+
+.lf-login__input::placeholder {
+  color: var(--color-graphite);
+}
+
+.lf-login__input:focus {
+  outline: none;
+  border-color: var(--color-void);
+}
+
+.lf-login__input:-webkit-autofill,
+.lf-login__input:-webkit-autofill:hover,
+.lf-login__input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-void);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-canvas) inset;
+  caret-color: var(--color-void);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.lf-login__toggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-graphite);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.lf-login__toggle:hover {
+  color: var(--color-void);
+}
+
+.lf-login__toggle:focus-visible {
+  outline: 2px solid var(--color-void);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+.lf-login__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 4px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-void);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--color-canvas);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.lf-login__cta:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.lf-login__cta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lf-login__cta:focus-visible {
+  outline: 2px solid var(--color-void);
+  outline-offset: 2px;
+}
+
+.lf-login__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--color-canvas);
+  border-radius: 50%;
+  animation: lf-login-spin 0.6s linear infinite;
+}
+
+.lf-login__animate {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: lf-login-fade-up 0.5s ease forwards;
+}
+
+.lf-login__animate--1 { animation-delay: 0.05s; }
+.lf-login__animate--2 { animation-delay: 0.1s; }
+.lf-login__animate--3 { animation-delay: 0.15s; }
+.lf-login__animate--4 { animation-delay: 0.2s; }
+.lf-login__animate--5 { animation-delay: 0.25s; }
+.lf-login__animate--6 { animation-delay: 0.3s; }
+.lf-login__animate--hero { animation-delay: 0.15s; }
+
+@keyframes lf-login-fade-up {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lf-login-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (min-width: 768px) {
+  .lf-login {
+    flex-direction: row;
+  }
+
+  .lf-login__hero-col {
+    display: block;
+  }
+}

@@ -8,6 +8,16 @@
    ══════════════════════════════════════════════════════════════ */
 
 @theme inline {
+  /* Achromatic UI tokens (login + marketing surfaces) */
+  --color-void: #000000;
+  --color-fog-border: #e5e7eb;
+  --color-chalk: #f1f1f1;
+  --color-graphite: #666666;
+  --color-ash: #8f8f8f;
+  --color-canvas: #ffffff;
+
+  --shadow-sm: rgba(0, 0, 0, 0.02) 0px 4px 6px 0px, rgba(0, 0, 0, 0.05) 0px 0px 2px 0px;
+
   --color-canvas-ice: #fbfdf6;
   --color-adaline-ink: #0a1d08;
   --color-mist-gray: #c5ccb6;
@@ -148,6 +158,26 @@ body {
   letter-spacing: -0.04em;
   overflow: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Landing — scroll inside .lf-home-page (body stays locked like app shell) */
+html.lf-page-home,
+html:has(.lf-home-page),
+body.lf-page-home,
+body:has(.lf-home-page) {
+  height: 100%;
+  overflow: hidden !important;
+}
+
+.lf-home-page {
+  display: block;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 /* ── Backdrop ── */
