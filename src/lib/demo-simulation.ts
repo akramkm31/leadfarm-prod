@@ -349,7 +349,7 @@ export async function runDemoSimulation(
       key: "alert",
       label: "Alerte",
       status: "ok",
-      href: `/alerts?highlight=${DEMO_IDS.alert}`,
+      href: `/dashboard?alerts=1&highlight=${DEMO_IDS.alert}`,
     });
 
     push({

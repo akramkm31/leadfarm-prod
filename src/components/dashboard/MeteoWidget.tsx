@@ -122,7 +122,7 @@ export default function MeteoWidget({ compact = false }: { compact?: boolean }) 
     return (
       <div className="flex flex-col gap-4 w-full">
         {/* Top current conditions */}
-        <div className="dash-meteo-compact flex items-center justify-between">
+        <div className="dash-meteo-compact flex items-center">
           {loading ? (
             <div className="flex items-center gap-2 text-[var(--color-mist-gray)] text-xs py-1">
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -150,14 +150,6 @@ export default function MeteoWidget({ compact = false }: { compact?: boolean }) 
                     <span className="dash-meteo-stat-lbl text-[9px] text-stone-400 font-semibold uppercase">Pluie</span>
                   </div>
                 </div>
-              </div>
-              <div
-                className={cn(
-                  "fc-badge mono shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold text-center",
-                  canTreat ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" : "bg-red-500/10 text-red-600 border border-red-500/20"
-                )}
-              >
-                {canTreat ? "GO" : "STOP"}
               </div>
             </>
           )}

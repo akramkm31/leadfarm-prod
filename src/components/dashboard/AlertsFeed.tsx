@@ -4,6 +4,7 @@ import { useAlerts } from "@/hooks/useData";
 import type { Alert } from "@/lib/database.types";
 import { AlertService } from "@/lib/services/alert.service";
 import { useRouter } from "next/navigation";
+import { useAlertsPanel } from "@/components/alerts/AlertsProvider";
 import { cn } from "@/lib/utils";
 import {
   AlertTriangle,
@@ -60,6 +61,7 @@ const severityMap: Record<"info" | "warning" | "critical", SeverityStyle> = {
 
 export default function AlertsFeed() {
   const router = useRouter();
+  const { openAlerts } = useAlertsPanel();
   const { data: alertsRaw } = useAlerts();
   const alerts = (alertsRaw || []) as Alert[];
 
@@ -88,7 +90,7 @@ export default function AlertsFeed() {
           </p>
         </div>
         <button
-          onClick={() => router.push("/alerts")}
+          onClick={() => openAlerts()}
           className="group text-[10px] font-bold text-[var(--color-valley-green)] hover:opacity-80 transition-all flex items-center gap-0.5"
         >
           Voir tout

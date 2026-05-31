@@ -27,6 +27,7 @@ import {
   Beaker,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAlertsPanel } from "@/components/alerts/AlertsProvider";
 import { useAccess } from "@/hooks/useAccess";
 import { COMMAND_ITEMS, filterCommands } from "@/lib/rbac/navigation";
 
@@ -71,6 +72,7 @@ interface CommandPaletteProps {
 export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const router = useRouter();
   const { profile } = useAccess();
+  const { openAlerts } = useAlertsPanel();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
@@ -107,7 +109,11 @@ export default function CommandPalette({ open, onClose }: CommandPaletteProps) {
   if (!open) return null;
 
   const handleSelect = (cmd: Command) => {
-    router.push(cmd.href);
+    if (cmd.id === "alerts") {
+      openAlerts();
+    } else {
+      router.push(cmd.href);
+    }
     onClose();
   };
 

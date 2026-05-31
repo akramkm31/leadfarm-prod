@@ -47,10 +47,10 @@
 .lf-content:has(.dashboard-screen) {
   flex: 1 1 0;
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
 }
 
 .lf-app-main:has(.lf-content--page-scroll),
@@ -100,6 +100,8 @@
 }
 
 .lf-dock {
+  position: relative;
+  z-index: 2;
   width: 72px;
   height: 100vh;
   background: var(--color-canvas-ice);
@@ -109,7 +111,11 @@
   align-items: center;
   padding: 16px 0;
   flex-shrink: 0;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.lf-dock--account-open {
+  z-index: 60;
 }
 
 .lf-dock-logo {
@@ -146,6 +152,8 @@
   width: 100%;
   padding: 0 10px;
   min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .lf-dock-btn {
@@ -212,17 +220,30 @@
 }
 
 .lf-dock-footer {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   padding: 0 10px;
   flex-shrink: 0;
+  overflow: visible;
+}
+
+.lf-dock-account-menu {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  width: 12rem;
+  z-index: 70;
+  isolation: isolate;
 }
 
 .lf-dock-avatar {
   width: 36px;
   height: 36px;
+  border: none;
   border-radius: 50%;
   background: var(--color-amber-seed);
   color: var(--color-canvas-ice);
@@ -231,9 +252,13 @@
   display: grid;
   place-items: center;
   letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 0;
 }
 
 .lf-flyout {
+  position: relative;
+  z-index: 1;
   width: 0;
   height: 100vh;
   overflow: hidden;
@@ -686,12 +711,211 @@
   }
 }
 
-/* Dashboard — contenu plus haut que la fenêtre → scroll dans .lf-content */
+/* Dashboard — carte plein écran + panneaux en popup */
 .dashboard-screen.lf-screen {
-  min-height: min-content;
-  overflow: visible;
-  padding: 14px 24px max(48px, env(safe-area-inset-bottom, 16px));
-  gap: 14px;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  padding: 0;
+  gap: 0;
+}
+
+.dashboard-screen .dash-map-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.dashboard-screen .dash-map-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.dashboard-screen .dash-map-bg .dash-mini-map {
+  height: 100%;
+  min-height: 100%;
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  background: #f5f8ec;
+  display: flex;
+}
+
+.dashboard-screen .dash-map-bg .dash-mini-map > div,
+.dashboard-screen .dash-map-bg .dashboard-map-embedded {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.dashboard-screen .dash-map-bg .dash-mini-map .leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.dashboard-screen .dash-map-insights-overlay {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 14;
+  pointer-events: auto;
+  max-width: min(720px, calc(100% - 240px));
+}
+
+.dashboard-screen .dash-map-insights-overlay .dash-insights {
+  padding: 0;
+  justify-content: center;
+}
+
+
+.dashboard-screen .dash-map-fabs {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.dashboard-screen .dash-map-fab {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 9999px;
+  background: rgba(251, 253, 246, 0.96);
+  border: 1px solid var(--color-stone-moss);
+  box-shadow: 0 4px 24px rgba(32, 59, 20, 0.14);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-adaline-ink);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.dashboard-screen .dash-map-fab:hover {
+  background: #fff;
+  box-shadow: 0 6px 28px rgba(32, 59, 20, 0.18);
+  transform: translateY(-1px);
+}
+
+.dashboard-screen .dash-map-fab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: var(--color-forest-dew);
+  color: var(--color-valley-green);
+  flex-shrink: 0;
+}
+
+.dashboard-screen .dash-map-stage-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 15;
+  max-width: min(320px, calc(100% - 180px));
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--color-mist-gray);
+  line-height: 1.45;
+  padding: 8px 12px;
+  border-radius: var(--r-img);
+  background: rgba(251, 253, 246, 0.88);
+  border: 1px solid var(--color-stone-moss);
+  backdrop-filter: blur(6px);
+}
+
+.dashboard-screen .dash-map-stage-hint svg {
+  display: inline;
+  vertical-align: -2px;
+  margin-right: 4px;
+}
+
+.dash-panel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(13, 26, 13, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.dash-panel-modal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 560px;
+  max-height: min(85vh, 640px);
+  background: var(--color-canvas-ice);
+  border: 1px solid var(--color-stone-moss);
+  border-radius: var(--r-card);
+  box-shadow: 0 24px 64px rgba(32, 59, 20, 0.2);
+  overflow: hidden;
+}
+
+.dash-panel-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--color-stone-moss);
+  flex-shrink: 0;
+}
+
+.dash-panel-modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-adaline-ink);
+  margin: 0;
+}
+
+.dash-panel-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.dash-panel-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--color-mist-gray);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dash-panel-modal-close:hover {
+  background: #f1f5e6;
+  color: var(--color-adaline-ink);
+}
+
+.dash-panel-modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 18px 18px;
+  scrollbar-width: thin;
 }
 
 .dashboard-screen .dash-hero,
@@ -755,11 +979,14 @@
 }
 
 .dashboard-screen .dash-insights {
+  position: relative;
+  z-index: 20;
   flex-shrink: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   min-height: 0;
+  padding: 0;
 }
 
 .dashboard-screen .dash-insight-pill {
@@ -1011,13 +1238,13 @@
 
 .dashboard-screen .dash-mini-map {
   flex: 1;
-  min-height: 280px;
-  height: 340px;
+  min-height: 0;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: var(--r-img);
+  border-radius: 0;
   overflow: hidden;
-  border: 1px solid var(--color-stone-moss);
+  border: none;
   background: #f5f8ec;
 }
 
@@ -1101,9 +1328,26 @@
 @media (max-width: 1100px) {
   .dashboard-screen.lf-screen {
     height: auto;
-    overflow: visible;
-    padding: 24px 20px 40px;
-    gap: 16px;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0;
+    gap: 0;
+  }
+
+  .dashboard-screen .dash-map-stage {
+    min-height: min(70dvh, 520px);
+  }
+
+  .dashboard-screen .dash-map-fabs {
+    bottom: 14px;
+    right: 14px;
+  }
+
+  .dashboard-screen .dash-map-stage-hint {
+    bottom: auto;
+    top: 56px;
+    left: 14px;
+    max-width: calc(100% - 28px);
   }
 
   .dashboard-screen .dash-grid {

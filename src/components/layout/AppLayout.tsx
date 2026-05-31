@@ -8,6 +8,9 @@ import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import { ThemeProvider } from "./ThemeProvider";
 import { AccessProvider } from "@/components/auth/AccessProvider";
 import RouteAccessGuard from "@/components/auth/RouteAccessGuard";
+import { AlertsProvider } from "@/components/alerts/AlertsProvider";
+import AlertsDeepLink from "@/components/alerts/AlertsDeepLink";
+import { HeaderActionsProvider } from "@/components/layout/HeaderActions";
 import { cn } from "@/lib/utils";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -27,7 +30,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
       <AccessProvider>
-        <div className="min-h-screen flex" style={{ background: "var(--color-canvas-ice)" }}>
+        <AlertsProvider>
+          <HeaderActionsProvider>
+          <AlertsDeepLink />
+          <div className="min-h-screen flex" style={{ background: "var(--color-canvas-ice)" }}>
           <Sidebar
             mobileOpen={mobileOpen}
             onMobileClose={() => setMobileOpen(false)}
@@ -48,7 +54,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </ErrorBoundary>
             </div>
           </div>
-        </div>
+          </div>
+          </HeaderActionsProvider>
+        </AlertsProvider>
       </AccessProvider>
     </ThemeProvider>
   );

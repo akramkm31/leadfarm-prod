@@ -18,7 +18,6 @@ export const ROUTE_FEATURES: { pattern: RegExp; feature: Feature }[] = [
   { pattern: /^\/fertigation/, feature: "fertigation" },
   { pattern: /^\/conformite/, feature: "conformite" },
   { pattern: /^\/audit/, feature: "audit" },
-  { pattern: /^\/alerts/, feature: "alerts" },
   { pattern: /^\/operators/, feature: "operators" },
   { pattern: /^\/reports/, feature: "reports" },
   { pattern: /^\/settings/, feature: "settings" },

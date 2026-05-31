@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useParcelles, useTreatments } from "@/hooks/useData";
 import type { Parcelle } from "@/lib/mock-data";
-import { Maximize2, Layers, Target, X } from "lucide-react";
+import { Layers, Target } from "lucide-react";
 import {
   getProp,
   findParcelle,
@@ -11,6 +11,7 @@ import {
   resolveTreatmentParcelleId,
   treatmentsForParcelle,
   sortTreatmentsByDate,
+  collectParcelleBounds,
 } from "./dashboard-map-utils";
 import { parcelleLabelHtml, parcelleLabelIconAnchor } from "@/lib/map-labels";
 import ParcelleOverlay from "./ParcelleOverlay";
@@ -51,14 +52,6 @@ export default function DashboardMap({
   const onSelectTreatmentRef = useRef(onSelectTreatment);
   onSelectTreatmentRef.current = onSelectTreatment;
   const skipClearParcelleRef = useRef(false);
-
-  const [isTheaterMode, setIsTheaterMode] = useState(false);
-
-  // Refs for event handlers to bypass stale closures in Leaflet events
-  const handleMapDoubleClickRef = useRef<() => void>(() => {});
-  handleMapDoubleClickRef.current = () => {
-    setIsTheaterMode((prev) => !prev);
-  };
 
   const closeParcellePanel = useCallback(() => {
     setSelectedParcelleId(null);
@@ -113,6 +106,39 @@ export default function DashboardMap({
   const handleParcelleClickRef = useRef(handleParcelleClick);
   handleParcelleClickRef.current = handleParcelleClick;
 
+  const resolvedFocusId = useMemo(() => {
+    if (focusParcelleId) return focusParcelleId;
+    if (selectedParcelleId) return selectedParcelleId;
+    if (!activeTreatmentId) return null;
+    const trt = treatments.find((t) => String(t.id) === String(activeTreatmentId));
+    return trt ? resolveTreatmentParcelleId(parcelles, trt) : null;
+  }, [focusParcelleId, selectedParcelleId, activeTreatmentId, treatments, parcelles]);
+
+  const resolvedFocusIdRef = useRef(resolvedFocusId);
+  resolvedFocusIdRef.current = resolvedFocusId;
+
+  const fitAllParcelles = useCallback(
+    (animate = false) => {
+      if (!loaded || !mapInstance.current || !LRef.current) return;
+      if (resolvedFocusIdRef.current) return;
+
+      const points = collectParcelleBounds(parcelles);
+      if (points.length === 0) return;
+
+      const L = LRef.current;
+      const map = mapInstance.current;
+      map.fitBounds(L.latLngBounds(points).pad(0.02), {
+        padding: embedded ? [4, 4] : [24, 24],
+        maxZoom: embedded ? 18 : 17,
+        animate,
+      });
+    },
+    [loaded, parcelles, embedded]
+  );
+
+  const fitAllParcellesRef = useRef(fitAllParcelles);
+  fitAllParcellesRef.current = fitAllParcelles;
+
   // Init map once (re-mounts cleanly on layout toggles)
   useEffect(() => {
     const container = mapRef.current;
@@ -159,33 +185,30 @@ export default function DashboardMap({
         mapInstance.current = null;
       }
     };
-  }, [isTheaterMode]);
+  }, []);
 
   // Handle auto-resizing
   useEffect(() => {
     if (!loaded || !mapRef.current || !mapInstance.current) return;
     const map = mapInstance.current;
-    const ro = new ResizeObserver(() => {
+    const refit = () => {
       map.invalidateSize();
-    });
+      requestAnimationFrame(() => fitAllParcellesRef.current(false));
+    };
+
+    const ro = new ResizeObserver(refit);
     ro.observe(mapRef.current);
-    map.invalidateSize();
-    
-    const timer = setTimeout(() => map.invalidateSize(), 150);
+    refit();
+
+    const timer = setTimeout(refit, 200);
+    const timer2 = setTimeout(refit, 500);
 
     return () => {
       ro.disconnect();
       clearTimeout(timer);
+      clearTimeout(timer2);
     };
-  }, [loaded, isTheaterMode, embedded]);
-
-  const resolvedFocusId = useMemo(() => {
-    if (focusParcelleId) return focusParcelleId;
-    if (selectedParcelleId) return selectedParcelleId;
-    if (!activeTreatmentId) return null;
-    const trt = treatments.find((t) => String(t.id) === String(activeTreatmentId));
-    return trt ? resolveTreatmentParcelleId(parcelles, trt) : null;
-  }, [focusParcelleId, selectedParcelleId, activeTreatmentId, treatments, parcelles]);
+  }, [loaded, embedded, parcelles.length]);
 
   // Render parcelle polygons
   useEffect(() => {
@@ -197,7 +220,6 @@ export default function DashboardMap({
     layersRef.current.forEach((layer) => map.removeLayer(layer));
     layersRef.current = [];
 
-    const allBounds: L.LatLngExpression[] = [];
     const isSelected = (id: string) =>
       resolvedFocusId === id ||
       selectedParcelleId === id ||
@@ -244,7 +266,6 @@ export default function DashboardMap({
         addClickable(poly, p.id);
         layersRef.current.push(poly);
         if (isChild) poly.bringToFront();
-        allBounds.push(...(p.boundary as L.LatLngExpression[]));
       } else if (p.center) {
         // No boundary → draw a clickable circle marker so it's still reachable
         const circle = L.circleMarker(p.center as L.LatLngExpression, {
@@ -257,7 +278,6 @@ export default function DashboardMap({
         }).addTo(map);
         addClickable(circle, p.id);
         layersRef.current.push(circle);
-        allBounds.push(p.center as L.LatLngExpression);
       }
 
       // Pulse indicator for active treatments
@@ -281,9 +301,8 @@ export default function DashboardMap({
 
     parcelles.forEach((p) => drawParcelle(p));
 
-    const hasFocus = !!(selectedParcelleId || activeTreatmentId || focusParcelleId);
-    if (allBounds.length > 0 && mapInstance.current && !hasFocus) {
-      mapInstance.current.fitBounds(L.latLngBounds(allBounds).pad(0.1));
+    if (!resolvedFocusId) {
+      fitAllParcellesRef.current(false);
     }
   }, [parcelles, treatments, loaded, selectedParcelleId, activeTreatmentId, focusParcelleId, resolvedFocusId]);
 
@@ -408,239 +427,105 @@ export default function DashboardMap({
   // GIS HUD Actions
   const handleCenterMap = () => {
     if (!loaded || !mapInstance.current || !LRef.current) return;
-    const L = LRef.current;
-    const map = mapInstance.current;
-    
-    const allBounds: L.LatLngExpression[] = [];
-    parcelles.forEach((parcelle) => {
-      if (parcelle.boundary && parcelle.boundary.length > 0) {
-        allBounds.push(...(parcelle.boundary as L.LatLngExpression[]));
-      }
-    });
-
-    if (allBounds.length > 0) {
-      map.fitBounds(L.latLngBounds(allBounds).pad(0.1));
-    } else {
-      map.setView([34.9871, -0.5361], 14);
+    const points = collectParcelleBounds(parcelles);
+    if (points.length > 0) {
+      fitAllParcelles(true);
+      return;
     }
+    mapInstance.current.setView([34.9871, -0.5361], 14);
   };
 
   return (
-    <>
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes scaleUp {
-          from { transform: scale(0.95); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .animate-scale-up {
-          animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-      `}</style>
-
-      {/* REGULAR MODE (Inside dashboard card) */}
-      {!isTheaterMode && (
-        <div className={embedded ? "relative flex flex-col flex-1 min-h-0 overflow-hidden h-full bg-[#f5f8ec]" : "glass-card overflow-hidden relative"}>
-          {!embedded && (
-            <div className="flex items-center justify-between p-4 pb-0">
-              <div>
-                <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85">Carte des Parcelles</h3>
-                <p className="text-xs text-[var(--color-adaline-ink)]/40 mt-0.5">
-                  Cliquez sur une zone colorée pour voir l&apos;historique
-                </p>
-              </div>
-              <div className="flex items-center gap-1">
-                <button type="button" className="p-1.5 rounded-lg hover:bg-[#f1f5e6]" aria-label="Couches">
-                  <Layers className="w-4 h-4" />
-                </button>
-                <button type="button" onClick={handleCenterMap} className="p-1.5 rounded-lg hover:bg-[#f1f5e6]" aria-label="Centrer">
-                  <Target className="w-4 h-4" />
-                </button>
-                <button type="button" onClick={() => setIsTheaterMode(true)} className="p-1.5 rounded-lg hover:bg-[#f1f5e6]" aria-label="Agrandir">
-                  <Maximize2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {embedded && (
-            <div className="absolute top-3 right-3 z-[1000] flex gap-1">
-              <button
-                type="button"
-                onClick={() => setIsTheaterMode(true)}
-                className="p-1.5 rounded-lg bg-[rgba(251,253,246,.92)] border border-[var(--color-stone-moss)] text-[var(--color-adaline-ink)] hover:bg-[#f1f5e6] shadow-sm flex items-center justify-center animate-pulse"
-                title="Agrandir la carte"
-              >
-                <Maximize2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
-
-          {parcelles.length > 0 && (
-            <ParcelleQuickNav
-              parcelles={parcelles}
-              selectedId={chipSelectedId}
-              onSelect={focusParcelleById}
-              onClear={clearParcelleFocus}
-              variant="light"
-              hint="Clic parcelle → historique complet"
-            />
-          )}
-
-          {!loaded && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[#f5f8ec]/90 z-10">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-6 h-6 border-2 border-[var(--color-valley-green)]/30 border-t-[var(--color-amber-seed)] rounded-full animate-spin" />
-                <span className="text-xs text-[var(--color-mist-gray)]">Chargement de la carte…</span>
-              </div>
-            </div>
-          )}
-
-          <div
-            ref={mapRef}
-            className={embedded ? "flex-1 min-h-[120px] w-full" : "h-[400px] mt-3 rounded-b-2xl"}
-          />
-
-          {/* Legend */}
-          <div className="absolute bottom-3 left-3 z-[1000] flex flex-col gap-1 p-2 rounded-lg bg-[rgba(251,253,246,.92)] border border-[var(--color-stone-moss)] text-[10px]">
-            <div className="flex items-center gap-2 text-[var(--color-adaline-ink)]">
-              <div className="w-3 h-3 rounded bg-[var(--color-forest-dew)] border border-[var(--color-valley-green)]" />
-              <span>Traitée</span>
-            </div>
-            <div className="flex items-center gap-2 text-[var(--color-adaline-ink)]">
-              <div className="w-3 h-0.5 border-b border-dashed border-[var(--color-mist-gray)]" />
-              <span>Non traitée</span>
-            </div>
-            <div className="flex items-center gap-2 text-[var(--color-adaline-ink)]">
-              <div className="w-3 h-3 rounded-full border-2 border-[var(--color-amber-seed)] animate-pulse" />
-              <span>Sélection</span>
-            </div>
+    <div className={embedded ? "dashboard-map-embedded relative h-full w-full min-h-0 overflow-hidden bg-[#f5f8ec]" : "glass-card overflow-hidden relative"}>
+      {!embedded && (
+        <div className="flex items-center justify-between p-4 pb-0">
+          <div>
+            <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85">Carte des Parcelles</h3>
+            <p className="text-xs text-[var(--color-adaline-ink)]/40 mt-0.5">
+              Cliquez sur une zone colorée pour voir l&apos;historique
+            </p>
           </div>
-
-          {/* React history overlay — renders over the map, no Leaflet popup constraints */}
-          {overlayParcelle && embedded && (
-            <DashboardParcelleHistoryPanel
-              parcelle={overlayParcelle}
-              history={historyBundle}
-              loading={historyLoading}
-              onClose={closeParcellePanel}
-            />
-          )}
-          {overlayParcelle && !embedded && (
-            <ParcelleOverlay
-              parcelle={overlayParcelle}
-              treatments={overlayTreatments}
-              onClose={closeParcellePanel}
-            />
-          )}
-        </div>
-      )}
-
-      {/* THEATER MODE (GORGEOUS SIMPLE MODAL POPUP WINDOW) */}
-      {isTheaterMode && (
-        <div className="fixed inset-0 z-[9999] bg-black/45 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in text-[var(--color-adaline-ink)] font-sans">
-          <div className="relative bg-white border border-[var(--color-stone-moss)] rounded-3xl shadow-2xl w-full max-w-4xl h-[550px] overflow-hidden flex flex-col animate-scale-up">
-            
-            {parcelles.length > 0 && (
-              <ParcelleQuickNav
-                parcelles={parcelles}
-                selectedId={chipSelectedId}
-                onSelect={focusParcelleById}
-                onClear={clearParcelleFocus}
-                variant="light"
-                className="border-b border-[var(--color-stone-moss)]"
-              />
-            )}
-
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-3.5 border-b border-[var(--color-stone-moss)] bg-white/95 backdrop-blur-sm z-[1000] flex-shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <div>
-                  <h3 className="text-xs font-bold text-[var(--color-adaline-ink)]">Carte des Parcelles (Agrandie)</h3>
-                  <p className="text-[8px] text-[var(--color-adaline-ink)]/50 uppercase tracking-widest mt-0.5 font-medium">Contrôle interactif et vue détaillée</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={handleCenterMap}
-                  className="px-3 py-1.5 bg-[#f1f5e6] hover:bg-[#e6ecce] text-[var(--color-valley-green)] text-[10px] font-semibold rounded-lg transition-all flex items-center gap-1"
-                  title="Recadrer l&apos;exploitation"
-                >
-                  <Target className="w-3.5 h-3.5" />
-                  Recadrer
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsTheaterMode(false)}
-                  className="p-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition-all flex items-center justify-center"
-                  title="Fermer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Map Frame body panel */}
-            <div className="relative flex-1 flex min-h-0 overflow-hidden">
-              
-              {/* Loader */}
-              {!loaded && (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#f5f8ec]/95 z-[1001]">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-6 h-6 border-2 border-[var(--color-valley-green)]/30 border-t-[var(--color-amber-seed)] rounded-full animate-spin" />
-                    <span className="text-xs text-[var(--color-mist-gray)]">Chargement de la carte…</span>
-                  </div>
-                </div>
-              )}
-
-              {/* LEAFLET CONTAINER DIV */}
-              <div
-                ref={mapRef}
-                className="w-full h-full min-h-[350px] relative"
-              />
-
-              {/* Floating Legend */}
-              <div className="absolute bottom-4 left-4 z-[1000] flex flex-col gap-1 p-2.5 rounded-xl bg-white/95 border border-[var(--color-stone-moss)] text-[9px] text-[var(--color-adaline-ink)] shadow-md">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded bg-[var(--color-forest-dew)] border border-[var(--color-valley-green)]" />
-                  <span>Zone Traitée</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-0.5 border-b border-dashed border-stone-400" />
-                  <span>Non Traitée</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full border-2 border-[var(--color-amber-seed)] animate-pulse" />
-                  <span>Sélection</span>
-                </div>
-              </div>
-
-              {overlayParcelle && (
-                <ParcelleOverlay
-                  parcelle={overlayParcelle}
-                  treatments={overlayTreatments}
-                  embedded
-                  onClose={closeParcellePanel}
-                />
-              )}
-            </div>
-
-            <div className="bg-stone-50 border-t border-[var(--color-stone-moss)] px-4 py-2 text-center text-[9px] text-[var(--color-adaline-ink)]/40 flex-shrink-0">
-              Double-cliquez n&apos;importe où sur la carte ou cliquez sur la croix pour réduire.
-            </div>
-
+          <div className="flex items-center gap-1">
+            <button type="button" className="p-1.5 rounded-lg hover:bg-[#f1f5e6]" aria-label="Couches">
+              <Layers className="w-4 h-4" />
+            </button>
+            <button type="button" onClick={handleCenterMap} className="p-1.5 rounded-lg hover:bg-[#f1f5e6]" aria-label="Centrer">
+              <Target className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
-    </>
+
+      {embedded && (
+        <div className="absolute top-3 right-3 z-[1000] flex gap-1">
+          <button
+            type="button"
+            onClick={handleCenterMap}
+            className="p-1.5 rounded-lg bg-[rgba(251,253,246,.92)] border border-[var(--color-stone-moss)] text-[var(--color-adaline-ink)] hover:bg-[#f1f5e6] shadow-sm flex items-center justify-center"
+            title="Recadrer sur les parcelles"
+          >
+            <Target className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {parcelles.length > 0 && !embedded && (
+        <ParcelleQuickNav
+          parcelles={parcelles}
+          selectedId={chipSelectedId}
+          onSelect={focusParcelleById}
+          onClear={clearParcelleFocus}
+          variant="light"
+          hint="Clic parcelle → historique complet"
+        />
+      )}
+
+      {!loaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-[#f5f8ec]/90 z-10">
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-6 h-6 border-2 border-[var(--color-valley-green)]/30 border-t-[var(--color-amber-seed)] rounded-full animate-spin" />
+            <span className="text-xs text-[var(--color-mist-gray)]">Chargement de la carte…</span>
+          </div>
+        </div>
+      )}
+
+      <div
+        ref={mapRef}
+        className={embedded ? "absolute inset-0 w-full h-full z-0" : "h-[400px] mt-3 rounded-b-2xl"}
+      />
+
+      {!embedded && (
+        <div className="absolute bottom-3 left-3 z-[1000] flex flex-col gap-1 p-2 rounded-lg bg-[rgba(251,253,246,.92)] border border-[var(--color-stone-moss)] text-[10px]">
+          <div className="flex items-center gap-2 text-[var(--color-adaline-ink)]">
+            <div className="w-3 h-3 rounded bg-[var(--color-forest-dew)] border border-[var(--color-valley-green)]" />
+            <span>Traitée</span>
+          </div>
+          <div className="flex items-center gap-2 text-[var(--color-adaline-ink)]">
+            <div className="w-3 h-0.5 border-b border-dashed border-[var(--color-mist-gray)]" />
+            <span>Non traitée</span>
+          </div>
+          <div className="flex items-center gap-2 text-[var(--color-adaline-ink)]">
+            <div className="w-3 h-3 rounded-full border-2 border-[var(--color-amber-seed)] animate-pulse" />
+            <span>Sélection</span>
+          </div>
+        </div>
+      )}
+
+      {overlayParcelle && embedded && (
+        <DashboardParcelleHistoryPanel
+          parcelle={overlayParcelle}
+          history={historyBundle}
+          loading={historyLoading}
+          onClose={closeParcellePanel}
+        />
+      )}
+      {overlayParcelle && !embedded && (
+        <ParcelleOverlay
+          parcelle={overlayParcelle}
+          treatments={overlayTreatments}
+          onClose={closeParcellePanel}
+        />
+      )}
+    </div>
   );
 }

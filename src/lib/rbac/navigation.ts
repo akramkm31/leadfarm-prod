@@ -50,7 +50,6 @@ export const NAV_GROUPS: NavGroupDef[] = [
     items: [
       { href: "/conformite", label: "Conformité LMR", feature: "conformite" },
       { href: "/audit", label: "Journal SCD2", feature: "audit" },
-      { href: "/alerts", label: "Alertes", feature: "alerts" },
       { href: "/operators", label: "Opérateurs", feature: "operators" },
       { href: "/reports", label: "Rapports", feature: "reports" },
       { href: "/admin", label: "Admin rôles", feature: "admin.roles" },
@@ -89,7 +88,7 @@ export const COMMAND_ITEMS: {
   { id: "audit", label: "Audit SCD2", hint: "Versions", href: "/audit", group: "Gestion", feature: "audit" },
   { id: "operators", label: "Opérateurs", hint: "Équipe", href: "/operators", group: "Gestion", feature: "operators" },
   { id: "reports", label: "Rapports", hint: "Exports", href: "/reports", group: "Gestion", feature: "reports" },
-  { id: "alerts", label: "Alertes", hint: "Notifications", href: "/alerts", group: "Gestion", feature: "alerts" },
+  { id: "alerts", label: "Alertes", hint: "Notifications", href: "#alerts", group: "Gestion", feature: "alerts" },
   { id: "settings", label: "Paramètres", hint: "Compte", href: "/settings", group: "Gestion", feature: "settings" },
 ];
 

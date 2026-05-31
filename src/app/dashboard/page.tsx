@@ -2,42 +2,40 @@
 
 import { useEffect, useState, useCallback, useRef, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import dynamic from "next/dynamic";
 import AppLayout from "@/components/layout/AppLayout";
 import MeteoWidget from "@/components/dashboard/MeteoWidget";
-import DashboardHeroAside from "@/components/dashboard/DashboardHeroAside";
 import DashboardInsights from "@/components/dashboard/DashboardInsights";
+import DashboardPanelModal from "@/components/dashboard/DashboardPanelModal";
 import FeatureGate from "@/components/auth/FeatureGate";
 import {
   PageScreen,
-  PageHero,
-  KpiCard,
-  DashCard,
   AdalineButton,
   StatusPill,
 } from "@/components/adaline/PageScreen";
 import { fetchDashboardKPIs, type DashboardKPIs } from "@/lib/data-provider";
-import { useAlerts, useTreatments, useParcelles } from "@/hooks/useData";
-import type { Alert, Parcelle } from "@/lib/mock-data";
+import { useTreatments, useParcelles } from "@/hooks/useData";
+import type { Parcelle } from "@/lib/mock-data";
 import {
   findParcelleByTreatment,
   resolveTreatmentParcelleId,
 } from "@/components/map/dashboard-map-utils";
-import { alertTypeLabel, TREATMENT_STATUS_SHORT, FARM_DISPLAY_NAME } from "@/lib/ux-labels";
-import { countTreatmentsInWeek, sumParcelleHectares } from "@/lib/dashboard-utils";
+import { TREATMENT_STATUS_SHORT } from "@/lib/ux-labels";
+import { countTreatmentsInWeek } from "@/lib/dashboard-utils";
 import InlineBanner from "@/components/ui/InlineBanner";
+import { useSetHeaderActions } from "@/components/layout/HeaderActions";
 import { cn } from "@/lib/utils";
 import {
   Plus,
-  Map as MapIcon,
-  Download,
   ChevronRight,
   Loader2,
-  Radio,
   RefreshCw,
   MapPin,
+  ClipboardList,
+  CloudSun,
 } from "lucide-react";
+
+type DashboardPanel = "treatments" | "meteo" | null;
 
 const DashboardMap = dynamic(() => import("@/components/map/DashboardMap"), {
   ssr: false,
@@ -49,7 +47,6 @@ const DashboardMap = dynamic(() => import("@/components/map/DashboardMap"), {
 });
 
 const REFRESH_MS = 60_000;
-const ALERTS_SHOWN = 4;
 
 const STATUS_PILL: Record<string, "treating" | "planned" | "done" | "warn"> = {
   in_progress: "treating",
@@ -64,6 +61,14 @@ export default function DashboardPage() {
 }
 
 function DashboardContent() {
+  return (
+    <AppLayout>
+      <DashboardView />
+    </AppLayout>
+  );
+}
+
+function DashboardView() {
   const searchParams = useSearchParams();
   const accessDenied = searchParams.get("access") === "denied";
   const [showAccessBanner, setShowAccessBanner] = useState(accessDenied);
@@ -71,17 +76,14 @@ function DashboardContent() {
   const [kpis, setKpis] = useState<DashboardKPIs | null>(null);
   const [loading, setLoading] = useState(true);
   const [kpiError, setKpiError] = useState(false);
-  const [lastKpiUpdate, setLastKpiUpdate] = useState<Date | null>(null);
   const [activeTreatmentId, setActiveTreatmentId] = useState<string | null>(null);
   const [focusParcelleId, setFocusParcelleId] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const [openPanel, setOpenPanel] = useState<DashboardPanel>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const mapCardRef = useRef<HTMLDivElement>(null);
+  const setHeaderActions = useSetHeaderActions();
 
-  const { data: alertsRaw } = useAlerts();
   const { data: treatmentsRaw } = useTreatments();
   const { data: parcellesRaw } = useParcelles();
-  const alerts = (alertsRaw || []) as Alert[];
   const treatments = (treatmentsRaw || []) as unknown as Record<string, unknown>[];
   const parcelles = (parcellesRaw || []) as Parcelle[];
 
@@ -91,9 +93,7 @@ function DashboardContent() {
       const next = activeTreatmentId === id ? null : id;
       setActiveTreatmentId(next);
       setFocusParcelleId(next ? resolveTreatmentParcelleId(parcelles, t) : null);
-      if (next) {
-        mapCardRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }
+      if (next) setOpenPanel(null);
     },
     [activeTreatmentId, parcelles]
   );
@@ -108,14 +108,11 @@ function DashboardContent() {
     setFocusParcelleId(t ? resolveTreatmentParcelleId(parcelles, t) : null);
   }, [treatments, parcelles]);
 
-  useEffect(() => setMounted(true), []);
-
   const loadKpis = useCallback(async () => {
     try {
       const data = await fetchDashboardKPIs();
       setKpis(data);
       setKpiError(false);
-      setLastKpiUpdate(new Date());
     } catch {
       setKpiError(true);
     } finally {
@@ -131,20 +128,50 @@ function DashboardContent() {
     };
   }, [loadKpis]);
 
-  const today = mounted
-    ? new Date().toLocaleDateString("fr-FR", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : "";
+  const plannedThisWeek = useMemo(() => countTreatmentsInWeek(treatments), [treatments]);
 
-  const timeLabel = mounted
-    ? new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
-    : "";
+  const treatmentsWeekLabel = loading
+    ? "Chargement du tableau de bord…"
+    : `${plannedThisWeek} traitement${plannedThisWeek !== 1 ? "s" : ""} planifié${plannedThisWeek !== 1 ? "s" : ""} cette semaine`;
 
-  const unack = alerts.filter((a) => !a.acknowledged);
+  const treatmentsMonthLabel = loading
+    ? "—"
+    : (kpis?.pendingApproval ?? 0) > 0
+      ? `${kpis?.traitementsMois ?? 0} traitements / mois · ${kpis?.pendingApproval} en attente de validation`
+      : `${kpis?.traitementsMois ?? 0} traitements / mois · ${(kpis?.surfaceMois ?? 0).toFixed(1)} ha traités ce mois`;
+
+  const headerStatsLabel = loading
+    ? treatmentsWeekLabel
+    : `${treatmentsWeekLabel} · ${treatmentsMonthLabel}`;
+
+  useEffect(() => {
+    setHeaderActions(
+      <>
+        <span className="hidden sm:inline text-sm text-[var(--color-mist-gray)] whitespace-nowrap">
+          {headerStatsLabel}
+        </span>
+        <FeatureGate feature="treatments.edit">
+          <AdalineButton variant="primary" href="/treatments">
+            <Plus className="w-3.5 h-3.5" />
+            Planifier un traitement
+          </AdalineButton>
+        </FeatureGate>
+        <button
+          type="button"
+          className="lf-btn lf-btn-tertiary !h-8"
+          onClick={() => {
+            setLoading(true);
+            void loadKpis();
+          }}
+          title="Actualiser les indicateurs"
+        >
+          <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
+        </button>
+      </>
+    );
+    return () => setHeaderActions(null);
+  }, [loading, loadKpis, setHeaderActions, headerStatsLabel]);
+
   const recentTreatments = [...treatments]
     .sort(
       (a, b) =>
@@ -153,29 +180,8 @@ function DashboardContent() {
     )
     .slice(0, 5);
 
-  const plannedThisWeek = useMemo(() => countTreatmentsInWeek(treatments), [treatments]);
-  const totalHa = useMemo(() => sumParcelleHectares(parcelles), [parcelles]);
-
-  const favorableHint = useMemo(() => {
-    if ((kpis?.stressedParcels ?? 0) > 0) return `${kpis?.stressedParcels} zone(s) sous stress.`;
-    if (unack.some((a) => a.message?.toLowerCase().includes("vent"))) {
-      return "Fenêtres météo à confirmer avant pulvérisation.";
-    }
-    return "Conditions favorables pour planifier cette semaine.";
-  }, [kpis?.stressedParcels, unack]);
-
-  const alertTone = (type: string) => {
-    if (type === "critical" || type === "disease") return "danger";
-    if (type === "warning" || type === "stock") return "warn";
-    return "info";
-  };
-
-  const heroTitle = loading
-    ? "Chargement du tableau de bord…"
-    : `${plannedThisWeek} traitement${plannedThisWeek !== 1 ? "s" : ""} planifié${plannedThisWeek !== 1 ? "s" : ""} cette semaine.`;
-
   return (
-    <AppLayout>
+    <>
       {showAccessBanner && (
         <div className="mx-6 mt-4 flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-800">
           <span>🔒 Vous n'avez pas accès à cette page avec votre profil actuel.</span>
@@ -183,52 +189,9 @@ function DashboardContent() {
         </div>
       )}
       <PageScreen className="dashboard-screen">
-        <PageHero
-          aside={<DashboardHeroAside />}
-          eyebrow={
-            mounted
-              ? `BONJOUR · ${today.toUpperCase()}${timeLabel ? ` · ${timeLabel}` : ""}`
-              : FARM_DISPLAY_NAME.toUpperCase()
-          }
-          title={heroTitle}
-          faded={favorableHint}
-          actions={
-            <>
-              <FeatureGate feature="treatments.edit">
-                <AdalineButton variant="primary" href="/treatments">
-                  <Plus className="w-3.5 h-3.5" />
-                  Planifier un traitement
-                </AdalineButton>
-              </FeatureGate>
-              <FeatureGate feature="parcelles.view">
-                <AdalineButton variant="tertiary" href="/parcelles">
-                  <MapIcon className="w-3.5 h-3.5" />
-                  Ouvrir la carte
-                </AdalineButton>
-              </FeatureGate>
-              <FeatureGate feature="registre">
-                <AdalineButton variant="tertiary" href="/registre">
-                  <Download className="w-3.5 h-3.5" />
-                  Registre du jour
-                </AdalineButton>
-              </FeatureGate>
-              <button
-                type="button"
-                className="lf-btn lf-btn-tertiary !h-8"
-                onClick={() => {
-                  setLoading(true);
-                  void loadKpis();
-                }}
-                title="Actualiser les indicateurs"
-              >
-                <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
-              </button>
-            </>
-          }
-        />
-
         {kpiError && (
-          <InlineBanner tone="warn">
+          <div className="px-4 pt-3 shrink-0">
+            <InlineBanner tone="warn">
             Impossible de charger les indicateurs.{" "}
             <button type="button" className="underline font-medium" onClick={() => {
               setLoading(true);
@@ -236,255 +199,177 @@ function DashboardContent() {
             }}>
               Réessayer
             </button>
-          </InlineBanner>
+            </InlineBanner>
+          </div>
         )}
 
-        <div className="dash-kpi-row">
-          {lastKpiUpdate && !kpiError && (
-            <p className="mono text-[9px] text-[var(--color-mist-gray)] col-span-full -mt-1 mb-0 flex items-center gap-2">
-              <span className="lf-live-dot inline-block w-1.5 h-1.5 rounded-full bg-[#3d8b3d]" />
-              SYNC · indicateurs à{" "}
-              {lastKpiUpdate.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
-            </p>
-          )}
-          <KpiCard
-            label="SURFACE TOTALE"
-            value={loading ? "—" : totalHa.toFixed(1)}
-            unit="ha"
-            trend={
-              parcelles.length > 0
-                ? `${parcelles.length} parcelle(s) cartographiée(s)`
-                : "Cartographie monitorée"
-            }
-          />
-          <KpiCard
-            label="TRAITEMENTS / MOIS"
-            value={loading ? "—" : (kpis?.traitementsMois ?? 0)}
-            trend={
-              (kpis?.pendingApproval ?? 0) > 0
-                ? `${kpis?.pendingApproval} en attente de validation`
-                : `${(kpis?.surfaceMois ?? 0).toFixed(1)} ha traités ce mois`
-            }
-            tone={(kpis?.pendingApproval ?? 0) > 0 ? "warn" : "ok"}
-          />
-          <KpiCard
-            label="ALERTES ACTIVES"
-            value={unack.length}
-            trend={
-              unack.length === 0
-                ? "Aucune action requise"
-                : `${Math.min(unack.length, ALERTS_SHOWN)} affichée(s) ci-contre`
-            }
-            tone={unack.length > 0 ? "warn" : "ok"}
-          />
-        </div>
-
-        <DashboardInsights kpis={kpis} loading={loading} />
-
-        <div className="dash-grid">
-          <div ref={mapCardRef} className="dash-map-card-anchor">
-            <DashCard
-              eyebrow="EXPLOITATION"
-              title={`Vue d'ensemble · ${parcelles.length || 0} parcelle(s)`}
-              action={
-                <AdalineButton variant="tertiary" href="/parcelles">
-                  Détails
-                  <ChevronRight className="w-3 h-3" />
-                </AdalineButton>
-              }
-              className="dash-map-card"
-              bodyClassName="!overflow-hidden"
-            >
-              <div className="dash-mini-map">
-                <DashboardMap
-                  embedded
-                  activeTreatmentId={activeTreatmentId}
-                  focusParcelleId={focusParcelleId}
-                  onSelectTreatment={handleMapTreatmentSelect}
-                />
-              </div>
-              <p className="mono text-[9px] text-[var(--color-mist-gray)] mt-2 shrink-0 flex items-center gap-1">
-                <MapPin className="w-3 h-3 shrink-0 text-[var(--color-valley-green)]" />
-                Cliquez une parcelle sur la carte : historique complet (traitements, maladies, récoltes, satellite…)
-              </p>
-              {activeTreatmentId && (
-                <p className="mono text-[9px] text-amber-700 mt-2 shrink-0">
-                  Traitement sélectionné — associez une parcelle (nom ou parcelle_id) pour la localiser sur la carte.
-                </p>
-              )}
-            </DashCard>
+        <div className="dash-map-stage">
+          <div className="dash-map-bg">
+            <div className="dash-mini-map">
+              <DashboardMap
+                embedded
+                activeTreatmentId={activeTreatmentId}
+                focusParcelleId={focusParcelleId}
+                onSelectTreatment={handleMapTreatmentSelect}
+              />
+            </div>
           </div>
 
-          <DashCard
-            eyebrow="FLUX D'ALERTES"
-            title={
-              unack.length === 0
-                ? "Aucune action requise"
-                : `${unack.length} action${unack.length > 1 ? "s" : ""} requise${unack.length > 1 ? "s" : ""}`
-            }
-            action={
-              <Link href="/alerts" className="lf-live-pill hover:opacity-90" title="Voir toutes les alertes">
-                <span className="lf-live-dot" />
-                LIVE
-              </Link>
-            }
-            scrollBody
-          >
-            <div className="alert-list">
-              {unack.length === 0 ? (
-                <p className="text-sm text-[var(--color-mist-gray)] py-4 text-center">
-                  Tout est à jour — bonne journée de pilotage.
-                </p>
-              ) : (
-                unack.slice(0, ALERTS_SHOWN).map((a) => (
-                  <div key={a.id} className={`alert-item alert-${alertTone(a.type)}`}>
-                    <div className="alert-time mono">
-                      {new Date(a.timestamp).toLocaleTimeString("fr-FR", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="alert-title line-clamp-2">{a.message}</div>
-                      <div className="alert-sub">{alertTypeLabel(a.type)}</div>
-                    </div>
-                    <AdalineButton
-                      variant="tertiary"
-                      href={`/alerts?highlight=${a.id}`}
-                      className="!h-8 !px-3 text-xs shrink-0"
-                    >
-                      Voir
-                    </AdalineButton>
-                  </div>
-                ))
-              )}
-            </div>
-          </DashCard>
+          <div className="dash-map-insights-overlay">
+            <DashboardInsights kpis={kpis} loading={loading} />
+          </div>
 
-          <DashCard
-            eyebrow="PLANNING RÉCENT"
-            title="Derniers traitements"
-            action={
-              <AdalineButton variant="tertiary" href="/treatments">
-                Voir tout
-                <ChevronRight className="w-3 h-3" />
-              </AdalineButton>
-            }
-            scrollBody
-          >
-            <p className="dash-table-hint">
-              Cliquez une ligne pour centrer la parcelle sur la carte et afficher son historique de traitements.
-            </p>
-            <div className="dash-table-wrap">
-              <table className="dash-table">
-                <thead>
-                  <tr>
-                    <th>PARC.</th>
-                    <th>TYPE</th>
-                    <th className="hidden md:table-cell">OPÉRATEUR</th>
-                    <th>DATE</th>
-                    <th>STATUT</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentTreatments.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="!py-6 text-center text-[var(--color-mist-gray)] text-sm">
-                        Aucun traitement récent.
-                      </td>
-                    </tr>
-                  ) : (
-                    recentTreatments.map((t) => {
-                      const id = String(t.id);
-                      const status = String(t.status || "planned");
-                      const date = t.plannedDate || t.planned_date;
-                      const selected = activeTreatmentId === id;
-                      const parc = findParcelleByTreatment(parcelles, t);
-                      const parcLabel =
-                        (t.parcelleName as string) ||
-                        parc?.name ||
-                        (t.site_name as string) ||
-                        "—";
-                      return (
-                        <tr
-                          key={id}
-                          tabIndex={0}
-                          role="button"
-                          aria-selected={selected}
-                          aria-label={`Localiser sur la carte : ${parcLabel}, traitement ${String(t.type || "")}`}
-                          className={cn(
-                            "cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-valley-green)]/40",
-                            selected && "dash-table-row-selected"
-                          )}
-                          onClick={() => handleTreatmentRowSelect(t)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              handleTreatmentRowSelect(t);
-                            }
-                          }}
-                        >
-                          <td className="mono font-medium dash-table-parc">
-                            <span className="inline-flex items-center gap-1.5 max-w-[140px]">
-                              {parc && (
-                                <span
-                                  className="w-2 h-2 rounded-full shrink-0 border border-black/10"
-                                  style={{ backgroundColor: parc.color || "var(--color-valley-green)" }}
-                                  aria-hidden
-                                />
-                              )}
-                              <span className="truncate" title={parcLabel}>
-                                {parcLabel}
-                              </span>
-                              {selected && (
-                                <MapPin className="w-3 h-3 shrink-0 text-[var(--color-valley-green)]" aria-hidden />
-                              )}
-                            </span>
-                          </td>
-                          <td>{String(t.type || "—")}</td>
-                          <td className="hidden md:table-cell">
-                            {String(t.operatorName || t.operator_name || "—")}
-                          </td>
-                          <td>
-                            {date
-                              ? new Date(String(date)).toLocaleDateString("fr-FR", {
-                                  day: "numeric",
-                                  month: "short",
-                                })
-                              : "—"}
-                          </td>
-                          <td>
-                            <StatusPill
-                              label={TREATMENT_STATUS_SHORT[status] || status.toUpperCase()}
-                              variant={STATUS_PILL[status] || "planned"}
-                            />
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </DashCard>
+          <p className="dash-map-stage-hint">
+            <MapPin className="w-3 h-3 shrink-0 text-[var(--color-valley-green)]" />
+            Cliquez une parcelle sur la carte : historique complet (traitements, maladies, récoltes, satellite…)
+            {activeTreatmentId && (
+              <span className="block mt-1 text-amber-700">
+                Traitement sélectionné — associez une parcelle pour la localiser sur la carte.
+              </span>
+            )}
+          </p>
 
-          <DashCard
-            eyebrow="FENÊTRES MÉTÉO"
-            title="Conditions applicatives"
-            action={
-              <FeatureGate feature="live">
-                <AdalineButton variant="tertiary" href="/live" className="!h-8">
-                  <Radio className="w-3 h-3" />
-                  IoT Live
-                </AdalineButton>
-              </FeatureGate>
-            }
-            scrollBody
-          >
-            <MeteoWidget compact />
-          </DashCard>
+          <div className="dash-map-fabs">
+            <button
+              type="button"
+              className="dash-map-fab"
+              onClick={() => setOpenPanel("treatments")}
+            >
+              <span className="dash-map-fab-icon">
+                <ClipboardList className="w-4 h-4" />
+              </span>
+              Derniers traitements
+            </button>
+            <button
+              type="button"
+              className="dash-map-fab"
+              onClick={() => setOpenPanel("meteo")}
+            >
+              <span className="dash-map-fab-icon">
+                <CloudSun className="w-4 h-4" />
+              </span>
+              Conditions applicatives
+            </button>
+          </div>
         </div>
+
+        <DashboardPanelModal
+          open={openPanel === "treatments"}
+          onClose={() => setOpenPanel(null)}
+          eyebrow="PLANNING RÉCENT"
+          title="Derniers traitements"
+          action={
+            <AdalineButton variant="tertiary" href="/treatments">
+              Voir tout
+              <ChevronRight className="w-3 h-3" />
+            </AdalineButton>
+          }
+        >
+          <p className="dash-table-hint">
+            Cliquez une ligne pour centrer la parcelle sur la carte et afficher son historique de traitements.
+          </p>
+          <div className="dash-table-wrap">
+            <table className="dash-table">
+              <thead>
+                <tr>
+                  <th>PARC.</th>
+                  <th>TYPE</th>
+                  <th className="hidden md:table-cell">OPÉRATEUR</th>
+                  <th>DATE</th>
+                  <th>STATUT</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentTreatments.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="!py-6 text-center text-[var(--color-mist-gray)] text-sm">
+                      Aucun traitement récent.
+                    </td>
+                  </tr>
+                ) : (
+                  recentTreatments.map((t) => {
+                    const id = String(t.id);
+                    const status = String(t.status || "planned");
+                    const date = t.plannedDate || t.planned_date;
+                    const selected = activeTreatmentId === id;
+                    const parc = findParcelleByTreatment(parcelles, t);
+                    const parcLabel =
+                      (t.parcelleName as string) ||
+                      parc?.name ||
+                      (t.site_name as string) ||
+                      "—";
+                    return (
+                      <tr
+                        key={id}
+                        tabIndex={0}
+                        role="button"
+                        aria-selected={selected}
+                        aria-label={`Localiser sur la carte : ${parcLabel}, traitement ${String(t.type || "")}`}
+                        className={cn(
+                          "cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-valley-green)]/40",
+                          selected && "dash-table-row-selected"
+                        )}
+                        onClick={() => handleTreatmentRowSelect(t)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            handleTreatmentRowSelect(t);
+                          }
+                        }}
+                      >
+                        <td className="mono font-medium dash-table-parc">
+                          <span className="inline-flex items-center gap-1.5 max-w-[140px]">
+                            {parc && (
+                              <span
+                                className="w-2 h-2 rounded-full shrink-0 border border-black/10"
+                                style={{ backgroundColor: parc.color || "var(--color-valley-green)" }}
+                                aria-hidden
+                              />
+                            )}
+                            <span className="truncate" title={parcLabel}>
+                              {parcLabel}
+                            </span>
+                            {selected && (
+                              <MapPin className="w-3 h-3 shrink-0 text-[var(--color-valley-green)]" aria-hidden />
+                            )}
+                          </span>
+                        </td>
+                        <td>{String(t.type || "—")}</td>
+                        <td className="hidden md:table-cell">
+                          {String(t.operatorName || t.operator_name || "—")}
+                        </td>
+                        <td>
+                          {date
+                            ? new Date(String(date)).toLocaleDateString("fr-FR", {
+                                day: "numeric",
+                                month: "short",
+                              })
+                            : "—"}
+                        </td>
+                        <td>
+                          <StatusPill
+                            label={TREATMENT_STATUS_SHORT[status] || status.toUpperCase()}
+                            variant={STATUS_PILL[status] || "planned"}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </DashboardPanelModal>
+
+        <DashboardPanelModal
+          open={openPanel === "meteo"}
+          onClose={() => setOpenPanel(null)}
+          eyebrow="FENÊTRES MÉTÉO"
+          title="Conditions applicatives"
+        >
+          <MeteoWidget compact />
+        </DashboardPanelModal>
       </PageScreen>
-    </AppLayout>
+    </>
   );
 }

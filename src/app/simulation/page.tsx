@@ -37,7 +37,7 @@ const FLOW = [
   { icon: Sprout, label: "Plantation", desc: "Culture & variété sur la parcelle", href: "/campagnes" },
   { icon: FlaskConical, label: "Produit", desc: "Phyto en stock (CONFIDOR)", href: "/products" },
   { icon: Droplets, label: "Traitement", desc: "Ordre exécuté + produits appliqués", href: `/treatments?id=${DEMO_IDS.treatment}` },
-  { icon: Bell, label: "Alerte", desc: "Notification post-traitement", href: "/alerts" },
+  { icon: Bell, label: "Alerte", desc: "Notification post-traitement", href: "/dashboard?alerts=1" },
   { icon: GitBranch, label: "Traçabilité", desc: "Fil complet parcelle → produit", href: `/trace/${DEMO_IDS.treatment}` },
 ];
 
@@ -214,7 +214,7 @@ export default function SimulationPage() {
                   ["Stock", "/stock"],
                   ["Traitements", "/treatments"],
                   ["Registre", "/registre"],
-                  ["Alertes", "/alerts"],
+                  ["Alertes", "/dashboard?alerts=1"],
                   ["Traçabilité", `/trace/${DEMO_IDS.treatment}`],
                   ["IoT Live", "/live"],
                   ["Satellite", "/satellite"],

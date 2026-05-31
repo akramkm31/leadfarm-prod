@@ -2,11 +2,12 @@
 
 import { useState, useRef, useEffect, useId } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAlerts, useStockLevels, SUPABASE_CONFIGURED } from "@/hooks/useData";
 import type { Alert, StockLevel } from "@/lib/mock-data";
 import { FARM_DISPLAY_NAME } from "@/lib/ux-labels";
+import { getSupabaseBrowser } from "@/lib/supabase-browser";
 import { useAccess } from "@/hooks/useAccess";
 import { filterNavGroups } from "@/lib/rbac/navigation";
 import {
@@ -25,14 +26,18 @@ import {
   GitBranch,
   CalendarDays,
   Bell,
+  Search,
   Users,
   FileText,
   Beaker,
   Settings,
+  LogOut,
   Leaf,
   Tractor,
   Wheat,
 } from "lucide-react";
+import CommandPalette from "./CommandPalette";
+import { useAlertsPanel } from "@/components/alerts/AlertsProvider";
 
 type NavItem = { href: string; label: string; icon: React.ElementType; badge?: number };
 type NavGroup = { id: string; label: string; icon: React.ElementType; items: NavItem[]; badge?: number };
@@ -91,9 +96,7 @@ function useNavGroups(lowStock: number, alerts: number): NavGroup[] {
       badge:
         item.href === "/stock" && lowStock > 0
           ? lowStock
-          : item.href === "/alerts" && alerts > 0
-            ? alerts
-            : undefined,
+          : undefined,
     })),
   }));
 }
@@ -113,9 +116,11 @@ export default function Sidebar({
   onMobileClose,
   onFlyoutOpenChange,
 }: SidebarProps) {
+  const router = useRouter();
   const pathname = usePathname();
   const flyoutId = useId();
   const dockRef = useRef<HTMLDivElement>(null);
+  const userRef = useRef<HTMLDivElement>(null);
   const { data: stockLevelsRaw } = useStockLevels();
   const { data: alertsRaw } = useAlerts();
   const stockLevels = (stockLevelsRaw || []) as StockLevel[];
@@ -125,9 +130,23 @@ export default function Sidebar({
   const navGroups = useNavGroups(lowStock, unack);
   const { can } = useAccess();
   const showSettings = can("settings");
+  const { openAlerts } = useAlertsPanel();
 
   const [hoveredGroupId, setHoveredGroupId] = useState<string | null>(null);
+  const [userOpen, setUserOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [isMac, setIsMac] = useState(false);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const shortcutLabel = isMac ? "⌘K" : "Ctrl+K";
+  const showAlerts = can("alerts");
+
+  const handleLogout = async () => {
+    const supabase = getSupabaseBrowser();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  };
 
   const isActiveHref = (href: string) =>
     pathname === href || (href !== "/dashboard" && pathname?.startsWith(href + "/"));
@@ -170,13 +189,34 @@ export default function Sidebar({
   }, [mobileOpen]);
 
   useEffect(() => {
-    if (!mobileOpen) return;
+    if (typeof navigator !== "undefined") {
+      setIsMac(/Mac|iPod|iPhone|iPad/.test(navigator.platform));
+    }
+  }, []);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onMobileClose?.();
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((v) => !v);
+      }
+      if (e.key === "Escape") {
+        setPaletteOpen(false);
+        setUserOpen(false);
+        if (mobileOpen) onMobileClose?.();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [mobileOpen, onMobileClose]);
+
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (userRef.current && !userRef.current.contains(e.target as Node)) setUserOpen(false);
+    };
+    window.addEventListener("mousedown", onClick);
+    return () => window.removeEventListener("mousedown", onClick);
+  }, []);
 
   return (
     <>
@@ -200,7 +240,10 @@ export default function Sidebar({
         aria-modal={mobileOpen ? true : undefined}
         aria-label={mobileOpen ? "Menu de navigation" : undefined}
       >
-        <aside className="lf-dock" aria-label="Navigation principale">
+        <aside
+          className={cn("lf-dock", userOpen && "lf-dock--account-open")}
+          aria-label="Navigation principale"
+        >
           <Link href="/dashboard" className="lf-dock-logo" onClick={onMobileClose} title="LeadFarm">
             <Leaf className="w-6 h-6 text-[var(--color-valley-green)]" strokeWidth={1.6} />
             <span className="lf-dock-dot" />
@@ -240,24 +283,76 @@ export default function Sidebar({
           </nav>
 
           <div className="lf-dock-footer">
-            {showSettings && (
-              <Link
-                href="/settings"
-                title="Paramètres"
-                onClick={onMobileClose}
-                className={cn("lf-dock-btn", pathname === "/settings" && "active")}
-              >
-                <Settings strokeWidth={1.6} className="w-5 h-5" />
-              </Link>
-            )}
-            <Link
-              href="/settings"
-              className="lf-dock-avatar"
-              title="Compte — Paramètres"
-              onClick={onMobileClose}
+            <button
+              type="button"
+              className="lf-dock-btn"
+              title={`Rechercher (${shortcutLabel})`}
+              aria-label={`Rechercher (${shortcutLabel})`}
+              onClick={() => setPaletteOpen(true)}
             >
-              AK
-            </Link>
+              <Search strokeWidth={1.6} className="w-5 h-5" />
+            </button>
+            {showAlerts && (
+              <button
+                type="button"
+                className="lf-dock-btn"
+                title="Alertes"
+                aria-label={
+                  unack > 0 ? `Alertes — ${unack} non acquittée(s)` : "Alertes"
+                }
+                onClick={() => {
+                  openAlerts();
+                  onMobileClose?.();
+                }}
+              >
+                <Bell strokeWidth={1.6} className="w-5 h-5" />
+                {unack > 0 && (
+                  <span className="lf-dock-badge-num" aria-hidden>
+                    {formatDockBadge(unack)}
+                  </span>
+                )}
+              </button>
+            )}
+            <div className="relative" ref={userRef}>
+              <button
+                type="button"
+                className="lf-dock-avatar"
+                title="Menu compte"
+                aria-label="Menu compte"
+                aria-expanded={userOpen}
+                aria-haspopup="menu"
+                onClick={() => setUserOpen((v) => !v)}
+              >
+                AK
+              </button>
+              {userOpen && (
+                <div className="lf-dock-account-menu card-soft py-2 shadow-lg" role="menu">
+                  {showSettings && (
+                    <Link
+                      href="/settings"
+                      role="menuitem"
+                      className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-[#f1f5e6]"
+                      onClick={() => {
+                        setUserOpen(false);
+                        onMobileClose?.();
+                      }}
+                    >
+                      <Settings className="w-4 h-4" />
+                      Paramètres
+                    </Link>
+                  )}
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm hover:bg-[#f1f5e6] text-left"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Déconnexion
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </aside>
 
@@ -315,6 +410,8 @@ export default function Sidebar({
           )}
         </aside>
       </div>
+
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </>
   );
 }

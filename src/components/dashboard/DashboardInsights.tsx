@@ -83,15 +83,7 @@ export default function DashboardInsights({ kpis, loading }: Props) {
   }
 
   if (items.length === 0) {
-    return (
-      <div className="dash-insights">
-        <div className="dash-insight-pill dash-insight-ok">
-          <span className="mono text-[10px] uppercase tracking-wider text-[var(--color-valley-green)]">
-            Exploitation sous contrôle
-          </span>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
