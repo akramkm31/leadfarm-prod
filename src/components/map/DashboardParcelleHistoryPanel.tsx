@@ -10,6 +10,7 @@ import {
   Target, ChevronDown, ChevronUp, Satellite, Apple, Zap,
 } from "lucide-react";
 import { useState, useMemo } from "react";
+import ModalPortal from "@/components/ui/ModalPortal";
 import type { Parcelle } from "@/lib/mock-data";
 import type { ParcelleHistoryBundle, HistoryEventKind } from "@/lib/parcelle-history";
 import { KIND_COLORS, KIND_LABELS } from "@/lib/parcelle-history";
@@ -145,7 +146,8 @@ export default function DashboardParcelleHistoryPanel({ parcelle, history, loadi
   ];
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+    <ModalPortal>
+      <div className="lf-overlay-root flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 cursor-pointer"
            style={{ background: "rgba(8,12,8,0.65)", backdropFilter: "blur(6px)" }}
@@ -582,6 +584,7 @@ export default function DashboardParcelleHistoryPanel({ parcelle, history, loadi
         )}
       </div>
     </div>
+    </ModalPortal>
   );
 }
 

@@ -219,16 +219,6 @@ function DashboardView() {
             <DashboardInsights kpis={kpis} loading={loading} />
           </div>
 
-          <p className="dash-map-stage-hint">
-            <MapPin className="w-3 h-3 shrink-0 text-[var(--color-valley-green)]" />
-            Cliquez une parcelle sur la carte : historique complet (traitements, maladies, récoltes, satellite…)
-            {activeTreatmentId && (
-              <span className="block mt-1 text-amber-700">
-                Traitement sélectionné — associez une parcelle pour la localiser sur la carte.
-              </span>
-            )}
-          </p>
-
           <div className="dash-map-fabs">
             <button
               type="button"

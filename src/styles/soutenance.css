@@ -820,35 +820,16 @@
   flex-shrink: 0;
 }
 
-.dashboard-screen .dash-map-stage-hint {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  z-index: 15;
-  max-width: min(320px, calc(100% - 180px));
-  pointer-events: none;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.04em;
-  color: var(--color-mist-gray);
-  line-height: 1.45;
-  padding: 8px 12px;
-  border-radius: var(--r-img);
-  background: rgba(251, 253, 246, 0.88);
-  border: 1px solid var(--color-stone-moss);
-  backdrop-filter: blur(6px);
-}
-
-.dashboard-screen .dash-map-stage-hint svg {
-  display: inline;
-  vertical-align: -2px;
-  margin-right: 4px;
+.lf-overlay-root {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
 }
 
 .dash-panel-modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 2000;
+  z-index: 5000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1341,13 +1322,6 @@
   .dashboard-screen .dash-map-fabs {
     bottom: 14px;
     right: 14px;
-  }
-
-  .dashboard-screen .dash-map-stage-hint {
-    bottom: auto;
-    top: 56px;
-    left: 14px;
-    max-width: calc(100% - 28px);
   }
 
   .dashboard-screen .dash-grid {
