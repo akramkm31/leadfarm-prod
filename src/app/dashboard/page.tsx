@@ -4,8 +4,7 @@ import { useEffect, useState, useCallback, useRef, useMemo, Suspense } from "rea
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import AppLayout from "@/components/layout/AppLayout";
-import MeteoWidget from "@/components/dashboard/MeteoWidget";
-import DashboardInsights from "@/components/dashboard/DashboardInsights";
+import WeatherMapHud from "@/components/dashboard/WeatherMapHud";
 import DashboardPanelModal from "@/components/dashboard/DashboardPanelModal";
 import FeatureGate from "@/components/auth/FeatureGate";
 import {
@@ -22,6 +21,11 @@ import {
 } from "@/components/map/dashboard-map-utils";
 import { TREATMENT_STATUS_SHORT } from "@/lib/ux-labels";
 import { countTreatmentsInWeek } from "@/lib/dashboard-utils";
+import type { WeatherMapData } from "@/lib/weather-map";
+import {
+  DEFAULT_WEATHER_LAYERS,
+  type WeatherLayerState,
+} from "@/lib/open-weather-layers";
 import InlineBanner from "@/components/ui/InlineBanner";
 import { useSetHeaderActions } from "@/components/layout/HeaderActions";
 import { cn } from "@/lib/utils";
@@ -79,6 +83,10 @@ function DashboardView() {
   const [activeTreatmentId, setActiveTreatmentId] = useState<string | null>(null);
   const [focusParcelleId, setFocusParcelleId] = useState<string | null>(null);
   const [openPanel, setOpenPanel] = useState<DashboardPanel>(null);
+  const [weatherData, setWeatherData] = useState<WeatherMapData | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherLayers, setWeatherLayers] = useState<WeatherLayerState>(DEFAULT_WEATHER_LAYERS);
+  const [weatherOpacity, setWeatherOpacity] = useState(0.65);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const setHeaderActions = useSetHeaderActions();
 
@@ -97,6 +105,22 @@ function DashboardView() {
     },
     [activeTreatmentId, parcelles]
   );
+
+  const weatherMode = openPanel === "meteo";
+
+  const handleWeatherData = useCallback((data: WeatherMapData | null, loading: boolean) => {
+    setWeatherData(data);
+    setWeatherLoading(loading);
+  }, []);
+
+  const toggleWeatherMode = useCallback(() => {
+    setOpenPanel((prev) => {
+      if (prev === "meteo") return null;
+      setActiveTreatmentId(null);
+      setFocusParcelleId(null);
+      return "meteo";
+    });
+  }, []);
 
   const handleMapTreatmentSelect = useCallback((id: string | null) => {
     setActiveTreatmentId(id);
@@ -211,34 +235,49 @@ function DashboardView() {
                 activeTreatmentId={activeTreatmentId}
                 focusParcelleId={focusParcelleId}
                 onSelectTreatment={handleMapTreatmentSelect}
+                weatherMode={weatherMode}
+                weatherLayers={weatherLayers}
+                weatherOpacity={weatherOpacity}
+                onWeatherData={handleWeatherData}
               />
             </div>
           </div>
 
-          <div className="dash-map-insights-overlay">
-            <DashboardInsights kpis={kpis} loading={loading} />
-          </div>
+          {weatherMode && (
+            <WeatherMapHud
+              weather={weatherData}
+              loading={weatherLoading}
+              layers={weatherLayers}
+              opacity={weatherOpacity}
+              onLayersChange={setWeatherLayers}
+              onOpacityChange={setWeatherOpacity}
+              onClose={() => setOpenPanel(null)}
+            />
+          )}
 
           <div className="dash-map-fabs">
             <button
               type="button"
-              className="dash-map-fab"
-              onClick={() => setOpenPanel("treatments")}
+              className={cn(
+                "dash-map-icon-btn",
+                openPanel === "treatments" && "dash-map-icon-btn-active"
+              )}
+              onClick={() => setOpenPanel(openPanel === "treatments" ? null : "treatments")}
+              aria-pressed={openPanel === "treatments"}
+              aria-label="Derniers traitements"
+              title="Derniers traitements"
             >
-              <span className="dash-map-fab-icon">
-                <ClipboardList className="w-4 h-4" />
-              </span>
-              Derniers traitements
+              <ClipboardList className="w-4 h-4" />
             </button>
             <button
               type="button"
-              className="dash-map-fab"
-              onClick={() => setOpenPanel("meteo")}
+              className={cn("dash-map-icon-btn", weatherMode && "dash-map-icon-btn-active")}
+              onClick={toggleWeatherMode}
+              aria-pressed={weatherMode}
+              aria-label="Conditions applicatives"
+              title="Conditions applicatives"
             >
-              <span className="dash-map-fab-icon">
-                <CloudSun className="w-4 h-4" />
-              </span>
-              Conditions applicatives
+              <CloudSun className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -349,15 +388,6 @@ function DashboardView() {
               </tbody>
             </table>
           </div>
-        </DashboardPanelModal>
-
-        <DashboardPanelModal
-          open={openPanel === "meteo"}
-          onClose={() => setOpenPanel(null)}
-          eyebrow="FENÊTRES MÉTÉO"
-          title="Conditions applicatives"
-        >
-          <MeteoWidget compact />
         </DashboardPanelModal>
       </PageScreen>
     </>

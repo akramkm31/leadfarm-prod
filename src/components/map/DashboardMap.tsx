@@ -17,7 +17,17 @@ import { parcelleLabelHtml, parcelleLabelIconAnchor } from "@/lib/map-labels";
 import ParcelleOverlay from "./ParcelleOverlay";
 import ParcelleQuickNav from "./ParcelleQuickNav";
 import DashboardParcelleHistoryPanel from "./DashboardParcelleHistoryPanel";
+import WeatherMapOverlay from "./WeatherMapOverlay";
 import { buildParcelleHistoryBundle, type ParcelleHistoryBundle } from "@/lib/parcelle-history";
+import {
+  buildRainGridBounds,
+  fetchWeatherMapData,
+  type WeatherMapData,
+} from "@/lib/weather-map";
+import {
+  DEFAULT_WEATHER_LAYERS,
+  type WeatherLayerState,
+} from "@/lib/open-weather-layers";
 
 interface DashboardMapProps {
   activeTreatmentId?: string | null;
@@ -25,6 +35,10 @@ interface DashboardMapProps {
   /** Parcelle à centrer (ex. clic ligne tableau) — prioritaire sur la résolution interne */
   focusParcelleId?: string | null;
   embedded?: boolean;
+  weatherMode?: boolean;
+  weatherLayers?: WeatherLayerState;
+  weatherOpacity?: number;
+  onWeatherData?: (data: WeatherMapData | null, loading: boolean) => void;
 }
 
 export default function DashboardMap({
@@ -32,6 +46,10 @@ export default function DashboardMap({
   onSelectTreatment,
   focusParcelleId = null,
   embedded = false,
+  weatherMode = false,
+  weatherLayers = DEFAULT_WEATHER_LAYERS,
+  weatherOpacity = 0.65,
+  onWeatherData,
 }: DashboardMapProps) {
   const { data: parcellesRaw } = useParcelles();
   const { data: treatmentsRaw } = useTreatments();
@@ -45,9 +63,12 @@ export default function DashboardMap({
   const layersRef = useRef<L.Layer[]>([]);
   const detailLayersRef = useRef<L.Layer[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [leafletMap, setLeafletMap] = useState<L.Map | null>(null);
   const [selectedParcelleId, setSelectedParcelleId] = useState<string | null>(null);
   const [historyBundle, setHistoryBundle] = useState<ParcelleHistoryBundle | null>(null);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [weatherData, setWeatherData] = useState<WeatherMapData | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
 
   const onSelectTreatmentRef = useRef(onSelectTreatment);
   onSelectTreatmentRef.current = onSelectTreatment;
@@ -172,6 +193,7 @@ export default function DashboardMap({
       });
 
       mapInstance.current = map;
+      setLeafletMap(map);
       setLoaded(true);
     };
 
@@ -180,6 +202,7 @@ export default function DashboardMap({
     return () => {
       cancelled = true;
       setLoaded(false);
+      setLeafletMap(null);
       if (mapInstance.current) {
         mapInstance.current.remove();
         mapInstance.current = null;
@@ -424,6 +447,28 @@ export default function DashboardMap({
     };
   }, [resolvedFocusId, overlayParcelle, treatments]);
 
+  useEffect(() => {
+    if (!weatherMode) {
+      setWeatherData(null);
+      setWeatherLoading(false);
+      onWeatherData?.(null, false);
+      return;
+    }
+    let cancelled = false;
+    setWeatherLoading(true);
+    onWeatherData?.(null, true);
+    const bounds = buildRainGridBounds(collectParcelleBounds(parcelles));
+    fetchWeatherMapData(bounds).then((data) => {
+      if (cancelled) return;
+      setWeatherData(data);
+      setWeatherLoading(false);
+      onWeatherData?.(data, false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [weatherMode, parcelles, onWeatherData]);
+
   // GIS HUD Actions
   const handleCenterMap = () => {
     if (!loaded || !mapInstance.current || !LRef.current) return;
@@ -511,7 +556,19 @@ export default function DashboardMap({
         </div>
       )}
 
-      {overlayParcelle && embedded && (
+      {weatherMode && loaded && (
+        <WeatherMapOverlay
+          active={weatherMode}
+          map={leafletMap}
+          L={LRef.current}
+          parcelles={parcelles}
+          weather={weatherData}
+          layers={weatherLayers}
+          opacity={weatherOpacity}
+        />
+      )}
+
+      {overlayParcelle && embedded && !weatherMode && (
         <DashboardParcelleHistoryPanel
           parcelle={overlayParcelle}
           history={historyBundle}
