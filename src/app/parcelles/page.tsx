@@ -121,6 +121,7 @@ function ParcellesPageContent() {
   const [editModal, setEditModal] = useState<{ open: boolean; name: string; cropType: string; color: string }>({ open: false, name: "", cropType: "", color: "" });
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleteErrorMsg, setDeleteErrorMsg] = useState<string | null>(null);
+  const [editErrorMsg, setEditErrorMsg] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
 
@@ -2322,9 +2323,12 @@ function ParcellesPageContent() {
               </div>
             </div>
 
+            {editErrorMsg && (
+              <p className="mt-3 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{editErrorMsg}</p>
+            )}
             <div className="flex gap-2 mt-5">
               <button
-                onClick={() => setEditModal({ ...editModal, open: false })}
+                onClick={() => { setEditModal({ ...editModal, open: false }); setEditErrorMsg(null); }}
                 className="flex-1 py-2.5 text-xs font-medium rounded-xl border border-[var(--color-stone-moss)] text-[var(--color-adaline-ink)]/60 hover:bg-white/[0.06] transition-colors"
               >
                 Annuler
@@ -2333,6 +2337,7 @@ function ParcellesPageContent() {
                 disabled={actionLoading || !editModal.name.trim()}
                 onClick={async () => {
                   setActionLoading(true);
+                  setEditErrorMsg(null);
                   try {
                     await updateParcelle(selectedParcelle.id, {
                       name: editModal.name.trim(),
@@ -2343,7 +2348,7 @@ function ParcellesPageContent() {
                     setEditModal({ open: false, name: "", cropType: "", color: "" });
                     clearParcelleSelection();
                   } catch (err) {
-                    alert((err as Error).message);
+                    setEditErrorMsg((err as Error).message || "Erreur lors de l'enregistrement");
                   } finally {
                     setActionLoading(false);
                   }
