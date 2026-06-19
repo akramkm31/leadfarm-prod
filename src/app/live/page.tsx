@@ -1,8 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import AppLayout from "@/components/layout/AppLayout";
 import { supabase } from "@/lib/supabase";
@@ -54,8 +53,9 @@ import {
 } from "lucide-react";
 
 const TractorLiveMap = dynamic(() => import("@/components/map/TractorLiveMap"), { ssr: false });
+const SeedingGapMap = dynamic(() => import("@/components/map/SeedingGapMap"), { ssr: false });
 
-// ─── GPS quality thresholds (parametrable) ────────────────────────────────────
+// â”€â”€â”€ GPS quality thresholds (parametrable) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const GPS_MIN_SATS = 5;
 const GPS_MAX_HDOP = 2.0;
 
@@ -98,11 +98,11 @@ type TreatmentData = {
   products: { productName: string; quantityUsed: number; unit: string; productId?: string; lotId?: string }[];
   volumeBouillie?: number | null;
   areaTreatedHectares?: number;
+  executedDate?: string;
   notes?: string;
 };
 
 export default function LivePage() {
-  const router = useRouter();
   const [latest, setLatest] = useState<Reading | null>(null);
   const [history, setHistory] = useState<Reading[]>([]);
   const [connected, setConnected] = useState(false);
@@ -115,8 +115,9 @@ export default function LivePage() {
   const [treatments, setTreatments] = useState<TreatmentData[]>([]);
   const [activeTreatment, setActiveTreatment] = useState<TreatmentData | null>(null);
   const [showSelector, setShowSelector] = useState(false);
-  const [showHistoryPanel, setShowHistoryPanel] = useState(false);
+  const [showHistoryPanel, setShowHistoryPanel] = useState(true);
   const [historyTreatments, setHistoryTreatments] = useState<TreatmentData[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [visibleHistoryIds, setVisibleHistoryIds] = useState<string[]>([]);
   const [historyTrajectories, setHistoryTrajectories] = useState<Record<string, TrajectoryData>>({});
   const [sessionStartVol, setSessionStartVol] = useState(0);
@@ -127,9 +128,11 @@ export default function LivePage() {
   const [simIndex, setSimIndex] = useState(0);
   const [simRunning, setSimRunning] = useState(false);
 
-  // ── Mode réel / démo ──
+  // â”€â”€ Mode rÃ©el / dÃ©mo â”€â”€
   // Auto-switch to "real" when live GPS data arrives, manual override possible
+  const [liveView, setLiveView] = useState<"gps" | "gap">("gps");
   const [dataMode, setDataMode] = useState<DataMode>("demo");
+  const [gpsError, setGpsError] = useState<string | null>(null);
   // Accumulated real GPS trail during an active treatment session
   const [realTrailPoints, setRealTrailPoints] = useState<{lat: number, lon: number, flow: number}[]>([]);
   // Full resolution trajectory buffer for saving to DB
@@ -145,6 +148,26 @@ export default function LivePage() {
       setLatest(data[0] as Reading);
       setHistory(data as Reading[]);
       setLastUpdate(new Date());
+    }
+  }, []);
+
+  const loadHistoryTreatments = useCallback(async () => {
+    setHistoryLoading(true);
+    try {
+      const [completed, inProgress] = await Promise.all([
+        fetchTreatments("completed"),
+        fetchTreatments("in_progress"),
+      ]);
+      const merged = [...inProgress, ...completed].sort((a, b) => {
+        const dateA = new Date(a.executedDate || a.plannedDate).getTime();
+        const dateB = new Date(b.executedDate || b.plannedDate).getTime();
+        return dateB - dateA;
+      });
+      setHistoryTreatments(merged);
+    } catch {
+      setHistoryTreatments([]);
+    } finally {
+      setHistoryLoading(false);
     }
   }, []);
 
@@ -186,6 +209,7 @@ export default function LivePage() {
   useEffect(() => {
     fetchLatest();
     loadTreatments();
+    loadHistoryTreatments();
 
     // 1. Check for existing active treatment on mount
     fetchActiveTreatment("ESP32-001").then(active => {
@@ -253,7 +277,7 @@ export default function LivePage() {
       });
     channelRef.current = channel;
     return () => { supabase.removeChannel(channel); };
-  }, [fetchLatest, loadTreatments]);
+  }, [fetchLatest, loadTreatments, loadHistoryTreatments]);
 
   // Keep refs in sync for the realtime callback
   const activeTreatmentRef = useRef(activeTreatment);
@@ -285,7 +309,7 @@ export default function LivePage() {
         });
       }
       
-      // Mémoriser le volume initial réel (vol1 + vol2)
+      // MÃ©moriser le volume initial rÃ©el (vol1 + vol2)
       const currentVol = latest ? latest.vol1 + latest.vol2 : 0;
       setSessionStartVol(currentVol);
       setSessionStartTime(new Date());
@@ -305,16 +329,17 @@ export default function LivePage() {
       fullTrajectoryBuffer.current = [];
 
       await loadTreatments();
+      await loadHistoryTreatments();
     } catch (err) {
       console.error("Failed to start treatment:", err);
     }
   };
 
-  // Demo simulation — runs simulation without needing a DB treatment
+  // Demo simulation â€” runs simulation without needing a DB treatment
   const startDemoSimulation = () => {
     const demoTreatment = {
       id: "demo-sim",
-      parcelleName: "Simulation Démo",
+      parcelleName: "Simulation DÃ©mo",
       type: "pulverisation",
       status: "in_progress",
       plannedDate: new Date().toISOString(),
@@ -324,13 +349,13 @@ export default function LivePage() {
     startTreatment(demoTreatment, "demo");
   };
 
-  /** V�rifier la qualit� GPS avant de d�marrer en mode r�el */
+  /** Vï¿½rifier la qualitï¿½ GPS avant de dï¿½marrer en mode rï¿½el */
   const checkGpsQuality = async (): Promise<{ lat: number; lng: number } | null> => {
-    // D'abord v�rifier la derni�re lecture temps r�el
+    // D'abord vï¿½rifier la derniï¿½re lecture temps rï¿½el
     if (latest && latest.lat !== 0 && latest.lon !== 0 && latest.sats >= 4 && (latest.hdop ?? 99) <= 5) {
       return { lat: latest.lat, lng: latest.lon };
     }
-    // Sinon, requ�ter directement esp32_telemetry
+    // Sinon, requï¿½ter directement esp32_telemetry
     try {
       const { data: gps } = await supabase
         .from('esp32_telemetry')
@@ -353,11 +378,11 @@ export default function LivePage() {
       let startLat: number = tractorTrajectory.start[0];
       let startLng: number = tractorTrajectory.start[1];
 
-      // V�rification GPS qualifi� avant d�marrage r�el
+      // Vï¿½rification GPS qualifiï¿½ avant dï¿½marrage rï¿½el
       if (dataMode === "real") {
         const gpsFix = await checkGpsQuality();
         if (!gpsFix) {
-          alert('Signal GPS insuffisant. V�rifiez le bo�tier ESP32.');
+          setGpsError('Signal GPS insuffisant. Vï¿½rifiez le boï¿½tier ESP32.');
           return;
         }
         startLat = gpsFix.lat;
@@ -372,7 +397,8 @@ export default function LivePage() {
         parcelleName: pName,
         type: "pulverisation",
         startLat,
-        startLng
+        startLng,
+        parcelleId: activeParcelle?.id,
       });
 
       if (newT) {
@@ -397,6 +423,8 @@ export default function LivePage() {
           lon: startLng, 
           flow: latest ? (latest.flow1 + latest.flow2) / 2 : 0
         }]);
+        await loadTreatments();
+        await loadHistoryTreatments();
       }
     } catch (err) {
       console.error("Quick start failed:", err);
@@ -408,13 +436,13 @@ export default function LivePage() {
     if (!activeTreatment || activeTreatment.id !== "demo-sim" || simIndex < 5) return;
     setEnding(true);
     try {
-      const pName = activeParcelle ? activeParcelle.name : "Démo Sauvegardée";
+      const pName = activeParcelle ? activeParcelle.name : "DÃ©mo SauvegardÃ©e";
       const newT = await insertTreatment({
         parcelleName: pName,
         type: activeTreatment.type,
         plannedDate: new Date().toISOString(),
         status: "completed",
-        operatorName: "Simulation Démo",
+        operatorName: "Simulation DÃ©mo",
         volumeBouillie: simVolume,
         areaTreatedHectares: simAreaHa,
       });
@@ -436,18 +464,15 @@ export default function LivePage() {
       setActiveTreatment(null);
       setSimRunning(false);
       setSimIndex(0);
-      router.push("/treatments");
+      await loadHistoryTreatments();
+      await loadTreatments();
+      setShowHistoryPanel(true);
     } catch (err) {
       console.error("Failed to save demo:", err);
     } finally {
       setEnding(false);
     }
   };
-
-  useEffect(() => {
-    // Load recent history for the live panel
-    fetchTreatments("completed").then(setHistoryTreatments);
-  }, []);
 
   const toggleHistoryTrajectory = async (treatmentId: string) => {
     if (visibleHistoryIds.includes(treatmentId)) {
@@ -513,7 +538,7 @@ export default function LivePage() {
           durationSeconds: duration,
           distanceM,
           areaHa: area,
-          darDays: 21, // conservative default — replaced by per-product DAR when ordres workflow used
+          darDays: 21, // conservative default â€” replaced by per-product DAR when ordres workflow used
           stockDeductions: stockDeductions.length > 0 ? stockDeductions : undefined,
         });
       }
@@ -526,7 +551,9 @@ export default function LivePage() {
       setSimIndex(0);
       setSimRunning(false);
       setRealTrailPoints([]);
-      router.push("/treatments");
+      await loadHistoryTreatments();
+      await loadTreatments();
+      setShowHistoryPanel(true);
     } catch (err) {
       console.error("Failed to end treatment:", err);
     } finally {
@@ -542,12 +569,12 @@ export default function LivePage() {
   const flow1Active = latest ? latest.flow1 > 0.1 : false;
   const flow2Active = latest ? latest.flow2 > 0.1 : false;
 
-  // ─── GPS quality gate (HDOP ≤ GPS_MAX_HDOP AND sats ≥ GPS_MIN_SATS) ────────
+  // â”€â”€â”€ GPS quality gate (HDOP â‰¤ GPS_MAX_HDOP AND sats â‰¥ GPS_MIN_SATS) â”€â”€â”€â”€â”€â”€â”€â”€
   const gpsQualityOk = latest
     ? gpsValid && latest.hdop <= GPS_MAX_HDOP && latest.sats >= GPS_MIN_SATS
     : false;
 
-  /** "green" | "amber" | "red" — utilisé dans l'indicateur HUD */
+  /** "green" | "amber" | "red" â€” utilisÃ© dans l'indicateur HUD */
   const gpsQualityLevel = (() => {
     if (!latest || !gpsValid) return "red" as const;
     if (latest.hdop <= 1.5 && latest.sats >= GPS_MIN_SATS) return "green" as const;
@@ -555,7 +582,7 @@ export default function LivePage() {
     return "red" as const;
   })();
 
-  /** Position GPS réelle passée à la carte — uniquement si qualité suffisante */
+  /** Position GPS rÃ©elle passÃ©e Ã  la carte â€” uniquement si qualitÃ© suffisante */
   const livePosition = useMemo(
     () =>
       gpsQualityOk && latest
@@ -565,13 +592,13 @@ export default function LivePage() {
     [latest?.lat, latest?.lon, latest?.speed, latest?.hdop, latest?.sats, gpsQualityOk]
   );
 
-  /** Traînée réelle à afficher sur la carte */
+  /** TraÃ®nÃ©e rÃ©elle Ã  afficher sur la carte */
   const realTrailForMap = useMemo(
     () => (realTrailPoints.length >= 2 ? realTrailPoints : []),
     [realTrailPoints]
   );
 
-  /** Export CSV des dernières lectures — appelle l'API GET avec format=csv */
+  /** Export CSV des derniÃ¨res lectures â€” appelle l'API GET avec format=csv */
   const exportCsv = useCallback(() => {
     const url = `/api/readings?format=csv&limit=500${latest?.device_id ? `&device_id=${encodeURIComponent(latest.device_id)}` : ""}`;
     const a = document.createElement("a");
@@ -632,7 +659,7 @@ export default function LivePage() {
 
   const flowHistory = history.slice(0, 20).reverse();
 
-  // ═══ SIMULATION LOOP ═══
+  // â•â•â• SIMULATION LOOP â•â•â•
   // Flatten trajectory into ordered [lat, lon, speed] points
   const simFlatPath = useMemo(() => {
     if (!activeTrajectory) return [] as { lat: number; lon: number; speed: number }[];
@@ -641,20 +668,20 @@ export default function LivePage() {
     );
   }, [activeTrajectory]);
 
-  // Reset sim when treatment changes — only auto-start sim in demo mode
+  // Reset sim when treatment changes â€” only auto-start sim in demo mode
   useEffect(() => {
     setSimIndex(0);
     setSimRunning(!!activeTreatment && simFlatPath.length > 0 && dataMode === "demo");
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTreatment?.id, simFlatPath.length, dataMode]);
 
-  // Advance simulation tick — speed-proportional timing (slow=slow, fast=fast)
+  // Advance simulation tick â€” speed-proportional timing (slow=slow, fast=fast)
   const [simSpeedMult, setSimSpeedMult] = useState(3); // 1x = real time
   useEffect(() => {
     if (!simRunning || simFlatPath.length === 0) return;
     const curSpeedKmh = simFlatPath[simIndex]?.speed || 5;
     const speedMs = (curSpeedKmh * 1000) / 3600; // m/s
-    const POINT_SPACING_M = 2; // KMZ samples ≈2m apart
+    const POINT_SPACING_M = 2; // KMZ samples â‰ˆ2m apart
     const realMs = (POINT_SPACING_M / speedMs) * 1000;
     const tickMs = Math.max(40, Math.min(1500, realMs / simSpeedMult));
 
@@ -680,11 +707,11 @@ export default function LivePage() {
     : null;
 
   // Simulated metrics (per-tick increments, 250ms tick)
-  // Flow ≈ 4 L/min base + 0.4 per km/h → realistic sprayer flow
+  // Flow â‰ˆ 4 L/min base + 0.4 per km/h â†’ realistic sprayer flow
   const simFlow = simCurrent ? 4 + simCurrent.speed * 0.4 : 0;
   // Volume: integrate flow over elapsed ticks (0.25s each)
   const simVolume = simIndex * (simFlow / 60) * 0.25;
-  // Area: speed (m/s) × tick (0.25s) × working width (6m) × number of ticks, in m²
+  // Area: speed (m/s) Ã— tick (0.25s) Ã— working width (6m) Ã— number of ticks, in mÂ²
   const simAreaM2 = simFlatPath.slice(0, simIndex + 1).reduce(
     (acc, p) => acc + (p.speed * 1000 / 3600) * 0.25 * 6,
     0
@@ -705,9 +732,9 @@ export default function LivePage() {
   const simProgress = simFlatPath.length > 0 ? (simIndex / (simFlatPath.length - 1)) * 100 : 0;
 
   const typeLabels: Record<string, string> = {
-    pulverisation: "Pulvérisation",
+    pulverisation: "PulvÃ©risation",
     fertilisation: "Fertilisation",
-    desherbage: "Désherbage",
+    desherbage: "DÃ©sherbage",
     traitement_semence: "Traitement semence",
     autre: "Autre",
   };
@@ -725,22 +752,26 @@ export default function LivePage() {
       <div className="relative" style={{ height: "calc(100vh - 90px)" }}>
         {/* Full-screen map */}
         <div className="absolute inset-0 rounded-2xl overflow-hidden border border-[var(--color-stone-moss)]">
-          <TractorLiveMap
-            points={[]}
-            parcelles={parcelleOverlays}
-            trajectory={activeTrajectory || undefined}
-            simPosition={isSimActive ? simPosition : null}
-            simTrail={isSimActive && simTrail.length >= 2 ? simTrail : undefined}
-            livePosition={livePosition}
-            realTrail={realTrailForMap.length >= 2 ? realTrailForMap : undefined}
-            historyTrajectories={Object.entries(historyTrajectories)
-              .filter(([id]) => visibleHistoryIds.includes(id))
-              .map(([_, t]) => t)}
-            className="w-full h-full"
-          />
+          {liveView === "gap" ? (
+            <SeedingGapMap />
+          ) : (
+            <TractorLiveMap
+              points={[]}
+              parcelles={parcelleOverlays}
+              trajectory={activeTrajectory || undefined}
+              simPosition={isSimActive ? simPosition : null}
+              simTrail={isSimActive && simTrail.length >= 2 ? simTrail : undefined}
+              livePosition={livePosition}
+              realTrail={realTrailForMap.length >= 2 ? realTrailForMap : undefined}
+              historyTrajectories={Object.entries(historyTrajectories)
+                .filter(([id]) => visibleHistoryIds.includes(id))
+                .map(([_, t]) => t)}
+              className="w-full h-full"
+            />
+          )}
         </div>
 
-        {/* ═══ TOP HUD BAR ═══ */}
+        {/* â•â•â• TOP HUD BAR â•â•â• */}
         <div className="absolute top-3 left-3 right-3 z-[500] flex items-center justify-between">
           {/* Left: Device identity */}
           <div className="flex items-center gap-2">
@@ -782,6 +813,24 @@ export default function LivePage() {
             </div>
           </div>
 
+          {/* Center: view mode tabs */}
+          <div className="flex items-center gap-0.5 hud-panel px-1 py-1">
+            {(["gps", "gap"] as const).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setLiveView(mode)}
+                className={cn(
+                  "px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
+                  liveView === mode
+                    ? "bg-[var(--color-valley-green)]/20 text-[var(--color-valley-green)] border border-emerald-500/30"
+                    : "text-[var(--color-adaline-ink)]/40 hover:text-[var(--color-adaline-ink)]/70"
+                )}
+              >
+                {mode === "gps" ? "GPS Live" : "Analyse Semis"}
+              </button>
+            ))}
+          </div>
+
           {/* Right: GPS quality + mode toggle + time + refresh + CSV */}
           <div className="flex items-center gap-2">
             {/* GPS Quality indicator */}
@@ -804,7 +853,7 @@ export default function LivePage() {
               </div>
             )}
 
-            {/* Mode Réel / Démo toggle */}
+            {/* Mode RÃ©el / DÃ©mo toggle */}
             <button
               onClick={() => setDataMode((m) => m === "real" ? "demo" : "real")}
               className={cn(
@@ -813,7 +862,7 @@ export default function LivePage() {
                   ? "border-emerald-500/40 bg-[var(--color-valley-green)]/10 hover:bg-[var(--color-valley-green)]/20"
                   : "border-[var(--color-valley-green)]/30 bg-[var(--color-valley-green)]/10 hover:bg-[var(--color-valley-green)]/20"
               )}
-              title={dataMode === "real" ? "Passer en mode Démo" : "Passer en mode Réel"}
+              title={dataMode === "real" ? "Passer en mode DÃ©mo" : "Passer en mode RÃ©el"}
             >
               <FlaskConical className={cn(
                 "w-3 h-3",
@@ -823,7 +872,7 @@ export default function LivePage() {
                 "text-[9px] font-bold uppercase tracking-widest",
                 dataMode === "real" ? "text-[var(--color-valley-green)]" : "text-[var(--color-valley-green)]"
               )}>
-                {dataMode === "real" ? "Réel" : "Démo"}
+                {dataMode === "real" ? "RÃ©el" : "DÃ©mo"}
               </span>
             </button>
 
@@ -840,13 +889,35 @@ export default function LivePage() {
               </div>
             )}
 
+            <button
+              onClick={() => setShowHistoryPanel((v) => !v)}
+              className={cn(
+                "hud-panel px-2.5 py-1.5 flex items-center gap-1.5 transition-all",
+                showHistoryPanel
+                  ? "border-emerald-500/40 bg-[var(--color-valley-green)]/10"
+                  : "hover:bg-[var(--color-stone-moss)]"
+              )}
+              title="Historique des sessions"
+            >
+              <History className="w-3 h-3 text-[var(--color-valley-green)]" />
+              <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-adaline-ink)]/70">
+                Historique
+              </span>
+              {historyTreatments.length > 0 && (
+                <span className="text-[8px] font-bold bg-[var(--color-valley-green)]/20 text-[var(--color-valley-green)] px-1.5 py-0.5 rounded-full">
+                  {historyTreatments.length}
+                </span>
+              )}
+            </button>
+
             <button onClick={fetchLatest} className="hud-panel p-2 hover:bg-[var(--color-stone-moss)] transition-colors group">
               <RefreshCw className="w-3.5 h-3.5 text-[var(--color-adaline-ink)]/50 group-hover:text-[var(--color-adaline-ink)]/80 transition-colors" />
             </button>
           </div>
         </div>
 
-        {/* ═══ TREATMENT SESSION CONTROL — BOTTOM CENTER ═══ */}
+        {liveView === "gps" && (<>
+        {/* â•â•â• TREATMENT SESSION CONTROL â€” BOTTOM CENTER â•â•â• */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[500] w-[calc(100%-24px)] max-w-[520px]">
           {activeTreatment ? (
             /* Active treatment banner */
@@ -874,14 +945,14 @@ export default function LivePage() {
                         </Link>
                       )}
                       <div className="flex items-center gap-1.5 text-[10px] font-medium mt-1">
-                        <span className="text-[var(--color-valley-green)]/80">{typeLabels[activeTreatment.type] || activeTreatment.type} · En cours</span>
+                        <span className="text-[var(--color-valley-green)]/80">{typeLabels[activeTreatment.type] || activeTreatment.type} Â· En cours</span>
                         <span className={cn(
                           "px-1.5 py-0.5 rounded-full text-[8px] font-bold border",
                           dataMode === "real"
                             ? "bg-[var(--color-valley-green)]/20 border-[var(--color-valley-green)]/30 text-[var(--color-valley-green)]"
                             : "bg-[var(--color-valley-green)]/20 border-[var(--color-valley-green)]/30 text-[var(--color-valley-green)]"
                         )}>
-                          {dataMode === "real" ? "📶 Réel" : "🎬 Démo"}
+                          {dataMode === "real" ? "ðŸ“¶ RÃ©el" : "ðŸŽ¬ DÃ©mo"}
                         </span>
                       </div>
                     </div>
@@ -909,12 +980,12 @@ export default function LivePage() {
                       )}
                     >
                       <Square className="w-3.5 h-3.5" />
-                      {ending ? "..." : "Terminer"}
+                      {ending ? "..." : "Sauvegarder session"}
                     </button>
                   </div>
                 </div>
 
-                {/* Simulation progress + controls (visible en mode Démo seulement) */}
+                {/* Simulation progress + controls (visible en mode DÃ©mo seulement) */}
                 {isSimActive && (
                   <div className="mb-2">
                     <div className="flex items-center justify-between text-[9px] text-[var(--color-adaline-ink)]/40 mb-1">
@@ -923,7 +994,7 @@ export default function LivePage() {
                         <span className="font-mono text-[var(--color-adaline-ink)]/60">
                           {simIndex}/{simFlatPath.length - 1}
                         </span>
-                        <span className="font-mono text-[var(--color-valley-green)]">·</span>
+                        <span className="font-mono text-[var(--color-valley-green)]">Â·</span>
                         <span className="font-mono text-[var(--color-valley-green)]">{simCurrent.speed.toFixed(0)} km/h</span>
                       </div>
                       <div className="flex items-center gap-1">
@@ -942,7 +1013,7 @@ export default function LivePage() {
                           onClick={() => { setSimIndex(0); setSimRunning(true); }}
                           className="px-2 py-0.5 rounded text-[9px] font-bold bg-[var(--color-stone-moss)] border border-white/15 text-[var(--color-adaline-ink)]/70 hover:bg-[var(--color-stone-moss)]"
                         >
-                          ↻
+                          â†»
                         </button>
                         {[1, 3, 6].map((m) => (
                           <button
@@ -987,7 +1058,7 @@ export default function LivePage() {
                     <span className="text-[8px] text-[var(--color-adaline-ink)]/40 ml-0.5">L</span>
                   </div>
                   <div className="bg-black/30 rounded-lg p-2 text-center border border-white/[0.06]">
-                    <span className="text-[9px] text-[var(--color-adaline-ink)]/35 block mb-0.5">DURÉE</span>
+                    <span className="text-[9px] text-[var(--color-adaline-ink)]/35 block mb-0.5">DURÃ‰E</span>
                     <span className="text-sm font-bold font-mono text-[var(--color-adaline-ink)]/60">
                       {sessionElapsed < 60
                         ? `${sessionElapsed}s`
@@ -995,7 +1066,7 @@ export default function LivePage() {
                     </span>
                   </div>
                   <div className="bg-black/30 rounded-lg p-2 text-center border border-white/[0.06]">
-                    <span className="text-[9px] text-[var(--color-adaline-ink)]/35 block mb-0.5">DÉBIT</span>
+                    <span className="text-[9px] text-[var(--color-adaline-ink)]/35 block mb-0.5">DÃ‰BIT</span>
                     <span className={cn(
                       "text-sm font-bold font-mono",
                       displayFlow1 + displayFlow2 > 0.1 ? "text-[var(--color-valley-green)]" : "text-[var(--color-adaline-ink)]/30"
@@ -1011,7 +1082,7 @@ export default function LivePage() {
                   <div className="mt-2 pt-2 border-t border-white/[0.06] flex flex-wrap gap-1.5">
                     {activeTreatment.products.map((p, i) => (
                       <span key={i} className="text-[9px] bg-white/[0.06] border border-white/[0.08] rounded-md px-2 py-0.5 text-[var(--color-adaline-ink)]/50">
-                        {p.productName} · {p.quantityUsed} {p.unit}
+                        {p.productName} Â· {p.quantityUsed} {p.unit}
                       </span>
                     ))}
                   </div>
@@ -1019,7 +1090,14 @@ export default function LivePage() {
               </div>
             </div>
           ) : (
-            /* No active treatment — Traitement 1 + planned dropdown */
+            /* No active treatment â€” Traitement 1 + planned dropdown */
+            <>
+            {gpsError && (
+              <div className="mb-2 px-3 py-2 rounded-xl bg-red-900/50 border border-red-500/40 text-xs text-red-300 flex items-center justify-between gap-2">
+                <span>{gpsError}</span>
+                <button onClick={() => setGpsError(null)} className="text-red-400 hover:text-red-200 shrink-0">✕</button>
+              </div>
+            )}
             <div className="flex items-stretch gap-2">
               <button
                 onClick={startQuickTreatment}
@@ -1030,7 +1108,7 @@ export default function LivePage() {
                 </div>
                 <div className="text-left">
                   <div className="text-xs font-bold text-[var(--color-adaline-ink)]/90">Nouveau Traitement</div>
-                  <div className="text-[10px] text-[var(--color-valley-green)]/70">Démarrer une session live</div>
+                  <div className="text-[10px] text-[var(--color-valley-green)]/70">DÃ©marrer une session live</div>
                 </div>
               </button>
 
@@ -1048,10 +1126,10 @@ export default function LivePage() {
                     </div>
                     <div className="text-left">
                       <div className="text-xs font-bold text-[var(--color-adaline-ink)]/90">
-                        {treatments.length > 0 ? (treatments[0].sousParcelleName || treatments[0].parcelleName) : "Démo KMZ"}
+                        {treatments.length > 0 ? (treatments[0].sousParcelleName || treatments[0].parcelleName) : "DÃ©mo KMZ"}
                       </div>
                       <div className="text-[10px] text-[var(--color-valley-green)]/70">
-                        {treatments.length > 0 ? "Utiliser le planning" : "Simulation démo"}
+                        {treatments.length > 0 ? "Utiliser le planning" : "Simulation dÃ©mo"}
                       </div>
                     </div>
                   </div>
@@ -1079,7 +1157,7 @@ export default function LivePage() {
                   ) : treatments.length === 0 ? (
                     <div className="p-4 text-center">
                       <Beaker className="w-5 h-5 text-[var(--color-adaline-ink)]/35 mx-auto mb-2" />
-                      <p className="text-xs text-[var(--color-adaline-ink)]/40">Aucun traitement planifié</p>
+                      <p className="text-xs text-[var(--color-adaline-ink)]/40">Aucun traitement planifiÃ©</p>
                       <p className="text-[10px] text-[var(--color-adaline-ink)]/45 mt-1">Planifiez un traitement depuis la page Traitements</p>
                     </div>
                   ) : (
@@ -1094,14 +1172,14 @@ export default function LivePage() {
                             <Plus className="w-3.5 h-3.5 text-[var(--color-valley-green)]" />
                           </div>
                           <div>
-                            <div className="text-[11px] font-bold text-[var(--color-adaline-ink)]/90">Démarrer sans planning</div>
-                            <div className="text-[9px] text-[var(--color-valley-green)]/80">Créer un traitement rapide {activeParcelle ? `(${activeParcelle.name})` : ""}</div>
+                            <div className="text-[11px] font-bold text-[var(--color-adaline-ink)]/90">DÃ©marrer sans planning</div>
+                            <div className="text-[9px] text-[var(--color-valley-green)]/80">CrÃ©er un traitement rapide {activeParcelle ? `(${activeParcelle.name})` : ""}</div>
                           </div>
                         </div>
                       </button>
 
                       <div className="h-px bg-[var(--color-canvas-ice)] mx-2 my-1.5" />
-                      <div className="px-2 pb-1 text-[9px] font-bold text-[var(--color-adaline-ink)]/20 uppercase tracking-widest">Planifiés</div>
+                      <div className="px-2 pb-1 text-[9px] font-bold text-[var(--color-adaline-ink)]/20 uppercase tracking-widest">PlanifiÃ©s</div>
 
                       {treatments.map((t) => (
                         <button
@@ -1129,11 +1207,11 @@ export default function LivePage() {
                               </div>
                               <div className="flex items-center gap-2 text-[10px] text-[var(--color-adaline-ink)]/40">
                                 <span>{typeLabels[t.type] || t.type}</span>
-                                <span>·</span>
+                                <span>Â·</span>
                                 <span>{new Date(t.plannedDate).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}</span>
                                 {t.products.length > 0 && (
                                   <>
-                                    <span>·</span>
+                                    <span>Â·</span>
                                     <span>{t.products.length} produit{t.products.length > 1 ? "s" : ""}</span>
                                   </>
                                 )}
@@ -1149,10 +1227,11 @@ export default function LivePage() {
               )}
             </div>
           </div>
+          </>
         )}
       </div>
 
-        {/* ═══ SPEED LEGEND (bottom-left, only during sim) ═══ */}
+        {/* â•â•â• SPEED LEGEND (bottom-left, only during sim) â•â•â• */}
         {isSimActive && (
           <div className="absolute bottom-4 left-3 z-[500] hud-panel px-3 py-2">
             <div className="text-[9px] text-[var(--color-adaline-ink)]/40 font-bold tracking-widest mb-1.5">VITESSE</div>
@@ -1162,7 +1241,7 @@ export default function LivePage() {
                 { c: "#91cf60", l: "Moyen", v: "5" },
                 { c: "#f0d400", l: "Normal", v: "8" },
                 { c: "#fc7850", l: "Rapide", v: "12" },
-                { c: "#d73027", l: "Très rapide", v: "18" },
+                { c: "#d73027", l: "TrÃ¨s rapide", v: "18" },
               ].map((s) => (
                 <div key={s.l} className="flex items-center gap-1">
                   <span className="w-2.5 h-2.5 rounded-sm" style={{ background: s.c, boxShadow: `0 0 6px ${s.c}` }} />
@@ -1174,7 +1253,7 @@ export default function LivePage() {
           </div>
         )}
 
-        {/* ═══ LEFT: RADIAL FLOW GAUGES ═══ */}
+        {/* â•â•â• LEFT: RADIAL FLOW GAUGES â•â•â• */}
         <div className="absolute left-3 top-16 z-[500] space-y-2">
           <RadialFlowGauge
             label="DEBIT 1"
@@ -1200,7 +1279,7 @@ export default function LivePage() {
           />
         </div>
 
-        {/* ═══ EXPERT HISTORY PANEL (Right) ═══ */}
+        {/* â•â•â• EXPERT HISTORY PANEL (Right) â•â•â• */}
         {showHistoryPanel && (
           <div className="absolute right-3 top-[260px] bottom-24 z-[500] w-[260px] animate-in slide-in-from-right-4 duration-300">
             <div className="hud-panel h-full flex flex-col p-0 overflow-hidden border-[var(--color-valley-green)]/20">
@@ -1208,16 +1287,34 @@ export default function LivePage() {
                 <div className="flex items-center gap-2">
                   <History className="w-3.5 h-3.5 text-[var(--color-valley-green)]" />
                   <span className="text-[10px] font-bold text-[var(--color-adaline-ink)]/80 uppercase tracking-widest">Historique</span>
+                  <span className="text-[9px] text-[var(--color-adaline-ink)]/40">({historyTreatments.length})</span>
                 </div>
-                <button onClick={() => setShowHistoryPanel(false)} className="text-[var(--color-adaline-ink)]/30 hover:text-[var(--color-adaline-ink)]/60">
-                  <X className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={loadHistoryTreatments}
+                    disabled={historyLoading}
+                    className="p-1 rounded hover:bg-[var(--color-stone-moss)] text-[var(--color-adaline-ink)]/40 hover:text-[var(--color-adaline-ink)]/70 disabled:opacity-40"
+                    title="Actualiser"
+                  >
+                    <RefreshCw className={cn("w-3 h-3", historyLoading && "animate-spin")} />
+                  </button>
+                  <button onClick={() => setShowHistoryPanel(false)} className="text-[var(--color-adaline-ink)]/30 hover:text-[var(--color-adaline-ink)]/60">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
               
               <div className="flex-1 overflow-y-auto p-2 space-y-1.5 custom-scrollbar">
-                {historyTreatments.length === 0 ? (
+                {historyLoading && historyTreatments.length === 0 ? (
                   <div className="py-8 text-center">
-                    <p className="text-[10px] text-[var(--color-adaline-ink)]/30 italic">Aucun historique trouvé</p>
+                    <RefreshCw className="w-4 h-4 text-[var(--color-adaline-ink)]/30 animate-spin mx-auto mb-2" />
+                    <p className="text-[10px] text-[var(--color-adaline-ink)]/30">Chargement...</p>
+                  </div>
+                ) : historyTreatments.length === 0 ? (
+                  <div className="py-8 text-center px-3">
+                    <History className="w-5 h-5 text-[var(--color-adaline-ink)]/20 mx-auto mb-2" />
+                    <p className="text-[10px] text-[var(--color-adaline-ink)]/40">Aucune session enregistrÃ©e</p>
+                    <p className="text-[9px] text-[var(--color-adaline-ink)]/30 mt-1">DÃ©marrez une session puis cliquez sur Sauvegarder session</p>
                   </div>
                 ) : (
                   historyTreatments.map((t) => (
@@ -1228,18 +1325,32 @@ export default function LivePage() {
                         "w-full text-left p-2.5 rounded-lg border transition-all group",
                         visibleHistoryIds.includes(t.id)
                           ? "bg-[var(--color-valley-green)]/10 border-[var(--color-valley-green)]/30"
-                          : "bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.08]"
+                          : "bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.08]",
+                        t.status === "in_progress" && !visibleHistoryIds.includes(t.id) && "border-[var(--color-valley-green)]/20"
                       )}
                     >
-                      <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center justify-between mb-1 gap-1">
                         <span className="text-[11px] font-bold text-[var(--color-adaline-ink)]/90 truncate">{t.parcelleName}</span>
-                        {visibleHistoryIds.includes(t.id) && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#f59e0b]" />
-                        )}
+                        <div className="flex items-center gap-1 shrink-0">
+                          {t.status === "in_progress" && (
+                            <span className="text-[7px] font-bold uppercase tracking-wider bg-[var(--color-valley-green)]/20 text-[var(--color-valley-green)] px-1 py-0.5 rounded">
+                              En cours
+                            </span>
+                          )}
+                          {visibleHistoryIds.includes(t.id) && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]" />
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center justify-between text-[9px] text-[var(--color-adaline-ink)]/40">
-                        <span>{new Date(t.plannedDate).toLocaleDateString("fr-FR", { day: 'numeric', month: 'short' })}</span>
-                        <span className="font-mono text-[var(--color-valley-green)]/60">{t.areaTreatedHectares?.toFixed(2) || 0} ha</span>
+                        <span>
+                          {typeLabels[t.type] || t.type}
+                          {" Â· "}
+                          {new Date(t.executedDate || t.plannedDate).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
+                        </span>
+                        <span className="font-mono text-[var(--color-valley-green)]/60">
+                          {t.status === "completed" ? `${t.areaTreatedHectares?.toFixed(2) || 0} ha` : "â€”"}
+                        </span>
                       </div>
                     </button>
                   ))
@@ -1248,14 +1359,14 @@ export default function LivePage() {
               
               <div className="p-2 border-t border-[var(--color-stone-moss)] bg-black/20">
                 <p className="text-[8px] text-center text-[var(--color-adaline-ink)]/30 leading-tight">
-                  Cliquez sur une session pour afficher son tracé sur la carte en arrière-plan.
+                  Cliquez sur une session pour afficher son tracÃ© sur la carte en arriÃ¨re-plan.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* ═══ RIGHT: VERTICAL HUD STRIP ═══ */}
+        {/* â•â•â• RIGHT: VERTICAL HUD STRIP â•â•â• */}
         <div className="absolute right-3 top-16 z-[500] w-[200px] space-y-2">
 
           {/* GPS Compass Card */}
@@ -1278,7 +1389,7 @@ export default function LivePage() {
               ) : gpsQualityOk ? (
                 <div className="flex items-center gap-1.5 bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/30 rounded-md px-2 py-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[9px] font-bold text-[var(--color-valley-green)]">RÉEL</span>
+                  <span className="text-[9px] font-bold text-[var(--color-valley-green)]">RÃ‰EL</span>
                 </div>
               ) : gpsValid ? (
                 <div className="flex items-center gap-1.5 bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/30 rounded-md px-2 py-0.5">
@@ -1308,9 +1419,9 @@ export default function LivePage() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-1.5">
-                  <MiniStat icon={<Satellite className="w-3 h-3" />} value={`${latest?.sats ?? "—"}`} label="SAT" color="amber" />
+                  <MiniStat icon={<Satellite className="w-3 h-3" />} value={`${latest?.sats ?? "â€”"}`} label="SAT" color="amber" />
                   <MiniStat icon={<Navigation className="w-3 h-3" />} value={displaySpeed.toFixed(0)} label="KM/H" color="cyan" />
-                  <MiniStat icon={<Radio className="w-3 h-3" />} value={`${latest?.hdop?.toFixed(1) ?? "—"}`} label="HDOP" color="amber" />
+                  <MiniStat icon={<Radio className="w-3 h-3" />} value={`${latest?.hdop?.toFixed(1) ?? "â€”"}`} label="HDOP" color="amber" />
                 </div>
               </div>
             ) : gpsValid && latest ? (
@@ -1362,7 +1473,7 @@ export default function LivePage() {
               <div className="bg-black/30 rounded-lg p-2.5 border border-white/[0.06]">
                 <div className="flex items-center gap-2 mb-1.5">
                   <div className="w-3 h-3 rounded-sm ring-2 ring-white/10" style={{ backgroundColor: activeParcelle.color }} />
-                  <span className="text-xs font-semibold text-[var(--color-adaline-ink)]/90">{activeParcelle.name.split(" — ")[1] || activeParcelle.name}</span>
+                  <span className="text-xs font-semibold text-[var(--color-adaline-ink)]/90">{activeParcelle.name.split(" â€” ")[1] || activeParcelle.name}</span>
                 </div>
                 <div className="flex items-center gap-2 text-[10px] text-[var(--color-adaline-ink)]/45">
                   <span className="bg-white/[0.06] px-1.5 py-0.5 rounded">{activeParcelle.cropType}</span>
@@ -1402,13 +1513,14 @@ export default function LivePage() {
                     ? (gpsPoints.length / Math.max(history.length, 1)) > 0.5 ? "text-[var(--color-valley-green)]" : "text-[var(--color-valley-green)]"
                     : "text-[var(--color-adaline-ink)]/25"
                 )}>
-                  {gpsPoints.length > 0 ? `${((gpsPoints.length / Math.max(history.length, 1)) * 100).toFixed(0)}%` : "—"}
+                  {gpsPoints.length > 0 ? `${((gpsPoints.length / Math.max(history.length, 1)) * 100).toFixed(0)}%` : "â€”"}
                 </span>
                 <span className="text-[8px] text-[var(--color-adaline-ink)]/45 uppercase tracking-wider">FIX</span>
               </div>
             </div>
           </div>
         </div>
+        </>)}
 
 
       </div>
@@ -1416,7 +1528,7 @@ export default function LivePage() {
   );
 }
 
-/* ═══ RADIAL FLOW GAUGE ═══ */
+/* â•â•â• RADIAL FLOW GAUGE â•â•â• */
 function RadialFlowGauge({ label, flow, volume, active, color, maxFlow, sparkline }: {
   label: string; flow: number; volume: number; active: boolean;
   color: "cyan" | "orange"; maxFlow: number; sparkline: number[];
@@ -1487,7 +1599,7 @@ function RadialFlowGauge({ label, flow, volume, active, color, maxFlow, sparklin
   );
 }
 
-/* ═══ SPARKLINE ═══ */
+/* â•â•â• SPARKLINE â•â•â• */
 function Sparkline({ data, color, height, active }: {
   data: number[]; color: string; height: number; active: boolean;
 }) {
@@ -1541,7 +1653,7 @@ function Sparkline({ data, color, height, active }: {
   );
 }
 
-/* ═══ MINI STAT ═══ */
+/* â•â•â• MINI STAT â•â•â• */
 function MiniStat({ icon, value, label, color }: {
   icon: React.ReactNode; value: string; label: string;
   color: "emerald" | "cyan" | "amber" | "red";
@@ -1573,3 +1685,4 @@ function pointInPolygon(lat: number, lon: number, boundary: [number, number][]):
   }
   return inside;
 }
+

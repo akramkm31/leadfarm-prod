@@ -58,6 +58,7 @@ export default function NotificationsPage() {
   });
   const [testing, setTesting] = useState(false);
   const [testStatus, setTestStatus] = useState<string | null>(null);
+  const [routeError, setRouteError] = useState<string | null>(null);
 
   // Load alert routing & alerte logs
   const loadData = useCallback(async () => {
@@ -97,7 +98,7 @@ export default function NotificationsPage() {
       if (error) throw error;
       setRoutes(prev => prev.map(r => r.id === routeId ? { ...r, actif: !currentVal } : r));
     } catch (err) {
-      alert("Failed to toggle status");
+      setRouteError("Erreur lors du changement de statut");
     }
   };
 
@@ -112,7 +113,7 @@ export default function NotificationsPage() {
       if (error) throw error;
       setRoutes(prev => prev.map(r => r.id === routeId ? { ...r, priorite: priority } : r));
     } catch (err) {
-      alert("Failed to update priority");
+      setRouteError("Erreur lors de la mise à jour de la priorité");
     }
   };
 
@@ -127,7 +128,7 @@ export default function NotificationsPage() {
       if (error) throw error;
       setRoutes(prev => prev.filter(r => r.id !== routeId));
     } catch (err) {
-      alert("Failed to delete rule");
+      setRouteError("Erreur lors de la suppression de la règle");
     }
   };
 
@@ -153,7 +154,7 @@ export default function NotificationsPage() {
         setRoutes(prev => [data, ...prev]);
       }
     } catch (err) {
-      alert("La règle existe déjà ou une contrainte SQL a échoué.");
+      setRouteError("La règle existe déjà ou une contrainte SQL a échoué.");
     }
   };
 
@@ -227,6 +228,12 @@ export default function NotificationsPage() {
             {/* Alert Routing Matrix card */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200/80 p-5">
               <h2 className="text-sm font-bold text-gray-800 mb-4">Matrice de routage d'alertes</h2>
+              {routeError && (
+                <div className="mb-4 px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center justify-between gap-2">
+                  <span>{routeError}</span>
+                  <button onClick={() => setRouteError(null)} className="text-red-400 hover:text-red-600 shrink-0">✕</button>
+                </div>
+              )}
               
               {loading ? (
                 <div className="flex flex-col items-center justify-center p-12 gap-2">

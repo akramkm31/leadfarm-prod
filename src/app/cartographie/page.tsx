@@ -37,6 +37,7 @@ export default function CartographiePage() {
   const [cultureFilter, setCultureFilter] = useState("all");
   const [startDate, setStartDate] = useState("2026-05-01");
   const [endDate, setEndDate] = useState("2026-05-31");
+  const [pdfNotice, setPdfNotice] = useState<string | null>(null);
 
   // Load GIS layers data from Supabase
   useEffect(() => {
@@ -106,7 +107,8 @@ export default function CartographiePage() {
   };
 
   const handleExportPDF = () => {
-    alert("Génération du rapport cartographique PDF FOR.PR6.L9...");
+    setPdfNotice("Génération du rapport PDF FOR.PR6.L9 en cours de traitement...");
+    setTimeout(() => setPdfNotice(null), 4000);
   };
 
   return (
@@ -137,6 +139,13 @@ export default function CartographiePage() {
             </button>
           </div>
         </div>
+
+        {pdfNotice && (
+          <div className="mb-4 px-4 py-2.5 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-700 flex items-center justify-between gap-2">
+            <span>{pdfNotice}</span>
+            <button onClick={() => setPdfNotice(null)} className="text-blue-400 hover:text-blue-600 shrink-0">✕</button>
+          </div>
+        )}
 
         {/* Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
