@@ -115,6 +115,13 @@ export default function CampagnesPage() {
 
   const closeModal = () => { setModal(null); setEditing(null); setFormErr(null); };
 
+  useEffect(() => {
+    if (!modal) return;
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeModal(); };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [modal]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.nom.trim()) { setFormErr("Le nom est requis"); return; }

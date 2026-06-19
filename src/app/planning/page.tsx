@@ -194,7 +194,7 @@ export default function PlanningPage() {
       setIsNewPlanOpen(false);
       loadData();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Error creating plan");
+      setValidationError(err instanceof Error ? err.message : "Erreur lors de la création du plan");
     }
   };
 
@@ -208,11 +208,10 @@ export default function PlanningPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
 
-      // Update selected plan locally
       setSelectedPlan(data.plan);
       loadData();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Validation failed");
+      setValidationError(err instanceof Error ? err.message : "Validation échouée");
     }
   };
 

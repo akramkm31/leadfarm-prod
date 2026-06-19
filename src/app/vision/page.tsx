@@ -16,9 +16,6 @@ import {
   Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { TreatmentWorkflowService } from "@/lib/services/treatment-workflow.service";
-import { supabase } from "@/lib/supabase/client";
-import DetectionConfirmCard from "./DetectionConfirmCard";
 
 // Types for AI results
 interface Prediction {
@@ -37,20 +34,29 @@ export default function VisionPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Pending detections list for operator validation
-  const [pendingDetections, setPendingDetections] = useState<any[]>([]);
+  const [pendingEvents, setPendingEvents] = useState<Array<{
+    id: string;
+    maladie_nom?: string;
+    parcelle_name?: string;
+    severite: string;
+    date_observation: string;
+    notes?: string | null;
+  }>>([]);
   const [loadingPending, setLoadingPending] = useState(false);
 
   const loadPending = useCallback(async () => {
     setLoadingPending(true);
     try {
-      const { data } = await supabase
-        .from("detection")
-        .select("*")
-        .eq("confirmation_op", "en_attente")
-        .order("horodatage", { ascending: false });
-      setPendingDetections(data || []);
+      const res = await fetch("/api/v1/maladies?events=1", { credentials: "include" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+      const events = json.data?.evenements || [];
+      setPendingEvents(
+        events.filter((e: { source?: string }) => e.source === "IA").slice(0, 12)
+      );
     } catch (err) {
       console.error(err);
+      setPendingEvents([]);
     } finally {
       setLoadingPending(false);
     }
@@ -81,48 +87,26 @@ export default function VisionPage() {
     setError(null);
 
     try {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-      if (!supabaseUrl || supabaseUrl === "https://placeholder.supabase.co") {
-        throw new Error("Supabase non configuré. Configurez NEXT_PUBLIC_SUPABASE_URL dans .env.local.");
-      }
-
-      const response = await fetch(
-        `${supabaseUrl}/functions/v1/detect-disease`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": supabaseKey ?? "",
-            "Authorization": `Bearer ${supabaseKey ?? ""}`,
-          },
-          body: JSON.stringify({ image_base64: image }),
-        }
-      );
+      const response = await fetch("/api/v1/vision/analyze", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image_base64: image }),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.error === "model_loading") {
-          setError(data.message ?? "Le modèle IA démarre. Réessayez dans 30 secondes.");
-          return;
-        }
-        throw new Error(data.message ?? `Erreur serveur (${response.status})`);
+        throw new Error(data.error || `Erreur serveur (${response.status})`);
       }
 
-      // Map Edge Function outputs to local Vision UI predictions model
-      if (data.label && typeof data.confidence === "number") {
+      if (data.predictions?.length) {
+        setResults(data.predictions);
+      } else if (data.label && typeof data.confidence === "number") {
         setResults([{ label: data.label, score: data.confidence }]);
-        setEventSaved(false);
-        return;
-      }
-
-      if (!data.predictions || !Array.isArray(data.predictions)) {
+      } else {
         throw new Error("Réponse inattendue du modèle IA.");
       }
-
-      setResults(data.predictions);
       setEventSaved(false);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Impossible d'analyser l'image.";
@@ -130,6 +114,40 @@ export default function VisionPage() {
       console.error("[Vision] Analysis error:", err);
     } finally {
       setAnalyzing(false);
+    }
+  };
+
+  const saveAsDiseaseEvent = async (prediction: Prediction) => {
+    setSavingEvent(true);
+    try {
+      const malRes = await fetch("/api/v1/maladies", { credentials: "include" });
+      const malJson = await malRes.json();
+      const maladies: Array<{ id: string; nom: string }> = malJson.data || [];
+      const diseaseName = prediction.label.split("__").pop()?.replace(/_/g, " ") || prediction.label;
+      const match =
+        maladies.find((m) => m.nom.toLowerCase().includes(diseaseName.toLowerCase())) ||
+        maladies[0];
+      if (!match) throw new Error("Aucune maladie configurée en base");
+
+      const res = await fetch("/api/v1/maladies", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          maladie_id: match.id,
+          severite: prediction.score >= 0.8 ? "elevee" : "moderee",
+          date_observation: new Date().toISOString().slice(0, 10),
+          notes: `Diagnostic IA: ${diseaseName} (${Math.round(prediction.score * 100)}%)`,
+          source: "IA",
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Enregistrement échoué");
+      setEventSaved(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur lors de l'enregistrement.");
+    } finally {
+      setSavingEvent(false);
     }
   };
 
@@ -170,9 +188,9 @@ export default function VisionPage() {
               }`}
             >
               Validations Requises
-              {pendingDetections.length > 0 && (
+              {pendingEvents.length > 0 && (
                 <span className="bg-red-500 text-white font-mono text-[9px] w-4 h-4 rounded-full flex items-center justify-center">
-                  {pendingDetections.length}
+                  {pendingEvents.length}
                 </span>
               )}
             </button>
@@ -311,17 +329,7 @@ export default function VisionPage() {
                       Nous recommandons d&apos;isoler la zone et de prévoir un traitement ciblé.
                     </p>
                     <button 
-                      onClick={async () => {
-                        setSavingEvent(true);
-                        try {
-                          await TreatmentWorkflowService.createDiseaseEventFromVision(results[0]);
-                          setEventSaved(true);
-                        } catch (err) {
-                          alert("Erreur lors de l'enregistrement de l'évènement.");
-                        } finally {
-                          setSavingEvent(false);
-                        }
-                      }}
+                      onClick={() => void saveAsDiseaseEvent(results[0])}
                       disabled={savingEvent || eventSaved}
                       className="mt-4 flex items-center justify-between w-full p-2.5 rounded-xl bg-white border border-[#34c759]/30 text-[#34c759] font-bold text-xs hover:bg-[#34c759]/5 transition-all disabled:opacity-50 cursor-pointer"
                     >
@@ -350,15 +358,18 @@ export default function VisionPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {pendingDetections.map(det => (
-                  <DetectionConfirmCard
-                    key={det.id}
-                    detection={det}
-                    onActionComplete={loadPending}
-                  />
+                {pendingEvents.map((ev) => (
+                  <div key={ev.id} className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs">
+                    <p className="text-xs font-bold text-gray-800">{ev.maladie_nom || "Maladie IA"}</p>
+                    <p className="text-[10px] text-gray-400 mt-1">{ev.parcelle_name || "Parcelle non assignée"}</p>
+                    <p className="text-[10px] text-gray-500 mt-2 line-clamp-3">{ev.notes || "—"}</p>
+                    <span className="inline-block mt-3 text-[9px] uppercase font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                      {ev.severite}
+                    </span>
+                  </div>
                 ))}
 
-                {pendingDetections.length === 0 && (
+                {pendingEvents.length === 0 && (
                   <div className="col-span-full bg-white rounded-2xl border border-gray-200/80 p-12 text-center flex flex-col items-center justify-center shadow-xs">
                     <CheckCircle2 className="w-10 h-10 text-[#34c759] mb-3" />
                     <h3 className="text-base font-bold text-gray-800">Aucune validation requise</h3>

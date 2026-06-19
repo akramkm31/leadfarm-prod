@@ -4,6 +4,7 @@
  */
 import { supabase } from "./supabase";
 import { SUPABASE_CONFIGURED } from "./data-provider-config";
+import { deductStockForTreatment } from "./treatments/stock-deduction";
 
 export { SUPABASE_CONFIGURED };
 export {
@@ -29,111 +30,234 @@ function toIsoDate(v: string | null | undefined): string | null {
   return s;
 }
 
+function formatSupabaseError(error: {
+  message?: string;
+  code?: string;
+  details?: string;
+  hint?: string;
+} | null): string {
+  if (!error) return "Erreur inconnue";
+  return [error.message, error.code, error.details, error.hint].filter(Boolean).join(" — ");
+}
+
+async function resolveExploitationId(parcelleId: string | null): Promise<string | null> {
+  if (!parcelleId || !SUPABASE_CONFIGURED) return null;
+  const { data: parcelle } = await supabase
+    .from("parcelles")
+    .select("exploitation_id")
+    .eq("id", parcelleId)
+    .maybeSingle();
+  if (parcelle?.exploitation_id) return parcelle.exploitation_id;
+  return null;
+}
+
+async function loadTreatmentProducts(treatmentId: string): Promise<
+  { product_id: string; quantity_used?: number | null; unit?: string | null; nom_commercial?: string | null }[]
+> {
+  const [tpRes, tdRes] = await Promise.all([
+    supabase
+      .from("treatment_products")
+      .select("product_id, quantity_used, unit, products(trade_name)")
+      .eq("treatment_id", treatmentId),
+    supabase
+      .from("treatment_detail_products")
+      .select("product_id, nom_commercial, quantite_sortir")
+      .eq("treatment_id", treatmentId),
+  ]);
+
+  const rows: {
+    product_id: string;
+    quantity_used?: number | null;
+    unit?: string | null;
+    nom_commercial?: string | null;
+  }[] = [];
+
+  for (const p of tpRes.data ?? []) {
+    const legacyName = (p as { products?: { trade_name?: string } }).products?.trade_name;
+    if (!p.product_id && !legacyName) continue;
+    rows.push({
+      product_id: p.product_id ?? "",
+      quantity_used: p.quantity_used,
+      unit: p.unit,
+      nom_commercial: legacyName ?? null,
+    });
+  }
+
+  for (const p of tdRes.data ?? []) {
+    const qty = p.quantite_sortir ? parseFloat(String(p.quantite_sortir)) : null;
+    if (!p.product_id && !p.nom_commercial) continue;
+    if (!qty || qty <= 0) continue;
+    rows.push({
+      product_id: p.product_id ?? "",
+      quantity_used: qty,
+      unit: "l",
+      nom_commercial: p.nom_commercial ?? null,
+    });
+  }
+
+  return rows;
+}
+
+async function registerTraceCertificate(treatmentId: string): Promise<void> {
+  if (typeof window === "undefined") return;
+  try {
+    await fetch(`/api/v1/treatments/${treatmentId}/trace`, { method: "POST" });
+  } catch {
+    // best-effort — PDF route also registers trace
+  }
+}
+
 // ============================================================
 // Snake→Camel mappers (Supabase returns snake_case)
 // ============================================================
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-function mapStockLevel(row: any): any {
-  const p = row.products || {};
-  return {
-    productId: row.product_id,
-    productName: p.trade_name || "Inconnu",
-    category: p.category || "autre",
-    currentQuantity: row.current_quantity ?? 0,
-    unit: p.unit || "L",
-    minThreshold: row.min_threshold ?? 0,
-    maxCapacity: row.max_capacity ?? 1,
-    lastEntryDate: row.updated_at || "",
-    lastExitDate: null,
-    totalValueDZD: 0,
-    avgUnitPriceDZD: 0,
-    status: row.status || "ok",
-    expiryDate: "",
-    stockInitial: p.stock_initial_2024 ?? 0,
-  };
-}
 
+// ── Real-data (lf_*) taxonomy → legacy UI taxonomy ──────────────
+const LF_CATEGORY_TO_LEGACY: Record<string, string> = {
+  FONGICIDE: "fongicide",
+  HERBICIDE: "herbicide",
+  INSECTICIDE: "insecticide",
+  ENGRAIS: "engrais",
+  FER: "fer",
+  ACIDE: "acide",
+  DORMANCE: "dormance",
+  HORMONE: "hormone",
+  AUTRE: "autre",
+};
+const lfCategory = (c?: string | null): string =>
+  LF_CATEGORY_TO_LEGACY[(c || "").toUpperCase()] || "autre";
+
+const LF_FLOW_TO_TYPE: Record<string, string> = {
+  stock_initial: "stock_initial",
+  transfert: "transfer",
+  entree: "entry",
+  retour: "return",
+  sortie: "exit",
+};
+const LF_FLOW_TO_CATEGORY: Record<string, string> = {
+  stock_initial: "ajustement_inventaire",
+  transfert: "transfert_externe",
+  entree: "entree_fournisseur",
+  retour: "retour_parcelle",
+  sortie: "sortie_traitement",
+};
+
+// Enriched catalogue row (lf_products_full) → PhytoProduct UI shape.
 function mapProduct(row: any): any {
+  const reste = Number(row.reste) || 0;
   return {
     id: row.id,
-    tradeName: row.trade_name,
-    category: row.category,
-    activeSubstance: row.active_substance || "",
+    name: row.name,
+    tradeName: row.name,
+    registrationNumber: "",
+    activeSubstance: row.active_ingredient || "",
+    composition: row.composition || "",
     teneurMA: row.teneur_ma || "",
-    teneurMAUnit: row.teneur_ma_unit || "",
-    formulation: row.formulation || "",
+    teneurMAUnit: "",
+    category: lfCategory(row.category),
+    categoryRaw: row.category,
     familleChimique: row.famille_chimique || "",
-    dose: row.dose || "",
-    cible: row.cible ? (Array.isArray(row.cible) ? row.cible : [row.cible]) : [],
-    doseUnit: row.dose_unit || "L",
-    dar: row.dar,
-    unit: row.unit || "L",
-    priceDzd: row.price_dzd ?? 0,
-    stockInitial2024: row.stock_initial_2024 ?? 0,
-    expiryDate: row.expiry_date || "",
-    notes: row.notes || "",
-    supplierName: "",
+    formulation: row.formulation || "",
+    cible: row.cible ? [row.cible] : [],
+    dar: row.dar_days ?? null,
+    unit: row.unit || "l",
+    subcategory: row.subcategory || "",
+    priceDZD: 0,
+    supplierId: row.last_supplier_id || null,
+    supplierName: row.last_supplier || "",
+    expiryDate: row.next_expiry || "",
+    stockInitial: row.snapshot_qty ?? 0,
+    reste,
+    status: row.is_negative ? "negative" : reste > 0 ? "ok" : "empty",
     pictograms: [],
     toxicityClass: "",
   };
 }
 
+// Enriched catalogue row (lf_products_full) → StockLevel UI shape.
+function mapStockLevel(row: any): any {
+  const reste = Number(row.reste) || 0;
+  return {
+    productId: row.id,
+    productName: row.name,
+    category: lfCategory(row.category),
+    currentQuantity: reste,
+    unit: row.unit || "l",
+    minThreshold: 0,
+    maxCapacity: Math.max(reste, Number(row.snapshot_qty) || 0, 1),
+    lastEntryDate: row.last_purchase_date || "",
+    lastExitDate: null,
+    totalValueDZD: 0,
+    avgUnitPriceDZD: 0,
+    status: row.is_negative ? "critical" : "ok",
+    expiryDate: row.next_expiry || "",
+    lotNumber: undefined,
+    stockInitial: row.snapshot_qty ?? 0,
+    isNegative: !!row.is_negative,
+    subcategory: row.subcategory || "",
+    activeSubstance: row.active_ingredient || "",
+  };
+}
+
+// lf_suppliers_full → Supplier UI shape.
 function mapSupplier(row: any): any {
   return {
     id: row.id,
     name: row.name,
+    type: row.role === "manufacturer" ? "fabricant" : "distributeur",
     role: row.role,
-    phone: row.phone,
-    email: row.email,
-    address: row.address,
-    city: row.city,
-    wilaya: row.wilaya,
-    registrationNumber: row.registration_number,
-    active: row.active,
+    phone: row.phone || "",
+    email: row.email || undefined,
+    address: row.address || undefined,
+    city: row.city || "",
+    wilaya: row.wilaya || "",
+    registrationNumber: row.registration_number || undefined,
+    totalDeliveries: Number(row.delivery_count) || 0,
+    totalValueDZD: 0,
+    totalQuantity: Number(row.total_quantity) || 0,
+    productCount: Number(row.product_count) || 0,
+    lastDeliveryDate: row.last_delivery || null,
+    active: row.active ?? true,
   };
 }
 
-const MOVEMENT_TYPE_MAP: Record<string, string> = {
-  entree: "entry",
-  sortie: "exit",
-  transfert: "transfer",
-  retour: "return",
-  entry: "entry",
-  exit: "exit",
-  transfer: "transfer",
-  adjustment: "adjustment",
-  treatment_consumption: "treatment_consumption",
-};
-
+// lf_movements (+ joined lf_products) → StockEntry/movement UI shape.
 function mapMovement(row: any): any {
-  const p = row.products || {};
-  const rawType = row.movement_type || "";
-  const normalizedType = MOVEMENT_TYPE_MAP[rawType] || rawType;
+  const p = row.lf_products || {};
+  const flow = row.flow || "";
+  const type = LF_FLOW_TO_TYPE[flow] || flow;
+  const magnitude = Math.abs(Number(row.quantity) || 0);
+  const signed = flow === "sortie" || flow === "transfert" ? -magnitude : magnitude;
   return {
     id: row.id,
     date: row.date,
     productId: row.product_id,
-    productName: p.trade_name || "",
-    category: row.category,
-    movementType: normalizedType,
-    type: normalizedType,
-    movementCategory: row.category || "autre",
-    quantity: row.quantity,
-    culture: row.culture,
-    siteId: row.site_id,
-    siteName: row.site_name,
-    detailsSite: row.details_site,
-    supplierId: row.supplier_id,
-    distributorId: row.distributor_id,
-    observations: row.observations,
-    unit: p.unit || "L",
-    stockInitial: p.stock_initial_2024 ?? null,
-    nUnits: row.n_units ?? null,
-    pUnits: row.p_units ?? null,
-    kUnits: row.k_units ?? null,
-    caUnits: row.ca_units ?? null,
-    zincUnits: row.zinc_units ?? null,
+    productName: p.name || "",
+    category: lfCategory(p.category),
+    movementType: type,
+    type,
+    flow,
+    movementCategory: LF_FLOW_TO_CATEGORY[flow] || "ajustement_inventaire",
+    quantity: signed,
+    unit: row.unit || p.unit || "l",
+    reference: row.source_tag || undefined,
+    lotNumber: undefined,
+    culture: row.culture || undefined,
+    siteId: row.site_id || undefined,
+    siteName: row.site_name || undefined,
+    detailsSite: row.details_site || undefined,
+    supplierId: row.supplier_id || null,
+    supplierName: "",
+    observations: row.notes || undefined,
+    notes: row.notes || undefined,
+    dar: row.dar_days ?? null,
+    stockInitial: null,
+    nUnits: null,
+    pUnits: null,
+    kUnits: null,
+    caUnits: null,
+    zincUnits: null,
   };
 }
 
@@ -190,14 +314,25 @@ function mapTreatment(row: any): any {
     vitesse_kmh: pick("vitesse_kmh", "vitesse_kmh", null),
     pression_bar: pick("pression_bar", "pression_bar", null),
     diametre_pastilles_mm: pick("diametre_pastilles_mm", "diametre_pastilles_mm", null),
-    produitsDetail: ((forData as any).produitsDetail || []).map((p: any) => ({
-      productId: p.productId || "",
-      nom_commercial: p.nom_commercial || "",
-      matiere_active: p.matiere_active || "",
-      dose_hl: p.dose_hl || "",
-      quantite_sortir: p.quantite_sortir || "",
-      dar_jours: p.dar_jours || 21,
-    })),
+    produitsDetail: (() => {
+      const fromDetailTable = (row.treatment_detail_products || []).map((p: any) => ({
+        productId: p.product_id || "",
+        nom_commercial: p.nom_commercial || "",
+        matiere_active: p.matiere_active || "",
+        dose_hl: p.dose_hl || "",
+        quantite_sortir: p.quantite_sortir || "",
+        dar_jours: p.dar_jours || 21,
+      }));
+      if (fromDetailTable.length > 0) return fromDetailTable;
+      return ((forData as any).produitsDetail || []).map((p: any) => ({
+        productId: p.productId || "",
+        nom_commercial: p.nom_commercial || "",
+        matiere_active: p.matiere_active || "",
+        dose_hl: p.dose_hl || "",
+        quantite_sortir: p.quantite_sortir || "",
+        dar_jours: p.dar_jours || 21,
+      }));
+    })(),
     date_reelle: pick("date_reelle", "date_reelle", null),
     heure_debut: pick("heure_debut", "heure_debut", null),
     heure_fin: pick("heure_fin", "heure_fin", null),
@@ -218,7 +353,14 @@ function mapTreatment(row: any): any {
         dosePerHectare: tp.dose_per_hectare,
       }));
       if (fromTable.length > 0) return fromTable;
-      // Fallback : construire depuis produitsDetail (stocké dans notes)
+      const fromDetail = (row.treatment_detail_products || []).map((p: any) => ({
+        productId: p.product_id || "",
+        productName: p.nom_commercial || "",
+        quantityUsed: p.quantite_sortir ? parseFloat(p.quantite_sortir) : null,
+        unit: "L",
+        dosePerHectare: p.dose_hl ? parseFloat(p.dose_hl) : null,
+      }));
+      if (fromDetail.length > 0) return fromDetail;
       return ((forData as any).produitsDetail || []).map((p: any) => ({
         productId: p.productId || "",
         productName: p.nom_commercial || "",
@@ -304,12 +446,15 @@ export async function fetchFromSupabase<T>(
 // ============================================================
 
 export async function fetchProducts() {
-  const data = await fetchFromSupabase("products", "*", {
-    order: { column: "trade_name" },
+  const data = await fetchFromSupabase("lf_products_full", "*", {
+    order: { column: "name" },
   });
   if (data) return data.map(mapProduct);
-  const { products } = await import("./mock-data");
-  return products;
+  if (!SUPABASE_CONFIGURED) {
+    const { products } = await import("./mock-data");
+    return products;
+  }
+  return [];
 }
 
 // ============================================================
@@ -317,12 +462,15 @@ export async function fetchProducts() {
 // ============================================================
 
 export async function fetchSuppliers() {
-  const data = await fetchFromSupabase("suppliers", "*", {
+  const data = await fetchFromSupabase("lf_suppliers_full", "*", {
     order: { column: "name" },
   });
   if (data) return data.map(mapSupplier);
-  const { suppliers } = await import("./mock-data");
-  return suppliers;
+  if (!SUPABASE_CONFIGURED) {
+    const { suppliers } = await import("./mock-data");
+    return suppliers;
+  }
+  return [];
 }
 
 // ============================================================
@@ -340,21 +488,22 @@ export async function fetchMovements(filters?: {
   }
 
   try {
-    let query = supabase
-      .from("movements")
-      .select("*, products(trade_name, category, active_substance, unit, stock_initial_2024)")
+    const query = supabase
+      .from("lf_movements")
+      .select("*, lf_products(name, category, unit)")
       .order("date", { ascending: false })
-      .limit(filters?.limit || 200);
-
-    if (filters?.category) query = query.eq("category", filters.category);
-    if (filters?.movement_type) query = query.eq("movement_type", filters.movement_type);
+      .limit(filters?.limit || 300);
 
     const { data, error } = await query;
     if (error) throw error;
     return (data || []).map(mapMovement);
-  } catch {
-    const { stockEntries } = await import("./mock-data");
-    return stockEntries;
+  } catch (err) {
+    console.warn("[fetchMovements]", err);
+    if (!SUPABASE_CONFIGURED) {
+      const { stockEntries } = await import("./mock-data");
+      return stockEntries;
+    }
+    return [];
   }
 }
 
@@ -363,12 +512,15 @@ export async function fetchMovements(filters?: {
 // ============================================================
 
 export async function fetchStockLevels() {
-  const data = await fetchFromSupabase("stock_levels", "*, products(trade_name, category, active_substance, unit, stock_initial_2024, formulation, teneur_ma, teneur_ma_unit, famille_chimique)", {
-    order: { column: "current_quantity" },
+  const data = await fetchFromSupabase("lf_products_full", "*", {
+    order: { column: "reste", ascending: false },
   });
   if (data) return data.map(mapStockLevel);
-  const { stockLevels } = await import("./mock-data");
-  return stockLevels;
+  if (!SUPABASE_CONFIGURED) {
+    const { stockLevels } = await import("./mock-data");
+    return stockLevels;
+  }
+  return [];
 }
 
 // Parcelles: see ./parcelles/repository.ts (ADR-15)
@@ -386,7 +538,7 @@ export async function fetchTreatments(status?: string) {
   try {
     let query = supabase
       .from("treatments")
-      .select("*, treatment_products(*, products(trade_name, unit))")
+      .select("*, treatment_products(*, products(trade_name, unit)), treatment_detail_products(*)")
       .order("planned_date", { ascending: false });
 
     if (status) query = query.eq("status", status);
@@ -394,9 +546,13 @@ export async function fetchTreatments(status?: string) {
     const { data, error } = await query;
     if (error) throw error;
     return (data || []).map(mapTreatment);
-  } catch {
-    const { treatments } = await import("./mock-data");
-    return status ? treatments.filter((t: any) => t.status === status) : treatments;
+  } catch (err) {
+    console.warn("[fetchTreatments]", err);
+    if (!SUPABASE_CONFIGURED) {
+      const { treatments } = await import("./mock-data");
+      return status ? treatments.filter((t: any) => t.status === status) : treatments;
+    }
+    return [];
   }
 }
 
@@ -422,6 +578,9 @@ export async function insertTreatment(data: {
   vitesseKmh?: number;
   pressionBar?: number;
   diametrePastillesMm?: number;
+  temperature?: number;
+  humidity?: number;
+  windSpeed?: number;
   produitsDetail?: {
     productId: string;
     nom_commercial: string;
@@ -445,93 +604,23 @@ export async function insertTreatment(data: {
     throw new Error("Supabase non configuré");
   }
 
-  // Normalize any date string to ISO YYYY-MM-DD (handles DD/MM/YYYY input)
-
-  const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  const parcelleId = data.parcelleId && uuidRe.test(data.parcelleId) ? data.parcelleId : null;
-
-  const { data: row, error } = await supabase
-    .from("treatments")
-    .insert({
-      site_name: data.parcelleName,
-      parcelle_id: parcelleId,
-      type: data.type,
-      planned_date: toIsoDate(data.plannedDate),
-      operator_name: data.operatorName || null,
-      area_treated_hectares: data.areaTreatedHectares ?? null,
-      volume_bouillie: data.volumeBouillie ?? null,
-      volume_bouillie_unit: data.volumeBouillieUnit || null,
-      notes: data.notes || null,
-      status: data.status || "planned",
-      culture: data.culture || null,
-      variete: data.variete || null,
-      cible: data.cible || null,
-      mode_application: data.modeApplication || null,
-      materiel: data.materiel || null,
-      vitesse_kmh: data.vitesseKmh ?? null,
-      pression_bar: data.pressionBar ?? null,
-      diametre_pastilles_mm: data.diametrePastillesMm ?? null,
-      date_reelle: toIsoDate(data.dateReelle),
-      heure_debut: data.heureDebut || null,
-      heure_fin: data.heureFin || null,
-      quantite_utilisee: data.qteProduitUtilise || null,
-      bouillon_citerne_l: data.bouillonParCiterne ?? null,
-      nb_citernes: data.nbCiternes ?? null,
-      date_reentree: toIsoDate(data.dateReentree),
-      dar_jours: data.darJours ?? null,
-      efficacite: data.efficacite || null,
-      visa_rt: data.visaRT || null,
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error("[insertTreatment] Supabase error:", error);
-    throw new Error(error.message || "Erreur lors de la planification");
+  const res = await fetch("/api/v1/treatments", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const details = Array.isArray(body.details) ? body.details.join(", ") : "";
+    throw new Error(body.error || details || `Erreur HTTP ${res.status}`);
   }
-
-  // Products depuis treatment_products (table liée)
-  if (data.products && data.products.length > 0) {
-    const tpRows = data.products.map(p => ({
-      treatment_id: row.id,
-      product_id: p.productId,
-      dose_per_hectare: p.dosePerHectare,
-      quantity_used: p.quantityUsed,
-      unit: p.unit || "L"
-    }));
-    const { error: tpErr } = await supabase.from("treatment_products").insert(tpRows);
-    if (tpErr) console.warn("[insertTreatment] treatment_products insert warn:", tpErr.message);
-  } else if (data.produitsDetail && data.produitsDetail.length > 0) {
-    // Fallback : insérer depuis produitsDetail (modal FOR.PR6.003)
-    // On filtre les lignes avec un productId valide (UUID)
-    const tpRows = data.produitsDetail
-      .filter(p => p.productId && uuidRe.test(p.productId))
-      .map(p => ({
-        treatment_id: row.id,
-        product_id: p.productId,
-        dose_per_hectare: p.dose_hl ? parseFloat(p.dose_hl) || null : null,
-        quantity_used: p.quantite_sortir ? parseFloat(p.quantite_sortir) || null : null,
-        unit: "L"
-      }));
-    if (tpRows.length > 0) {
-      const { error: tpErr } = await supabase.from("treatment_products").insert(tpRows);
-      if (tpErr) console.warn("[insertTreatment] treatment_products (produitsDetail) insert warn:", tpErr.message);
-    }
-  }
-
-  // Relire complet
-  const { data: fullRow } = await supabase
-    .from("treatments")
-    .select("*, treatment_products(*, products(trade_name, unit))")
-    .eq("id", row.id)
-    .single();
-
-  return mapTreatment(fullRow || row);
+  return mapTreatment(body);
 }
 
 export async function deleteTreatment(id: string): Promise<void> {
   if (!SUPABASE_CONFIGURED) throw new Error("Supabase non configuré");
-  // Delete linked products first
+  await supabase.from("treatment_detail_products").delete().eq("treatment_id", id);
   await supabase.from("treatment_products").delete().eq("treatment_id", id);
   const { error } = await supabase.from("treatments").delete().eq("id", id);
   if (error) throw new Error(error.message);
@@ -575,49 +664,30 @@ export async function updateTreatment(
 ): Promise<any> {
   if (!SUPABASE_CONFIGURED) throw new Error("Supabase non configuré");
 
-  // Rebuild the FOR.PR6.003 JSON stored in notes
-  // First read the existing row to preserve any existing notes prefix
-  const { data: existing } = await supabase
-    .from("treatments")
-    .select("notes")
-    .eq("id", id)
-    .single();
-
-  const forData: Record<string, unknown> = {};
-  if (data.culture !== undefined) forData.culture = data.culture;
-  if (data.variete !== undefined) forData.variete = data.variete;
-  if (data.cible !== undefined) forData.cible = data.cible;
-  if (data.modeApplication !== undefined) forData.mode_application = data.modeApplication;
-  if (data.materiel !== undefined) forData.materiel = data.materiel;
-  if (data.vitesseKmh !== undefined) forData.vitesse_kmh = data.vitesseKmh;
-  if (data.pressionBar !== undefined) forData.pression_bar = data.pressionBar;
-  if (data.diametrePastillesMm !== undefined) forData.diametre_pastilles_mm = data.diametrePastillesMm;
-  if (data.dateReelle !== undefined) forData.date_reelle = toIsoDate(data.dateReelle as string);
-  if (data.heureDebut !== undefined) forData.heure_debut = data.heureDebut;
-  if (data.heureFin !== undefined) forData.heure_fin = data.heureFin;
-  if (data.qteProduitUtilise !== undefined) forData.quantite_utilisee = data.qteProduitUtilise;
-  if (data.bouillonParCiterne !== undefined) forData.bouillon_citerne_l = data.bouillonParCiterne;
-  if (data.nbCiternes !== undefined) forData.nb_citernes = data.nbCiternes;
-  if (data.dateReentree !== undefined) forData.date_reentree = toIsoDate(data.dateReentree as string);
-  if (data.darJours !== undefined) forData.dar_jours = data.darJours;
-  if (data.efficacite !== undefined) forData.efficacite = data.efficacite;
-  if (data.visaRT !== undefined) forData.visa_rt = data.visaRT;
-  if (data.produitsDetail) forData.produitsDetail = data.produitsDetail;
-
-  // Preserve any non-FOR.PR6.003 prefix in notes
-  let notesPrefix = "";
-  if (existing?.notes && typeof existing.notes === "string") {
-    const markerIdx = existing.notes.indexOf("---FOR.PR6.003---");
-    if (markerIdx > 0) notesPrefix = existing.notes.substring(0, markerIdx).trimEnd() + "\n";
-  }
-  const newNotes = notesPrefix + "---FOR.PR6.003---\n" + JSON.stringify(forData);
-
-  const payload: Record<string, unknown> = { notes: newNotes };
+  const payload: Record<string, unknown> = {};
   if (data.parcelleName !== undefined) payload.site_name = data.parcelleName;
   if (data.plannedDate !== undefined) payload.planned_date = toIsoDate(data.plannedDate as string);
   if (data.operatorName !== undefined) payload.operator_name = data.operatorName;
   if (data.areaTreatedHectares !== undefined) payload.area_treated_hectares = data.areaTreatedHectares;
   if (data.status !== undefined) payload.status = data.status;
+  if (data.culture !== undefined) payload.culture = data.culture;
+  if (data.variete !== undefined) payload.variete = data.variete;
+  if (data.cible !== undefined) payload.cible = data.cible;
+  if (data.modeApplication !== undefined) payload.mode_application = data.modeApplication;
+  if (data.materiel !== undefined) payload.materiel = data.materiel;
+  if (data.vitesseKmh !== undefined) payload.vitesse_kmh = data.vitesseKmh;
+  if (data.pressionBar !== undefined) payload.pression_bar = data.pressionBar;
+  if (data.diametrePastillesMm !== undefined) payload.diametre_pastilles_mm = data.diametrePastillesMm;
+  if (data.dateReelle !== undefined) payload.date_reelle = toIsoDate(data.dateReelle as string);
+  if (data.heureDebut !== undefined) payload.heure_debut = data.heureDebut;
+  if (data.heureFin !== undefined) payload.heure_fin = data.heureFin;
+  if (data.qteProduitUtilise !== undefined) payload.quantite_utilisee = data.qteProduitUtilise;
+  if (data.bouillonParCiterne !== undefined) payload.bouillon_citerne_l = data.bouillonParCiterne;
+  if (data.nbCiternes !== undefined) payload.nb_citernes = data.nbCiternes;
+  if (data.dateReentree !== undefined) payload.date_reentree = toIsoDate(data.dateReentree as string);
+  if (data.darJours !== undefined) payload.dar_jours = data.darJours;
+  if (data.efficacite !== undefined) payload.efficacite = data.efficacite;
+  if (data.visaRT !== undefined) payload.visa_rt = data.visaRT;
 
   const { data: row, error } = await supabase
     .from("treatments")
@@ -671,6 +741,17 @@ export async function updateTreatmentStatus(
     .single();
 
   if (error) throw new Error(error.message);
+
+  if (status === "completed") {
+    const products = await loadTreatmentProducts(id);
+    const siteName = (row as { site_name?: string })?.site_name;
+    await deductStockForTreatment(id, products, {
+      siteName: siteName ?? undefined,
+      notes: `Traitement terminé ${id}`,
+    });
+    await registerTraceCertificate(id);
+  }
+
   return mapTreatment(row);
 }
 
@@ -688,7 +769,15 @@ export async function recordTreatmentPoint(point: {
   speed_kmh: number;
 }) {
   if (!SUPABASE_CONFIGURED) return;
-  const { error } = await supabase.from("traitement_points").insert(point);
+  const { error } = await supabase.from("traitement_points").insert({
+    treatment_id: point.traitement_id,
+    lat: point.lat,
+    lng: point.lng,
+    debit1_lpm: point.debit1_lpm,
+    debit2_lpm: point.debit2_lpm,
+    volume_cumul_l: point.volume_cumul_l,
+    speed_kmh: point.speed_kmh,
+  });
   if (error) console.error("Error recording point:", error);
 }
 
@@ -700,36 +789,33 @@ export async function finalizeTreatment(id: string, stats: {
   distanceM: number;
   areaHa: number;
 }) {
-  if (!SUPABASE_CONFIGURED) return;
-  const { error } = await supabase
-    .from("traitements")
-    .update({
-      status: "terminé",
-      end_time: stats.endTime,
-      total_volume_l: stats.totalVolume,
-      avg_dose_ha: stats.avgDose,
-      duration_seconds: stats.durationSeconds,
-      distance_m: stats.distanceM,
-      area_covered_ha: stats.areaHa,
-    })
-    .eq("id", id);
-
-  if (error) throw new Error(error.message);
+  return finalizeTreatmentFull(id, {
+    endTime: stats.endTime,
+    totalVolume: stats.totalVolume,
+    avgDose: stats.avgDose,
+    durationSeconds: stats.durationSeconds,
+    distanceM: stats.distanceM,
+    areaHa: stats.areaHa,
+  });
 }
 
 export async function fetchActiveTreatment(deviceId: string) {
   if (!SUPABASE_CONFIGURED) return null;
   const { data, error } = await supabase
-    .from("traitements")
+    .from("treatments")
     .select("*")
     .eq("device_id", deviceId)
-    .eq("status", "en_cours")
-    .order("created_at", { ascending: false })
+    .eq("status", "in_progress")
+    .order("start_time", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (error) return null;
-  return data;
+  if (error || !data) return null;
+  return {
+    ...data,
+    parcelle_name: data.site_name,
+    start_time: data.start_time ?? data.created_at,
+  };
 }
 
 /** Create a new treatment session instantly from live ESP32 data */
@@ -739,9 +825,9 @@ export async function createRealTreatment(params: {
   type: string;
   startLat: number;
   startLng: number;
+  parcelleId?: string;
 }): Promise<{ id: string; parcelle_name: string; type: string; start_time: string } | null> {
   if (!SUPABASE_CONFIGURED) {
-    // Offline fallback — return a local mock
     return {
       id: `local-${Date.now()}`,
       parcelle_name: params.parcelleName,
@@ -749,24 +835,41 @@ export async function createRealTreatment(params: {
       start_time: new Date().toISOString(),
     };
   }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const now = new Date().toISOString();
+  const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const parcelleId = params.parcelleId && uuidRe.test(params.parcelleId) ? params.parcelleId : null;
+  const exploitationId = await resolveExploitationId(parcelleId);
+
   const { data, error } = await supabase
-    .from("traitements")
+    .from("treatments")
     .insert({
       device_id: params.deviceId,
+      site_name: params.parcelleName,
+      parcelle_id: parcelleId,
+      exploitation_id: exploitationId,
       type: params.type,
-      status: "en_cours",
-      start_time: new Date().toISOString(),
+      status: "in_progress",
+      planned_date: today,
+      executed_date: today,
+      start_time: now,
       start_lat: params.startLat,
       start_lng: params.startLng,
     })
-    .select("id, type, start_time")
+    .select("id, type, start_time, site_name")
     .single();
 
   if (error) {
     console.error("[createRealTreatment]", error);
     return null;
   }
-  return { ...data, parcelle_name: params.parcelleName };
+  return {
+    id: data.id,
+    parcelle_name: data.site_name ?? params.parcelleName,
+    type: data.type,
+    start_time: data.start_time ?? now,
+  };
 }
 
 /** Save a full GPS trajectory buffer to traitement_points */
@@ -780,7 +883,7 @@ export async function saveTreatmentTrajectory(
 ): Promise<void> {
   if (!SUPABASE_CONFIGURED || payload.points.length === 0) return;
   const rows = payload.points.map(([lat, lng, speed, ts]) => ({
-    traitement_id: traitementId,
+    treatment_id: traitementId,
     lat,
     lng,
     speed_kmh: speed,
@@ -796,9 +899,9 @@ export async function saveTreatmentTrajectory(
 export async function fetchHistoricalTraitements() {
   if (!SUPABASE_CONFIGURED) return [];
   const { data, error } = await supabase
-    .from("traitements")
+    .from("treatments")
     .select("*")
-    .eq("status", "terminé")
+    .eq("status", "completed")
     .order("end_time", { ascending: false });
 
   if (error) return [];
@@ -807,21 +910,37 @@ export async function fetchHistoricalTraitements() {
 
 export async function fetchTreatmentWithPoints(id: string) {
   if (!SUPABASE_CONFIGURED) return null;
+
   const { data: treatment, error: tError } = await supabase
+    .from("treatments")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (treatment && !tError) {
+    const { data: points } = await supabase
+      .from("traitement_points")
+      .select("*")
+      .eq("treatment_id", id)
+      .order("timestamp", { ascending: true });
+    return { ...treatment, points: points || [] };
+  }
+
+  const { data: legacy, error: legacyError } = await supabase
     .from("traitements")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
-  if (tError) return null;
+  if (legacyError || !legacy) return null;
 
-  const { data: points, error: pError } = await supabase
+  const { data: points } = await supabase
     .from("traitement_points")
     .select("*")
     .eq("traitement_id", id)
     .order("timestamp", { ascending: true });
 
-  return { ...treatment, points: points || [] };
+  return { ...legacy, points: points || [] };
 }
 
 // ============================================================
@@ -863,24 +982,21 @@ export async function transitionTreatmentStatus(
 
   if (error) throw new Error(error.message);
 
-  // Audit log
   await supabase.from("audit_log").insert({
     table_name: "treatments",
     record_id: id,
     action: newStatus.toUpperCase(),
     new_data: payload,
-  }).then(() => {}); // fire-and-forget
+  }).then(() => {});
 
-  // Deduct stock if treatment is completed
-  if (newStatus === "completed" && treatment?.treatment_products?.length > 0) {
-    const mvts = treatment.treatment_products.map((tp: any) => ({
-      product_id: tp.product_id,
-      type_mvt: "SORTIE_TRAITEMENT",
-      quantite: -Math.abs(tp.quantity_used || 0),
-      traitement_id: id,
-      date_mvt: new Date().toISOString()
-    }));
-    await supabase.from("stock_movements").insert(mvts).then(() => {});
+  if (newStatus === "completed") {
+    const products = await loadTreatmentProducts(id);
+    if (products.length > 0) {
+      await deductStockForTreatment(id, products, {
+        siteName: treatment?.site_name ?? undefined,
+        notes: `Traitement ${id}`,
+      });
+    }
   }
 }
 
@@ -900,46 +1016,62 @@ export async function finalizeTreatmentFull(
 ): Promise<void> {
   if (!SUPABASE_CONFIGURED) return;
 
-  const dateExec = new Date();
   const darDays = stats.darDays ?? 0;
   const darDateRecolte = darDays > 0
-    ? new Date(dateExec.getTime() + darDays * 86400000).toISOString().split("T")[0]
+    ? new Date(Date.now() + darDays * 86400000).toISOString().split("T")[0]
     : null;
 
   const { error } = await supabase
-    .from("traitements")
+    .from("treatments")
     .update({
       status: "completed",
       end_time: stats.endTime,
+      executed_date: stats.endTime.slice(0, 10),
       total_volume_l: stats.totalVolume,
       avg_dose_ha: stats.avgDose,
+      volume_bouillie: stats.totalVolume,
       duration_seconds: stats.durationSeconds,
       distance_m: stats.distanceM,
       area_covered_ha: stats.areaHa,
-      ...(darDateRecolte && { dar_date_recolte_autorisee: darDateRecolte }),
+      area_treated_hectares: stats.areaHa,
+      dar_jours: darDays || null,
+      date_reentree: darDateRecolte,
+      dar_date_recolte_autorisee: darDateRecolte,
     })
     .eq("id", id);
 
   if (error) throw new Error(error.message);
 
-  // Stock deductions (SORTIE_TRAITEMENT)
-  if (stats.stockDeductions?.length) {
-    const mvts = stats.stockDeductions.map(d => ({
-      lot_id: d.lotId,
-      type_mvt: "SORTIE_TRAITEMENT",
-      quantite: -Math.abs(d.quantite),
-      traitement_id: id,
-    }));
-    await supabase.from("stock_movements").insert(mvts);
+  const products = await loadTreatmentProducts(id);
+  if (products.length > 0) {
+    const { data: treatment } = await supabase
+      .from("treatments")
+      .select("site_name")
+      .eq("id", id)
+      .maybeSingle();
+    await deductStockForTreatment(id, products, {
+      siteName: treatment?.site_name ?? undefined,
+      notes: `Traitement terminé ${id}`,
+    });
+  } else if (stats.stockDeductions?.length) {
+    await deductStockForTreatment(
+      id,
+      stats.stockDeductions.map((d) => ({
+        product_id: d.lotId,
+        quantity_used: d.quantite,
+        unit: "l",
+      })),
+    );
   }
 
-  // Audit
   await supabase.from("audit_log").insert({
-    table_name: "traitements",
+    table_name: "treatments",
     record_id: id,
     action: "COMPLETE",
     new_data: { status: "completed", dar_date_recolte_autorisee: darDateRecolte },
   }).then(() => {});
+
+  await registerTraceCertificate(id);
 }
 
 // ============================================================
@@ -951,8 +1083,11 @@ export async function fetchOperators() {
     order: { column: "name" },
   });
   if (data) return data.map(mapOperator);
-  const { operators } = await import("./mock-data");
-  return operators;
+  if (!SUPABASE_CONFIGURED) {
+    const { operators } = await import("./mock-data");
+    return operators;
+  }
+  return [];
 }
 
 export async function insertOperator(data: {
@@ -1003,33 +1138,63 @@ export async function fetchDashboardStats() {
   }
 
   try {
-    const [products, stockLevels, treatments, alertsRes, sites] = await Promise.all([
-      supabase.from("products").select("id", { count: "exact", head: true }),
-      supabase.from("stock_levels").select("status"),
-      supabase.from("treatments").select("id, status"),
-      supabase.from("alerts").select("id, acknowledged").eq("acknowledged", false),
-      supabase.from("regions").select("id, area_hectares, parent_id"),
+    const today = new Date().toISOString().slice(0, 10);
+    const in90 = new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10);
+    const thisMonth = new Date().toISOString().slice(0, 7);
+    const lastMonth = (() => {
+      const d = new Date(); d.setMonth(d.getMonth() - 1);
+      return d.toISOString().slice(0, 7);
+    })();
+
+    const [products, stock, sectors, sites, needs, treatments] = await Promise.all([
+      supabase.from("lf_products").select("id", { count: "exact", head: true }),
+      supabase.from("lf_products_full").select("is_negative, next_expiry"),
+      supabase.from("lf_sectors").select("surface_ha"),
+      supabase.from("lf_sites").select("id", { count: "exact", head: true }),
+      supabase.from("lf_needs").select("id", { count: "exact", head: true }),
+      supabase.from("treatments").select("status, executed_date, planned_date"),
     ]);
 
-    const lowStock = (stockLevels.data || []).filter((s: { status: string }) =>
-      s.status === "low" || s.status === "critical" || s.status === "negative"
-    );
-
-    const regionsData = sites.data || [];
-    const parentRegions = regionsData.filter((r: { parent_id: string | null }) => !r.parent_id);
-    const totalAreaHectares = parentRegions.reduce(
-      (sum: number, s: { area_hectares: number | null }) => sum + (s.area_hectares ?? 0),
+    const stockRows = stock.data || [];
+    const negatives = stockRows.filter((s: { is_negative: boolean }) => s.is_negative).length;
+    const expiring = stockRows.filter(
+      (s: { next_expiry: string | null }) =>
+        s.next_expiry && s.next_expiry >= today && s.next_expiry <= in90
+    ).length;
+    const totalAreaHectares = (sectors.data || []).reduce(
+      (sum: number, r: { surface_ha: number | null }) => sum + (r.surface_ha ?? 0),
       0
     );
 
+    const txRows = (treatments.data || []) as { status: string; executed_date: string | null; planned_date: string | null }[];
+    const activeTreatments = txRows.filter(t => t.status === "in_progress").length;
+    const completedTreatments = txRows.filter(t => t.status === "completed").length;
+    const treatmentsThisMonth = txRows.filter(t =>
+      (t.executed_date ?? t.planned_date ?? "").startsWith(thisMonth)
+    ).length;
+    const lastMonthCount = txRows.filter(t =>
+      t.status === "completed" && (t.executed_date ?? "").startsWith(lastMonth)
+    ).length;
+    const treatmentsTrend = lastMonthCount > 0
+      ? Math.round(((treatmentsThisMonth - lastMonthCount) / lastMonthCount) * 100)
+      : 0;
+
     return {
       totalProducts: products.count || 0,
-      lowStockCount: lowStock.length,
-      treatmentsThisMonth: (treatments.data || []).length,
-      treatmentsTrend: 0,
+      totalStockValue: 0,
+      lowStockCount: negatives,
+      totalParcelles: sites.count || 0,
       totalAreaHectares: Math.round(totalAreaHectares * 100) / 100,
-      totalParcelles: parentRegions.length,
-      alertsCount: (alertsRes.data || []).length,
+      activeTreatments,
+      completedTreatments,
+      treatmentsThisMonth,
+      treatmentsTrend,
+      operatorsActive: 0,
+      alertsCount: negatives,
+      avgCostPerHectare: 0,
+      totalTransfers: 0,
+      productsExpiringSoon: expiring,
+      needsCount: needs.count || 0,
     };
   } catch {
     const { dashboardStats } = await import("./mock-data");
@@ -1044,45 +1209,123 @@ export async function fetchDashboardStats() {
 
 import {
   movementSchema,
-  productSchema,
-  supplierSchema,
   stockLevelUpdateSchema,
   alertUpdateSchema,
 } from "./validations";
+import {
+  lfUnit,
+  mapMovementInputToLfRow,
+  mapMovementUpdatesToLfRow,
+} from "./movements/lf-movement";
+
+async function insertLfMovementViaApi(row: Record<string, unknown>) {
+  const res = await fetch("/api/v1/movements", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(row),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(body?.error || body?.message || `Erreur HTTP ${res.status}`);
+  }
+  return body;
+}
+
+// ── Add/Edit payload normalizers (legacy UI shape → lf_* columns) ──
+const LEGACY_CAT_TO_LF: Record<string, string> = {
+  fongicide: "FONGICIDE", herbicide: "HERBICIDE", insecticide: "INSECTICIDE",
+  engrais: "ENGRAIS", fer: "FER", acide: "ACIDE",
+  acide_phosphorique: "ACIDE", acide_nitrique: "ACIDE", acide_sulfurique: "ACIDE", acide_humique: "ACIDE",
+  dormance: "DORMANCE", hormone: "HORMONE", acaricide: "INSECTICIDE",
+  matiere_organique: "AUTRE", adjuvant: "AUTRE", semence: "AUTRE", drmx: "AUTRE", autre: "AUTRE",
+};
+const lfCatUpper = (c?: unknown): string => LEGACY_CAT_TO_LF[String(c ?? "").toLowerCase()] || "AUTRE";
+
+const PRODUCT_COL_TO_LF: Record<string, string> = {
+  trade_name: "name", name: "name",
+  active_substance: "active_ingredient_text",
+  formulation: "formulation", famille_chimique: "famille_chimique",
+};
+const SUPPLIER_TYPE_TO_ROLE: Record<string, string> = {
+  fabricant: "manufacturer", distributeur: "distributor", fournisseur: "distributor",
+};
 
 export async function insertMovement(movement: Record<string, unknown>) {
-  if (!SUPABASE_CONFIGURED) return null;
-  const validated = movementSchema.parse(movement);
-  const { data, error } = await supabase.from("movements").insert(validated).select().single();
-  if (error) throw error;
-  return data;
+  if (!SUPABASE_CONFIGURED) {
+    throw new Error("Supabase non configuré — enregistrement impossible");
+  }
+
+  movementSchema.parse({
+    ...movement,
+    quantity: Math.abs(Number(movement.quantity)),
+  });
+
+  const productId = movement.product_id;
+  if (!movement.unit && typeof productId === "string") {
+    const { data: prod } = await supabase
+      .from("lf_products")
+      .select("unit")
+      .eq("id", productId)
+      .maybeSingle();
+    if (prod?.unit) movement.unit = prod.unit;
+  }
+
+  const row = mapMovementInputToLfRow(movement);
+
+  try {
+    return await insertLfMovementViaApi(row);
+  } catch (apiErr) {
+    const { data, error } = await supabase
+      .from("lf_movements")
+      .insert(row)
+      .select("*, lf_products(name, category, unit)")
+      .single();
+    if (error) {
+      throw new Error(formatSupabaseError(error));
+    }
+    if (apiErr instanceof Error) console.warn("[insertMovement] API fallback:", apiErr.message);
+    return data;
+  }
 }
 
 export async function updateMovement(id: string, updates: Record<string, unknown>) {
   if (!SUPABASE_CONFIGURED) return null;
-  const validated = movementSchema.partial().parse(updates);
+  const row = mapMovementUpdatesToLfRow(updates);
+  if (Object.keys(row).length === 0) return null;
+
   const { data, error } = await supabase
-    .from("movements")
-    .update(validated)
+    .from("lf_movements")
+    .update(row)
     .eq("id", id)
-    .select("*, products(trade_name, category, active_substance, unit, stock_initial_2024)")
+    .select("*, lf_products(name, category, unit)")
     .single();
-  if (error) throw error;
+  if (error) throw new Error(formatSupabaseError(error));
   return data;
 }
 
 export async function insertProduct(product: Record<string, unknown>) {
   if (!SUPABASE_CONFIGURED) return null;
-  const validated = productSchema.parse(product);
-  const { data, error } = await supabase.from("products").insert(validated).select().single();
+  const row = {
+    name: String(product.trade_name || product.name || "").trim(),
+    category: lfCatUpper(product.category),
+    active_ingredient_text: product.active_substance || null,
+    formulation: product.formulation || null,
+    unit: lfUnit(product.unit),
+  };
+  if (!row.name) throw new Error("Nom du produit requis");
+  const { data, error } = await supabase.from("lf_products").insert(row).select().single();
   if (error) throw error;
   return data;
 }
 
 export async function updateProduct(id: string, updates: Record<string, unknown>) {
   if (!SUPABASE_CONFIGURED) return null;
-  const validated = productSchema.partial().parse(updates);
-  const { data, error } = await supabase.from("products").update(validated).eq("id", id).select().single();
+  const row: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(updates)) row[PRODUCT_COL_TO_LF[k] || k] = v;
+  if ("category" in row) row.category = lfCatUpper(row.category);
+  if ("unit" in row) row.unit = lfUnit(row.unit);
+  const { data, error } = await supabase.from("lf_products").update(row).eq("id", id).select().single();
   if (error) throw error;
   return data;
 }
@@ -1097,24 +1340,33 @@ export async function updateStockLevel(productId: string, updates: Record<string
 
 export async function updateSupplier(id: string, updates: Record<string, unknown>) {
   if (!SUPABASE_CONFIGURED) return null;
-  const validated = supplierSchema.partial().parse(updates);
-  const { data, error } = await supabase.from("suppliers").update(validated).eq("id", id).select().single();
+  const row: Record<string, unknown> = { ...updates };
+  if ("type" in row) { row.role = SUPPLIER_TYPE_TO_ROLE[String(row.type).toLowerCase()] || "distributor"; delete row.type; }
+  const { data, error } = await supabase.from("lf_suppliers").update(row).eq("id", id).select().single();
   if (error) throw error;
   return data;
 }
 
 export async function insertSupplier(supplier: Record<string, unknown>) {
   if (!SUPABASE_CONFIGURED) return null;
-  const validated = supplierSchema.parse(supplier);
-  const { data, error } = await supabase.from("suppliers").insert(validated).select().single();
+  const row = {
+    name: String(supplier.name || "").trim(),
+    role: SUPPLIER_TYPE_TO_ROLE[String(supplier.type ?? "").toLowerCase()] || "distributor",
+    phone: supplier.phone || null,
+    email: supplier.email || null,
+    address: supplier.address || null,
+    wilaya: supplier.wilaya || null,
+  };
+  if (!row.name) throw new Error("Nom du fournisseur requis");
+  const { data, error } = await supabase.from("lf_suppliers").insert(row).select().single();
   if (error) throw error;
   return data;
 }
 
 export async function deleteMovement(id: string) {
   if (!SUPABASE_CONFIGURED) return null;
-  const { error } = await supabase.from("movements").delete().eq("id", id);
-  if (error) throw error;
+  const { error } = await supabase.from("lf_movements").delete().eq("id", id);
+  if (error) throw new Error(formatSupabaseError(error));
   return true;
 }
 
@@ -1195,13 +1447,14 @@ export type MeteoData = {
   windspeed: number;
   precipitation_prob: number;
   weathercode: number;
+  humidity?: number;
   alerts: { message: string; level: "info" | "warning" | "danger" }[];
 };
 
 export async function fetchMeteo(lat: number, lng: number): Promise<MeteoData | null> {
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}` +
-      `&current_weather=true&hourly=precipitation_probability,temperature_2m,windspeed_10m` +
+      `&current_weather=true&hourly=precipitation_probability,temperature_2m,windspeed_10m,relativehumidity_2m` +
       `&forecast_days=1&timezone=auto`;
     const res = await fetch(url, { next: { revalidate: 1800 } });
     if (!res.ok) return null;
@@ -1212,6 +1465,7 @@ export async function fetchMeteo(lat: number, lng: number): Promise<MeteoData | 
     const code   = json.current_weather?.weathercode ?? 0;
     const hour   = new Date().getHours();
     const precip = json.hourly?.precipitation_probability?.[hour] ?? 0;
+    const humidity = json.hourly?.relativehumidity_2m?.[hour] ?? undefined;
 
     const alerts: MeteoData["alerts"] = [];
     if (precip > 40)  alerts.push({ level: "warning", message: `Pluie probable dans les prochaines heures (${precip}%) — risque de lessivage` });
@@ -1220,7 +1474,7 @@ export async function fetchMeteo(lat: number, lng: number): Promise<MeteoData | 
     if (temp > 30)    alerts.push({ level: "warning", message: `Température ${temp}°C — risque phytotoxicité sur feuillage humide` });
     if (temp > 35)    alerts.push({ level: "danger",  message: `Canicule ${temp}°C — traitement interdit` });
 
-    return { temperature: temp, windspeed: wind, precipitation_prob: precip, weathercode: code, alerts };
+    return { temperature: temp, windspeed: wind, precipitation_prob: precip, weathercode: code, humidity, alerts };
   } catch {
     return null;
   }
@@ -1242,53 +1496,47 @@ export type DashboardKPIs = {
 };
 
 export async function fetchDashboardKPIs(): Promise<DashboardKPIs> {
-  const mockFallback: DashboardKPIs = {
-    traitementsMois: 9,
-    surfaceMois: 154.0,
-    stockValeurDZD: 3539670,
-    parcellesEnDAR: 1,
-    prochainRecolte: { parcelleName: "Nord-A — Golden Delicious", date: "2026-05-28" },
-    expiryCount: 2,
-    pendingApproval: 1,
-    stressedParcels: 1,
+  const empty: DashboardKPIs = {
+    traitementsMois: 0,
+    surfaceMois: 0,
+    stockValeurDZD: 0,
+    parcellesEnDAR: 0,
+    prochainRecolte: null,
+    expiryCount: 0,
+    pendingApproval: 0,
+    stressedParcels: 0,
   };
 
-  if (!SUPABASE_CONFIGURED) {
-    return mockFallback;
-  }
+  if (!SUPABASE_CONFIGURED) return empty;
 
   try {
     const startOfMonth = new Date();
     startOfMonth.setDate(1); startOfMonth.setHours(0, 0, 0, 0);
+    const today = new Date().toISOString().split("T")[0];
+    const in90 = new Date(Date.now() + 90 * 86400000).toISOString().split("T")[0];
 
-    const [traitementsRes, stockRes, pendingRes, expiryAlerts, satelliteRes] = await Promise.all([
+    const [traitementsRes, stockRes, pendingRes, nowStr] = await Promise.all([
       supabase.from("treatments")
         .select("id, area_treated_hectares, status, planned_date, notes")
         .gte("planned_date", startOfMonth.toISOString().split("T")[0]),
-      supabase.from("stock_levels")
-        .select("current_quantity, avg_unit_price_dzd, total_value_dzd"),
+      supabase.from("lf_products_full").select("is_negative, next_expiry"),
       supabase.from("treatments")
         .select("id", { count: "exact", head: true })
         .eq("status", "pending_approval"),
-      fetchExpiryAlerts().catch(() => []),
-      supabase.from("alerts")
-        .select("id", { count: "exact", head: true })
-        .eq("type", "parcel_untreated")
-        .eq("acknowledged", false)
+      Promise.resolve(new Date().toISOString().split("T")[0]),
     ]);
 
     const tData = traitementsRes.data || [];
     const completedT = tData.filter(t => ["completed", "in_progress", "terminé"].includes(t.status));
-    
     const traitementsMois = completedT.length;
     const surfaceMois = completedT.reduce((sum, t) => sum + (t.area_treated_hectares || 0), 0);
 
-    const sData = stockRes.data || [];
-    const stockValeurDZD = sData.reduce((sum, r) => sum + (r.total_value_dzd || (r.current_quantity || 0) * (r.avg_unit_price_dzd || 0)), 0);
+    const stockRows = stockRes.data || [];
+    const expiryCount = stockRows.filter(
+      (r: { next_expiry: string | null }) => r.next_expiry && r.next_expiry >= today && r.next_expiry <= in90
+    ).length;
 
-    const nowStr = new Date().toISOString().split("T")[0];
     const darTreatments: { parcelleName: string; date: string }[] = [];
-    
     const { data: allCompleted } = await supabase.from("treatments")
       .select("id, site_name, notes, executed_date")
       .eq("status", "completed");
@@ -1301,10 +1549,7 @@ export async function fetchDashboardKPIs(): Promise<DashboardKPIs> {
         if (parts.length === 3) {
           const isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
           if (isoDate > nowStr) {
-            darTreatments.push({
-              parcelleName: t.site_name || "Parcelle",
-              date: isoDate
-            });
+            darTreatments.push({ parcelleName: t.site_name || "Parcelle", date: isoDate });
           }
         }
       }
@@ -1314,28 +1559,17 @@ export async function fetchDashboardKPIs(): Promise<DashboardKPIs> {
     darTreatments.sort((a, b) => a.date.localeCompare(b.date));
     const prochainRecolte = darTreatments[0] || null;
 
-    const expiryCount = expiryAlerts.length;
-    const pendingApproval = pendingRes.count || 0;
-    const stressedParcels = satelliteRes.count || 0;
-
-    // IF all key metrics are 0 (indicates an unpopulated/empty database for testing), 
-    // fallback gracefully to mock data so the CEO gets a beautifully populated experience!
-    if (traitementsMois === 0 && stockValeurDZD === 0 && parcellesEnDAR === 0 && pendingApproval === 0) {
-      return mockFallback;
-    }
-
     return {
       traitementsMois,
       surfaceMois,
-      stockValeurDZD,
+      stockValeurDZD: 0,
       parcellesEnDAR,
       prochainRecolte,
       expiryCount,
-      pendingApproval,
-      stressedParcels,
+      pendingApproval: pendingRes.count || 0,
+      stressedParcels: 0,
     };
-  } catch (err) {
-    console.error("Error fetching live dashboard KPIs, falling back to mock:", err);
-    return mockFallback;
+  } catch {
+    return empty;
   }
 }

@@ -52,6 +52,7 @@ export default function OperatorsPage() {
   const [search, setSearch] = useState("");
   const [addOpen, setAddOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [newOp, setNewOp] = useState({ name: "", role: "operator", phone: "", cert: "" });
 
   if (loading) {
@@ -73,7 +74,7 @@ export default function OperatorsPage() {
 
   return (
     <AppLayout>
-      <div className="mb-8 bg-black/30  rounded-2xl p-5 border border-[var(--color-stone-moss)]">
+      <div className="lf-page-header mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-[var(--color-adaline-ink)] tracking-tight">Opérateurs</h1>
@@ -280,9 +281,13 @@ export default function OperatorsPage() {
               </div>
             </div>
 
+            {saveError && (
+              <p className="mt-3 text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{saveError}</p>
+            )}
+
             <div className="flex gap-2 mt-5">
               <button
-                onClick={() => setAddOpen(false)}
+                onClick={() => { setAddOpen(false); setSaveError(null); }}
                 className="flex-1 py-2.5 text-xs font-medium rounded-xl border border-[var(--color-stone-moss)] text-[var(--color-adaline-ink)]/60 hover:bg-white/[0.06] transition-colors"
               >
                 Annuler
@@ -292,6 +297,7 @@ export default function OperatorsPage() {
                 onClick={async () => {
                   setSaving(true);
                   try {
+                    setSaveError(null);
                     await insertOperator({
                       name: newOp.name.trim(),
                       role: newOp.role,
@@ -302,7 +308,7 @@ export default function OperatorsPage() {
                     setAddOpen(false);
                     setNewOp({ name: "", role: "operator", phone: "", cert: "" });
                   } catch (err) {
-                    alert((err as Error).message);
+                    setSaveError((err as Error).message || "Erreur lors de l'ajout");
                   } finally {
                     setSaving(false);
                   }

@@ -11,7 +11,7 @@ import {
   type Supplier,
   type Parcelle,
 } from "@/lib/mock-data";
-import { insertMovement, updateStockLevel } from "@/lib/data-provider";
+import { insertMovement } from "@/lib/data-provider";
 import {
   Plus,
   Search,
@@ -27,9 +27,37 @@ import {
   XCircle,
 } from "lucide-react";
 
-export function NewEntryModal({ products, suppliers, defaultType = "entree", onClose, onSaved }: { products: PhytoProduct[]; suppliers: Supplier[]; defaultType?: string; onClose: () => void; onSaved?: () => Promise<void> }) {
+const MOVEMENT_CATEGORIES = [
+  "ENGRAIS", "FONGICIDE", "INSECTICIDE", "HERBICIDE", "FER",
+  "ACIDE HUMIQUE", "ACIDE NITRIQUE", "ACIDE PHOSPHORIQUE", "ACIDE SULFURIQUE",
+  "MATIERE ORGANIQUE", "DRMX", "AUTRE",
+] as const;
+
+function uiCategoryToDb(uiCategory: string): string {
+  return uiCategory.toLowerCase().replace(/ /g, "_");
+}
+
+function productToUiCategory(product: PhytoProduct): string {
+  const dbCat = (product.category || "autre").toLowerCase();
+  const fromDb = MOVEMENT_CATEGORIES.find((c) => uiCategoryToDb(c) === dbCat);
+  if (fromDb) return fromDb;
+  const label = (categoryLabels[product.category] || "").toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+  return MOVEMENT_CATEGORIES.find((c) => c === label) || "AUTRE";
+}
+
+function productMatchesUiCategory(product: PhytoProduct, uiCategory: string): boolean {
+  const dbCat = (product.category || "autre").toLowerCase();
+  const target = uiCategoryToDb(uiCategory);
+  if (target === "autre") {
+    const known = MOVEMENT_CATEGORIES.filter((c) => c !== "AUTRE").map(uiCategoryToDb);
+    return dbCat === "autre" || !known.includes(dbCat);
+  }
+  return dbCat === target;
+}
+
+export function NewEntryModal({ products, suppliers, defaultType = "entree", defaultProductName = "", onClose, onSaved }: { products: PhytoProduct[]; suppliers: Supplier[]; defaultType?: string; defaultProductName?: string; onClose: () => void; onSaved?: () => Promise<void> }) {
   const [movementType, setMovementType] = useState(defaultType);
-  const [productSearch, setProductSearch] = useState("");
+  const [productSearch, setProductSearch] = useState(defaultProductName);
   const [selectedProductId, setSelectedProductId] = useState("");
   const [showProductDropdown, setShowProductDropdown] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("ENGRAIS");
@@ -46,15 +74,44 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
+  useEffect(() => {
+    if (!defaultProductName) return;
+    const match = products.find(
+      (p) => p.tradeName?.toLowerCase() === defaultProductName.toLowerCase()
+    );
+    if (match) {
+      setSelectedProductId(match.id);
+      setProductSearch(match.tradeName);
+      setSelectedCategory(productToUiCategory(match));
+    }
+  }, [defaultProductName, products]);
+
+  const categoryProducts = useMemo(
+    () => products.filter((p) => productMatchesUiCategory(p, selectedCategory)),
+    [products, selectedCategory]
+  );
+
   const filteredProducts = useMemo(() => {
-    if (!productSearch) return products.slice(0, 20);
+    const base = categoryProducts;
+    if (!productSearch) return base.slice(0, 30);
     const q = productSearch.toLowerCase();
-    return products.filter((p: PhytoProduct) =>
+    return base.filter((p: PhytoProduct) =>
       p.tradeName?.toLowerCase().includes(q) ||
-      p.activeSubstance?.toLowerCase().includes(q) ||
-      (categoryLabels[p.category] || "").toLowerCase().includes(q)
-    ).slice(0, 20);
-  }, [products, productSearch]);
+      p.activeSubstance?.toLowerCase().includes(q)
+    ).slice(0, 30);
+  }, [categoryProducts, productSearch]);
+
+  const handleCategoryChange = useCallback((category: string) => {
+    setSelectedCategory(category);
+    setOpenDropdown(null);
+    if (selectedProductId) {
+      const prod = products.find((p) => p.id === selectedProductId);
+      if (prod && !productMatchesUiCategory(prod, category)) {
+        setSelectedProductId("");
+        setProductSearch("");
+      }
+    }
+  }, [products, selectedProductId]);
 
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -75,30 +132,35 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
     try {
       // Get product category in DB format (lowercase with underscores)
       const selectedProduct = products.find(p => p.id === selectedProductId);
-      const productCategoryDb = (selectedProduct?.category || "autre").toLowerCase().replace(/ /g, "_");
 
-      // Map UI culture values to DB culture_type enum
       const cultureDbMap: Record<string, string> = {
         "A PEPINS": "a_pepins",
         "A NOYAU": "a_noyau",
         "VIGNE": "vigne",
-        "AGRUMES": "agrumes",
-        "TT": "autre",
       };
+
+      const noteParts: string[] = [];
+      if (observations.trim()) noteParts.push(observations.trim());
+      if (movementType === "entree") {
+        if (bonLivraison.trim()) noteParts.push(`BL: ${bonLivraison.trim()}`);
+        if (lotNumber.trim()) noteParts.push(`Lot: ${lotNumber.trim()}`);
+        if (selectedDistributor.trim()) noteParts.push(`Dist: ${selectedDistributor.trim()}`);
+      }
 
       const movementData: Record<string, unknown> = {
         product_id: selectedProductId,
         movement_type: movementType,
-        quantity: (movementType === "sortie") ? -qty : qty,
+        quantity: qty,
         date: dateValue,
-        category: productCategoryDb,
+        unit: selectedProduct?.unit,
       };
 
-      // Only add optional fields if they have values
-      if (selectedCulture) movementData.culture = cultureDbMap[selectedCulture] || "autre";
+      if (selectedCulture && cultureDbMap[selectedCulture]) {
+        movementData.culture = cultureDbMap[selectedCulture];
+      }
       if (selectedSite) movementData.site_name = selectedSite;
       if (detailsSite) movementData.details_site = detailsSite;
-      if (observations) movementData.observations = observations;
+      if (noteParts.length) movementData.observations = noteParts.join(" | ");
 
       if (movementType === "entree" && selectedSupplier) {
         const sup = suppliers.find(s => s.name === selectedSupplier);
@@ -121,22 +183,18 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
       setFormError(msg);
     }
     setSaving(false);
-  }, [movementType, selectedProductId, selectedCategory, quantity, dateValue, selectedCulture, selectedSite, detailsSite, selectedSupplier, observations, suppliers, products, onClose, onSaved]);
+  }, [movementType, selectedProductId, quantity, dateValue, selectedCulture, selectedSite, detailsSite, selectedSupplier, selectedDistributor, observations, bonLivraison, lotNumber, suppliers, products, onClose, onSaved]);
 
   const typeOptions = [
-    { value: "entree", label: "Entrée", desc: "Réception fournisseur", color: "text-green-400", bg: "bg-green-400/10 border-green-400/25" },
-    { value: "sortie", label: "Sortie", desc: "Consommation terrain", color: "text-[var(--color-valley-green)]", bg: "bg-emerald-400/10 border-emerald-400/25" },
-    { value: "retour", label: "Retour", desc: "Retour au magasin", color: "text-[var(--color-valley-green)]", bg: "bg-emerald-400/10 border-emerald-400/25" },
-    { value: "transfert", label: "Transfert", desc: "Inter-sites", color: "text-[var(--color-valley-green)]", bg: "bg-emerald-400/10 border-emerald-400/25" },
+    { value: "entree", label: "Entrée", desc: "Réception fournisseur", color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-300" },
+    { value: "sortie", label: "Sortie", desc: "Consommation terrain", color: "text-[#203b14]", bg: "bg-[#203b14]/8 border-[#203b14]/25" },
+    { value: "retour", label: "Retour", desc: "Retour au magasin", color: "text-amber-700", bg: "bg-amber-50 border-amber-300" },
+    { value: "transfert", label: "Transfert", desc: "Inter-sites", color: "text-sky-700", bg: "bg-sky-50 border-sky-300" },
   ];
   const isEntry = movementType === "entree";
   const isExit = movementType === "sortie";
 
-  const categories = [
-    "ENGRAIS", "FONGICIDE", "INSECTICIDE", "HERBICIDE", "FER",
-    "ACIDE HUMIQUE", "ACIDE NITRIQUE", "ACIDE PHOSPHORIQUE", "ACIDE SULFURIQUE",
-    "MATIERE ORGANIQUE", "DRMX", "AUTRE"
-  ];
+  const categories = MOVEMENT_CATEGORIES;
   const cultures = ["A PEPINS", "A NOYAU", "VIGNE", "TT"];
   const sites = ["TENIRA", "SEFYOUN", "MEZAOUROU", "SIDIHMAD", "KOUANKA", "SYS V", "MAGUER", "TIRMANE"];
   const distributors = ["CASAP", "DEVAGRI", "FILAHIA", "AGRICHEM", "MAHALIYA TAYEB", "HYGINDUST", "ISSERS BOUMERDES", "BLIDA"];
@@ -148,7 +206,7 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
     const dropdownId = `dropdown-${label.replace(/\s+/g, "-").toLowerCase()}`;
     return (
       <div className="relative">
-        <label id={`${dropdownId}-label`} className="text-[10px] text-[var(--color-adaline-ink)]/40 block mb-1">{label}</label>
+        <label id={`${dropdownId}-label`} className="text-[10px] font-semibold text-[#31200b]/70 uppercase tracking-wide block mb-1">{label}</label>
         <button
           type="button"
           onClick={onToggle}
@@ -157,11 +215,11 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
           aria-labelledby={`${dropdownId}-label`}
           className="glass-input w-full px-3 py-2 text-sm text-left flex items-center justify-between"
         >
-          <span className={value ? "text-[var(--color-adaline-ink)]/80" : "text-[var(--color-adaline-ink)]/30"}>{value || placeholder}</span>
-          <ChevronDown className={cn("w-3.5 h-3.5 text-[var(--color-adaline-ink)]/30 transition-transform", open && "rotate-180")} />
+          <span className={value ? "text-[var(--color-adaline-ink)]" : "text-[#31200b]/45"}>{value || placeholder}</span>
+          <ChevronDown className={cn("w-3.5 h-3.5 text-[#31200b]/45 transition-transform", open && "rotate-180")} />
         </button>
         {open && (
-          <div role="listbox" aria-labelledby={`${dropdownId}-label`} className="absolute z-30 top-full left-0 right-0 mt-1 bg-[#1a2e1a]/98  border border-white/15 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
+          <div role="listbox" aria-labelledby={`${dropdownId}-label`} className="absolute z-30 top-full left-0 right-0 mt-1 bg-white border border-[var(--color-stone-moss)] rounded-xl shadow-lg max-h-48 overflow-y-auto">
             {options.map((o: { value: string; label: string }) => (
               <button
                 key={o.value}
@@ -170,8 +228,8 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
                 aria-selected={value === o.value}
                 onClick={() => { onSelect(o.value); }}
                 className={cn(
-                  "w-full text-left px-3 py-2 text-sm hover:bg-white/[0.06] transition-colors border-b border-white/[0.04] last:border-0",
-                  value === o.value ? "bg-[var(--color-valley-green)]/10 text-[var(--color-valley-green)]" : "text-[var(--color-adaline-ink)]/70"
+                  "w-full text-left px-3 py-2 text-sm hover:bg-[#f4f7ef] transition-colors border-b border-[var(--color-stone-moss)]/60 last:border-0",
+                  value === o.value ? "bg-[#203b14]/8 text-[#203b14] font-medium" : "text-[var(--color-adaline-ink)]"
                 )}
               >
                 {o.label}
@@ -185,16 +243,16 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
 
   return (
     <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 " onClick={onClose} onMouseDown={() => { setShowProductDropdown(false); setOpenDropdown(null); }} />
-      <div className="relative bg-[#1a2e1a]/95  rounded-2xl shadow-2xl border border-white/[0.15] w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} onMouseDown={() => { setShowProductDropdown(false); setOpenDropdown(null); }} />
+      <div className="relative glass-card w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-[#1a2e1a]/95  p-6 pb-4 border-b border-white/[0.08] rounded-t-2xl">
+        <div className="sticky top-0 z-10 bg-[var(--surface-pure)] p-6 pb-4 border-b border-[var(--color-stone-moss)] rounded-t-[8px]">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-[var(--color-adaline-ink)]/90">Nouveau Mouvement</h2>
-              <p className="text-xs text-[var(--color-adaline-ink)]/40 mt-0.5">Formulaire de saisie — conforme au registre SBA 2025</p>
+              <h2 className="text-lg font-bold text-[var(--color-adaline-ink)]">Nouveau Mouvement</h2>
+              <p className="text-xs text-[#31200b]/65 mt-0.5">Formulaire de saisie — conforme au registre SBA 2025</p>
             </div>
-            <button onClick={onClose} aria-label="Fermer" className="p-2 rounded-lg hover:bg-white/[0.08] text-[var(--color-adaline-ink)]/40 hover:text-[var(--color-adaline-ink)]/70 transition-colors">
+            <button onClick={onClose} aria-label="Fermer" className="p-2 rounded-lg hover:bg-[#f0f2eb] text-[#31200b]/55 hover:text-[var(--color-adaline-ink)] transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -203,7 +261,7 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
         <div className="p-6 space-y-5">
           {/* Movement type selector */}
           <div>
-            <label className="text-xs font-semibold text-[var(--color-adaline-ink)]/50 uppercase tracking-wider block mb-2">Type de mouvement</label>
+            <label className="text-xs font-semibold text-[#31200b]/70 uppercase tracking-wider block mb-2">Type de mouvement</label>
             <div className="grid grid-cols-4 gap-2">
               {typeOptions.map((t: { value: string; label: string; desc: string; color: string; bg: string }) => (
                 <button
@@ -213,11 +271,11 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
                     "p-3 rounded-xl border text-left transition-all",
                     movementType === t.value
                       ? t.bg
-                      : "border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.03]"
+                      : "border-[var(--color-stone-moss)] hover:border-[#203b14]/30 hover:bg-[#f8faf5]"
                   )}
                 >
-                  <span className={cn("text-sm font-semibold block", movementType === t.value ? t.color : "text-[var(--color-adaline-ink)]/60")}>{t.label}</span>
-                  <span className="text-[10px] text-[var(--color-adaline-ink)]/30 block mt-0.5">{t.desc}</span>
+                  <span className={cn("text-sm font-semibold block", movementType === t.value ? t.color : "text-[var(--color-adaline-ink)]")}>{t.label}</span>
+                  <span className="text-[10px] text-[#31200b]/55 block mt-0.5">{t.desc}</span>
                 </button>
               ))}
             </div>
@@ -226,18 +284,18 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
           {/* Date + Category row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-medium text-[var(--color-adaline-ink)]/50 block mb-1.5">Date</label>
+              <label className="text-xs font-medium text-[#31200b]/70 block mb-1.5">Date</label>
               <input type="date" className="glass-input w-full px-3 py-2.5 text-sm" value={dateValue} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDateValue(e.target.value)} />
             </div>
             <div className="relative">
-              <label className="text-xs font-medium text-[var(--color-adaline-ink)]/50 block mb-1.5">
+              <label className="text-xs font-medium text-[#31200b]/70 block mb-1.5">
                 Catégorie
-                {selectedProductId && <span className="text-[10px] text-[var(--color-valley-green)]/60 ml-1.5">(auto)</span>}
+                {selectedProductId && <span className="text-[10px] text-[#203b14]/70 ml-1.5">(auto)</span>}
               </label>
               {selectedProductId ? (
-                <div className="glass-input w-full px-3 py-2.5 text-sm flex items-center justify-between opacity-70 cursor-not-allowed">
-                  <span className="text-[var(--color-valley-green)]/80 font-medium">{selectedCategory}</span>
-                  <span className="text-[10px] text-[var(--color-adaline-ink)]/40">verrouillé</span>
+                <div className="glass-input w-full px-3 py-2.5 text-sm flex items-center justify-between opacity-80 cursor-not-allowed bg-[#f4f7ef]">
+                  <span className="text-[#203b14] font-medium">{selectedCategory}</span>
+                  <span className="text-[10px] text-[#31200b]/50">verrouillé</span>
                 </div>
               ) : (
                 <>
@@ -246,19 +304,19 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
                     onClick={() => setOpenDropdown(openDropdown === "cat" ? null : "cat")}
                     className="glass-input w-full px-3 py-2.5 text-sm text-left flex items-center justify-between"
                   >
-                    <span className="text-[var(--color-adaline-ink)]/80">{selectedCategory}</span>
-                    <ChevronDown className={cn("w-3.5 h-3.5 text-[var(--color-adaline-ink)]/30 transition-transform", openDropdown === "cat" && "rotate-180")} />
+                    <span className="text-[var(--color-adaline-ink)]">{selectedCategory}</span>
+                    <ChevronDown className={cn("w-3.5 h-3.5 text-[#31200b]/45 transition-transform", openDropdown === "cat" && "rotate-180")} />
                   </button>
                   {openDropdown === "cat" && (
-                    <div className="absolute z-30 top-full left-0 right-0 mt-1 bg-[#1a2e1a]/98  border border-white/15 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
+                    <div className="absolute z-30 top-full left-0 right-0 mt-1 bg-white border border-[var(--color-stone-moss)] rounded-xl shadow-lg max-h-48 overflow-y-auto">
                       {categories.map((c: string) => (
                         <button
                           key={c}
                           type="button"
-                          onClick={() => { setSelectedCategory(c); setOpenDropdown(null); }}
+                          onClick={() => handleCategoryChange(c)}
                           className={cn(
-                            "w-full text-left px-3 py-2.5 text-sm hover:bg-white/[0.06] transition-colors border-b border-white/[0.04] last:border-0",
-                            selectedCategory === c ? "bg-[var(--color-valley-green)]/10 text-[var(--color-valley-green)]" : "text-[var(--color-adaline-ink)]/70"
+                            "w-full text-left px-3 py-2.5 text-sm hover:bg-[#f4f7ef] transition-colors border-b border-[var(--color-stone-moss)]/60 last:border-0",
+                            selectedCategory === c ? "bg-[#203b14]/8 text-[#203b14] font-medium" : "text-[var(--color-adaline-ink)]"
                           )}
                         >
                           {c}
@@ -271,32 +329,35 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
             </div>
           </div>
 
-          {/* Product — searchable */}
+          {/* Product — searchable, filtered by category */}
           <div className="relative">
-            <label className="text-xs font-medium text-[var(--color-adaline-ink)]/50 block mb-1.5">Produit (nom commercial)</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-medium text-[#31200b]/70">Produit (nom commercial)</label>
+              <span className="text-[10px] text-[#31200b]/50">{categoryProducts.length} produit{categoryProducts.length !== 1 ? "s" : ""} · {selectedCategory}</span>
+            </div>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-adaline-ink)]/30" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#31200b]/40" />
               <input
                 type="text"
                 className="glass-input w-full pl-9 pr-3 py-2.5 text-sm"
-                placeholder="Taper pour rechercher un produit..."
+                placeholder={`Rechercher dans ${selectedCategory.toLowerCase()}...`}
                 value={productSearch}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setProductSearch(e.target.value); setShowProductDropdown(true); }}
                 onFocus={() => setShowProductDropdown(true)}
               />
               {selectedProductId && (
                 <button
-                  onClick={() => { setSelectedProductId(""); setProductSearch(""); setSelectedCategory("ENGRAIS"); }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-[var(--color-stone-moss)]"
+                  onClick={() => { setSelectedProductId(""); setProductSearch(""); }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-[#f0f2eb]"
                 >
-                  <X className="w-3 h-3 text-[var(--color-adaline-ink)]/40" />
+                  <X className="w-3 h-3 text-[#31200b]/50" />
                 </button>
               )}
             </div>
             {showProductDropdown && (
-              <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-[#1a2e1a]/98  border border-white/15 rounded-xl shadow-2xl max-h-56 overflow-y-auto">
+              <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-[var(--color-stone-moss)] rounded-xl shadow-lg max-h-56 overflow-y-auto">
                 {filteredProducts.length === 0 ? (
-                  <div className="p-3 text-xs text-[var(--color-adaline-ink)]/30 text-center">Aucun produit trouvé</div>
+                  <div className="p-3 text-xs text-[#31200b]/55 text-center">Aucun produit dans cette catégorie</div>
                 ) : (
                   filteredProducts.map((p: PhytoProduct) => (
                     <button
@@ -305,39 +366,36 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
                         setSelectedProductId(p.id);
                         setProductSearch(p.tradeName);
                         setShowProductDropdown(false);
-                        // Auto-fill category from product
-                        const catNorm = (p.category || "").toUpperCase().replace(/_/g, " ").trim();
-                        const match = categories.find(c => c === catNorm || c.replace(/ /g, "_") === (p.category || "").toUpperCase());
-                        if (match) {
-                          setSelectedCategory(match);
-                        } else {
-                          // Fallback: use categoryLabels display name
-                          const label = (categoryLabels[p.category] || "").toUpperCase();
-                          const fallback = categories.find(c => c === label);
-                          if (fallback) setSelectedCategory(fallback);
-                        }
+                        setSelectedCategory(productToUiCategory(p));
                       }}
                       className={cn(
-                        "w-full text-left px-3 py-2.5 hover:bg-white/[0.06] transition-colors border-b border-white/[0.04] last:border-0",
-                        selectedProductId === p.id && "bg-[var(--color-valley-green)]/10"
+                        "w-full text-left px-3 py-2.5 hover:bg-[#f4f7ef] transition-colors border-b border-[var(--color-stone-moss)]/60 last:border-0",
+                        selectedProductId === p.id && "bg-[#203b14]/8"
                       )}
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-sm text-[var(--color-adaline-ink)]/80 font-medium">{p.tradeName}</span>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <span className="text-sm text-[var(--color-adaline-ink)] font-medium">{p.tradeName}</span>
                           {p.activeSubstance && (
-                            <span className="text-[10px] text-[var(--color-adaline-ink)]/30 ml-2">{p.activeSubstance}</span>
+                            <span className="text-[10px] text-[#31200b]/55 ml-2">{p.activeSubstance}</span>
                           )}
                         </div>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-md border bg-[var(--color-canvas-ice)] text-[var(--color-adaline-ink)]/40 border-[var(--color-stone-moss)]">
+                        <span
+                          className="text-[10px] px-1.5 py-0.5 rounded-md border shrink-0"
+                          style={{
+                            backgroundColor: `${categoryColors[p.category] || "#94a3b8"}18`,
+                            color: categoryColors[p.category] || "#64748b",
+                            borderColor: `${categoryColors[p.category] || "#94a3b8"}40`,
+                          }}
+                        >
                           {categoryLabels[p.category] || p.category}
                         </span>
                       </div>
                     </button>
                   ))
                 )}
-                {products.length > 20 && !productSearch && (
-                  <div className="p-2 text-[10px] text-[var(--color-adaline-ink)]/45 text-center">Tapez pour filtrer {products.length} produits</div>
+                {categoryProducts.length > 30 && !productSearch && (
+                  <div className="p-2 text-[10px] text-[#31200b]/50 text-center">Tapez pour filtrer {categoryProducts.length} produits</div>
                 )}
               </div>
             )}
@@ -345,16 +403,16 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
 
           {/* Quantity — single field for active type */}
           <div>
-            <label className="text-xs font-semibold text-[var(--color-adaline-ink)]/50 uppercase tracking-wider block mb-2">Quantité (kg/L)</label>
+            <label className="text-xs font-semibold text-[#31200b]/70 uppercase tracking-wider block mb-2">Quantité (kg/L)</label>
             <div className="flex items-center gap-3">
               <div className={cn(
-                "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border",
                 typeOptions.find(t => t.value === movementType)?.bg
               )}>
-                {movementType === "entree" ? <Plus className="w-4 h-4 text-green-400" /> :
-                 movementType === "sortie" ? <Minus className="w-4 h-4 text-[var(--color-valley-green)]" /> :
-                 movementType === "retour" ? <Download className="w-4 h-4 text-[var(--color-valley-green)]" /> :
-                 <RefreshCw className="w-4 h-4 text-[var(--color-valley-green)]" />}
+                {movementType === "entree" ? <Plus className="w-4 h-4 text-emerald-700" /> :
+                 movementType === "sortie" ? <Minus className="w-4 h-4 text-[#203b14]" /> :
+                 movementType === "retour" ? <Download className="w-4 h-4 text-amber-700" /> :
+                 <RefreshCw className="w-4 h-4 text-sky-700" />}
               </div>
               <div className="flex-1">
                 <input
@@ -378,8 +436,8 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
 
           {/* Destination — Culture + Site */}
           {(isExit || movementType === "transfert") && (
-            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.08]">
-              <label className="text-xs font-semibold text-[var(--color-adaline-ink)]/50 uppercase tracking-wider block mb-3">Destination</label>
+            <div className="p-4 rounded-xl bg-[#f8faf5] border border-[var(--color-stone-moss)]">
+              <label className="text-xs font-semibold text-[#31200b]/70 uppercase tracking-wider block mb-3">Destination</label>
               <div className="grid grid-cols-3 gap-3">
                 <DropdownSelect
                   label="Culture"
@@ -398,7 +456,7 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
                   onSelect={(v) => { setSelectedSite(v); setOpenDropdown(null); }}
                 />
                 <div>
-                  <label className="text-[10px] text-[var(--color-adaline-ink)]/40 block mb-1">Détails site</label>
+                  <label className="text-[10px] font-semibold text-[#31200b]/70 uppercase tracking-wide block mb-1">Détails site</label>
                   <input type="text" className="glass-input w-full px-3 py-2 text-sm" placeholder="Ex: 13ha la base" value={detailsSite} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDetailsSite(e.target.value)} />
                 </div>
               </div>
@@ -407,8 +465,8 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
 
           {/* Supplier — only for entries */}
           {isEntry && (
-            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.08]">
-              <label className="text-xs font-semibold text-[var(--color-adaline-ink)]/50 uppercase tracking-wider block mb-3">Traçabilité fournisseur</label>
+            <div className="p-4 rounded-xl bg-[#f8faf5] border border-[var(--color-stone-moss)]">
+              <label className="text-xs font-semibold text-[#31200b]/70 uppercase tracking-wider block mb-3">Traçabilité fournisseur</label>
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <DropdownSelect
                   label="Fournisseur"
@@ -429,11 +487,11 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] text-[var(--color-adaline-ink)]/40 block mb-1">N° Bon de livraison</label>
+                  <label className="text-[10px] font-semibold text-[#31200b]/70 uppercase tracking-wide block mb-1">N° Bon de livraison</label>
                   <input type="text" className="glass-input w-full px-3 py-2 text-sm" value={bonLivraison} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBonLivraison(e.target.value)} />
                 </div>
                 <div>
-                  <label className="text-[10px] text-[var(--color-adaline-ink)]/40 block mb-1">N° Lot</label>
+                  <label className="text-[10px] font-semibold text-[#31200b]/70 uppercase tracking-wide block mb-1">N° Lot</label>
                   <input type="text" className="glass-input w-full px-3 py-2 text-sm" placeholder="LOT-XXX-XXXX" value={lotNumber} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLotNumber(e.target.value)} />
                 </div>
               </div>
@@ -442,20 +500,20 @@ export function NewEntryModal({ products, suppliers, defaultType = "entree", onC
 
           {/* Observations */}
           <div>
-            <label className="text-xs font-medium text-[var(--color-adaline-ink)]/50 block mb-1.5">Observations</label>
+            <label className="text-xs font-medium text-[#31200b]/70 block mb-1.5">Observations</label>
             <textarea className="glass-input w-full px-3 py-2.5 text-sm h-16 resize-none" placeholder="RS, ENTREE, RETOUR, TRANSFERT, STOCK INITIAL..." value={observations} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setObservations(e.target.value)} />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-[#1a2e1a]/95  p-6 pt-4 border-t border-white/[0.08] rounded-b-2xl">
+        <div className="sticky bottom-0 bg-[var(--surface-pure)] p-6 pt-4 border-t border-[var(--color-stone-moss)] rounded-b-[8px]">
           <div className="flex items-center justify-between">
             <div>
-              {formError && <p className="text-[10px] text-[var(--color-valley-green)] mb-1">{formError}</p>}
-              <p className="text-[10px] text-[var(--color-adaline-ink)]/45">Les données seront ajoutées à la table MOUVEMENT</p>
+              {formError && <p className="text-xs text-red-600 mb-1">{formError}</p>}
+              <p className="text-[10px] text-[#31200b]/55">Les données seront ajoutées à la table MOUVEMENT</p>
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={onClose} className="px-4 py-2.5 text-sm text-[var(--color-adaline-ink)]/50 hover:text-[var(--color-adaline-ink)]/70 rounded-xl hover:bg-white/[0.06] transition-all">
+              <button onClick={onClose} className="px-4 py-2.5 text-sm text-[#31200b]/65 hover:text-[var(--color-adaline-ink)] rounded-xl hover:bg-[#f0f2eb] transition-all">
                 Annuler
               </button>
               <button onClick={handleSubmit} disabled={saving} className={cn("glass-button px-6 py-2.5 text-sm flex items-center gap-2", saving && "opacity-60 cursor-wait")}>
@@ -490,9 +548,19 @@ export function InventoryModal({ stockLevels, onClose, onSaved }: { stockLevels:
     try {
       const updates = Object.entries(physicalCounts).filter(([, v]: [unknown, unknown]) => v !== "");
       for (const [productId, physVal] of updates) {
-        const qty = parseFloat(physVal as string);
-        if (isNaN(qty)) continue;
-        await updateStockLevel(productId, { current_quantity: qty });
+        const physQty = parseFloat(physVal as string);
+        if (isNaN(physQty)) continue;
+        const stock = stockLevels.find(s => s.productId === productId);
+        const systemQty = stock?.currentQuantity ?? 0;
+        const diff = physQty - systemQty;
+        if (diff === 0) continue;
+        await insertMovement({
+          product_id: productId,
+          movement_type: diff > 0 ? "entree" : "sortie",
+          quantity: Math.abs(diff),
+          date: new Date().toISOString().split("T")[0],
+          observations: `Inventaire physique: ${systemQty} → ${physQty}${stock?.unit ? " " + stock.unit : ""}`,
+        });
       }
       if (onSaved) await onSaved();
       onClose();
@@ -501,7 +569,7 @@ export function InventoryModal({ stockLevels, onClose, onSaved }: { stockLevels:
       setInventoryError(err?.message || "Erreur lors de la validation de l'inventaire");
     }
     setSaving(false);
-  }, [physicalCounts, onClose, onSaved]);
+  }, [physicalCounts, stockLevels, onClose, onSaved]);
 
   return (
     <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center">
@@ -566,7 +634,7 @@ export function InventoryModal({ stockLevels, onClose, onSaved }: { stockLevels:
         </table>
 
         {inventoryError && (
-          <div className="mt-4 p-3 rounded-xl bg-[var(--color-valley-green)]/10 border border-[var(--color-valley-green)]/20 text-[var(--color-valley-green)] text-sm">{inventoryError}</div>
+          <div className="mt-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">{inventoryError}</div>
         )}
 
         <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-white/[0.08]">
@@ -1091,7 +1159,7 @@ export function AjustementModal({ stockLevels, onClose, onSaved }: { stockLevels
         </div>
 
         {ajustError && (
-          <div className="mx-6 mb-2 p-3 rounded-xl bg-[var(--color-valley-green)]/10 border border-[var(--color-valley-green)]/20 text-[var(--color-valley-green)] text-sm">{ajustError}</div>
+          <div className="mx-6 mb-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">{ajustError}</div>
         )}
         <div className="sticky bottom-0 bg-[#1a2e1a]/95  p-6 pt-4 border-t border-white/[0.08] rounded-b-2xl">
           <div className="flex items-center justify-between">
@@ -1118,8 +1186,7 @@ export function AjustementModal({ stockLevels, onClose, onSaved }: { stockLevels
                       category: prodCatDb,
                       observations: `Ajustement inventaire: ${stock.currentQuantity} → ${physQty}`,
                     });
-                    // Update stock level
-                    await updateStockLevel(productId, { current_quantity: physQty });
+                    // Stock level is computed from lf_movements aggregation — no separate update needed
                   }
                   if (onSaved) await onSaved();
                   onClose();
