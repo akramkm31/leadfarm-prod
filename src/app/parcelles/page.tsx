@@ -7,7 +7,7 @@ import Link from "next/link";
 import AppLayout from "@/components/layout/AppLayout";
 import ScheduleTreatmentModal from "@/components/treatments/ScheduleTreatmentModal";
 import { useParcelles, useTreatments } from "@/hooks/useData";
-import { insertParcelle, updateParcelle, deleteParcelle, fetchTreatmentWithPoints } from "@/lib/data-provider";
+import { updateParcelle, deleteParcelle, fetchTreatmentWithPoints } from "@/lib/data-provider";
 import { dbPointsToTrajectory } from "@/lib/trajectory-utils";
 import type { Trajectory } from "@/lib/trajectory-utils";
 import { genererOrdreTraitementPDF } from "@/lib/pdf/ordreTraitement";
@@ -61,7 +61,8 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import type { DrawTool } from "@/components/map/ParcelleMap";
-import ParcelleQuickNav from "@/components/map/ParcelleQuickNav";
+import ParcelleBottomDropdown from "@/components/map/ParcelleBottomDropdown";
+import ParcelleDetailDrawer from "@/components/map/ParcelleDetailDrawer";
 
 const ParcelleMap = dynamic(() => import("@/components/map/ParcelleMap"), {
   ssr: false,
@@ -119,17 +120,14 @@ function ParcellesPageContent() {
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [editModal, setEditModal] = useState<{ open: boolean; name: string; cropType: string; color: string }>({ open: false, name: "", cropType: "", color: "" });
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleteErrorMsg, setDeleteErrorMsg] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
-  const [mapOverlayChild, setMapOverlayChild] = useState<{ child: Parcelle; parent: Parcelle } | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
 
   // ═══ THEATER & EXPLORATION STATES ═══
   const [isTheaterMode, setIsTheaterMode] = useState(false);
   const [isPinMode, setIsPinMode] = useState(false);
-  const [geoPins, setGeoPins] = useState<any[]>([
-    { id: "pin-1", lat: 34.9868, lng: -0.5362, type: "pest", note: "Foyer d'araignée rouge détecté sur les feuilles inférieures.", createdAt: new Date(Date.now() - 86400000).toISOString() },
-    { id: "pin-2", lat: 34.9875, lng: -0.5348, type: "irrigation", note: "Buse bouchée sur la rampe 3 d'irrigation.", createdAt: new Date(Date.now() - 172800000).toISOString() }
-  ]);
+  const [geoPins, setGeoPins] = useState<any[]>([]);
   const [pendingPinCoords, setPendingPinCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [newPinNote, setNewPinNote] = useState("");
   const [newPinType, setNewPinType] = useState<"pest" | "irrigation" | "weed" | "other">("pest");
@@ -161,12 +159,17 @@ function ParcellesPageContent() {
     [router, pathname]
   );
 
+  const confirmDeleteParcelle = useCallback((parcelle: Parcelle) => {
+    setSelectedParcelle(parcelle);
+    setDeleteErrorMsg(null);
+    setDeleteConfirm(true);
+  }, []);
+
   const clearParcelleSelection = useCallback(() => {
     suppressSelectSyncRef.current = true;
     pendingSelectIdRef.current = null;
     setSelectedParcelle(null);
     setHistoryOpen(false);
-    setMapOverlayChild(null);
     if (selectId) setSelectQuery(null);
   }, [selectId, setSelectQuery]);
 
@@ -223,8 +226,9 @@ function ParcellesPageContent() {
     if (found.center) {
       setFocusCoords(found.center as [number, number]);
     }
-    setHistoryOpen(true);
   }, [selectId, parcelles, findParcelleById, selectedParcelle?.id, setSelectQuery]);
+
+  const parcelleDrawerOpen = Boolean(selectedParcelle && !drawMode);
 
   // ═══ AUTO-SCROLL TREE SIDEBAR INTO VIEW ═══
   useEffect(() => {
@@ -311,6 +315,7 @@ function ParcellesPageContent() {
     setDrawingParentId(null);
     setNewParcelle({ name: "", site: "", cropType: "", variete: "", color: "#10b981" });
     setDrawMode(true);
+    setDrawTool("polygon");
     setDrawnPoints([]);
     setShowDrawForm(false);
   }, []);
@@ -418,46 +423,61 @@ function ParcellesPageContent() {
   }, []);
 
   const [saveStatus, setSaveStatus] = useState<"success" | "error" | null>(null);
+  const [saveErrorMsg, setSaveErrorMsg] = useState<string | null>(null);
 
   const saveParcelle = async () => {
-    if (!newParcelle.name.trim() || !newParcelle.site.trim() || !newParcelle.cropType.trim() || !newParcelle.variete.trim()) {
+    if (!newParcelle.name.trim() || !newParcelle.cropType.trim()) {
       setSaveStatus("error");
+      setSaveErrorMsg("Nom et culture sont obligatoires");
       return;
     }
     if (drawnPoints.length < 3) return;
 
     setSaving(true);
     setSaveStatus(null);
+    setSaveErrorMsg(null);
     try {
       const center: [number, number] = [
         drawnPoints.reduce((s, p) => s + p[0], 0) / drawnPoints.length,
         drawnPoints.reduce((s, p) => s + p[1], 0) / drawnPoints.length,
       ];
       const areaHa = parseFloat(computeArea(drawnPoints).toFixed(2));
+      const site = newParcelle.site.trim() || "Tlemcen";
+      const variete = newParcelle.variete.trim() || newParcelle.cropType.trim();
 
-      const result = await insertParcelle({
-        name: newParcelle.name.trim(),
-        site: newParcelle.site.trim(),
-        cropType: newParcelle.cropType.trim(),
-        variete: newParcelle.variete.trim(),
-        color: newParcelle.color,
-        boundary: drawnPoints,
-        areaHectares: areaHa,
-        center,
-        parentId: drawingParentId,
+      const res = await fetch("/api/v1/parcelles", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newParcelle.name.trim(),
+          site,
+          cropType: newParcelle.cropType.trim(),
+          variete,
+          color: newParcelle.color,
+          boundary: drawnPoints,
+          areaHectares: areaHa,
+          center,
+          parentId: drawingParentId,
+        }),
       });
 
+      const payload = (await res.json()) as { error?: string; id?: string; name?: string; exploitationId?: string };
+      if (!res.ok) {
+        throw new Error(payload.error ?? "Erreur lors de l'enregistrement");
+      }
+
       const created: Parcelle = {
-        id: result?.id || `p-${Date.now()}`,
+        id: payload.id || `p-${Date.now()}`,
         name: newParcelle.name.trim(),
         parentId: drawingParentId,
-        exploitationId: "exp-001",
+        exploitationId: payload.exploitationId ?? "exp-001",
         areaHectares: areaHa,
-        cropType: newParcelle.cropType,
-        variete: newParcelle.variete,
+        cropType: newParcelle.cropType.trim(),
+        variete,
         cultureType: "arboriculture",
         soilType: "Non défini",
-        site: newParcelle.site,
+        site,
         zone: "Nouvelle Zone",
         secteur: "Nouveau Secteur",
         irrigation: "aucune",
@@ -474,17 +494,14 @@ function ParcellesPageContent() {
           p.id === drawingParentId ? { ...p, children: [...(p.children || []), created] } : p
         );
       });
-      setSaveStatus("success");
-
-      // Show success briefly, then clean up
-      setTimeout(() => {
-        cancelDraw();
-        setNewParcelle({ name: "", site: "", cropType: "", variete: "", color: "#10b981" });
-        refetchParcelles?.();
-      }, 800);
+      setSaving(false);
+      cancelDraw();
+      setNewParcelle({ name: "", site: "", cropType: "", variete: "", color: "#10b981" });
+      void refetchParcelles?.();
     } catch (err) {
       console.error("Erreur création parcelle:", err);
       setSaveStatus("error");
+      setSaveErrorMsg(err instanceof Error ? err.message : "Erreur lors de l'enregistrement");
       setSaving(false);
     }
   };
@@ -754,7 +771,7 @@ function ParcellesPageContent() {
   return (
     <AppLayout>
       {/* Header */}
-      <div className="mb-6 bg-black/30  rounded-2xl p-5 border border-[var(--color-stone-moss)]">
+      <div className="lf-page-header mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-[var(--color-adaline-ink)] tracking-tight">Parcelles</h1>
@@ -773,7 +790,7 @@ function ParcellesPageContent() {
           ) : (
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               {/* Tool switcher */}
-              <div className="flex items-center gap-0.5 p-1 rounded-xl bg-black/40 border border-[var(--color-stone-moss)]">
+              <div className="flex items-center gap-0.5 p-1 rounded-xl bg-white/90 border border-[var(--color-stone-moss)] shadow-sm">
                 {([["polygon", Shapes, "Polygone"], ["rectangle", Square, "Rectangle"], ["gps", Navigation, "GPS"]] as const).map(([tool, Icon, label]) => (
                   <button
                     key={tool}
@@ -797,7 +814,7 @@ function ParcellesPageContent() {
               {/* Actions row */}
               <div className="flex items-center gap-2">
                 {/* Live badge */}
-                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-black/30 border border-[var(--color-stone-moss)]">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/90 border border-[var(--color-stone-moss)] shadow-sm">
                   <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: newParcelle.color }} />
                   <span className="text-xs font-mono text-[var(--color-adaline-ink)]/60">
                     {drawnPoints.length} pts
@@ -859,33 +876,6 @@ function ParcellesPageContent() {
         </div>
       )}
 
-      {/* KPIs */}
-      {parcelles.length > 0 && !drawMode && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-          {parcelles.map((p: Parcelle) => {
-            const CultureIcon = cultureIcons[p.cultureType] || Wheat;
-            return (
-              <div
-                key={p.id}
-                onClick={() => selectParcelle(p)}
-                className={cn(
-                  "glass-card p-4 cursor-pointer border-l-[3px] transition-all hover:scale-[1.02]",
-                  selectedParcelle?.id === p.id && "border-emerald-500/40"
-                )}
-                style={{ borderLeftColor: p.color || "#6b9e7a" }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <CultureIcon className="w-4 h-4" style={{ color: p.color || "#6b9e7a" }} />
-                  <span className="text-xs font-semibold text-[var(--color-adaline-ink)]/70 truncate">{p.name || p.cropType}</span>
-                </div>
-                <span className="text-lg font-bold text-[var(--color-adaline-ink)]/90 font-mono">{formatHectares(p.areaHectares)}</span>
-                <span className="text-[10px] text-[var(--color-adaline-ink)]/50 block">{p.cropType}{p.variete ? ` · ${p.variete}` : ""}</span>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
       {/* Empty state */}
       {parcelles.length === 0 && !drawMode && (
         <div className="glass-card p-12 flex flex-col items-center justify-center text-center min-h-[400px] mb-6">
@@ -920,40 +910,15 @@ function ParcellesPageContent() {
         </div>
       )}
 
-      {/* Map + embedded save form */}
-      <div className="mb-6 relative flex flex-col rounded-2xl overflow-hidden border border-[var(--color-stone-moss)] bg-[#f5f8ec]">
-        {parcelles.length > 0 && !drawMode && (
-          <ParcelleQuickNav
-            parcelles={parcelles}
-            selectedId={
-              activeTab === "treatments"
-                ? selectedTreatmentItem?.sousParcelleId ||
-                  selectedTreatmentItem?.parcelleId ||
-                  null
-                : selectedParcelle?.id ?? null
-            }
-            onSelect={(id) => {
-              const found = findParcelleById(id);
-              if (!found) return;
-              if (activeTab === "treatments") {
-                if (found.center) setFocusCoords(found.center as [number, number]);
-                else if (found.boundary?.length) {
-                  setFocusCoords(found.boundary[0] as [number, number]);
-                }
-              } else {
-                selectParcelle(found);
-              }
-            }}
-            onClear={clearParcelleSelection}
-            variant="light"
-            hint={
-              activeTab === "treatments"
-                ? "Centrer la carte sur la parcelle"
-                : "Accès rapide · clic pour ouvrir la fiche"
-            }
-          />
+      {/* Map + parcelle detail drawer */}
+      <div
+        className={cn(
+          "parc-map-shell mb-6 rounded-2xl overflow-hidden border border-[var(--color-stone-moss)] bg-[#f5f8ec]",
+          parcelleDrawerOpen && "parc-map-shell--open"
         )}
-        <div className="relative min-h-[500px] flex-1">
+      >
+        <div className="parc-map-canvas relative flex flex-col">
+        <div className="relative min-h-[min(72vh,720px)] flex-1 flex flex-col">
         <ParcelleMap
           parcelles={parcelles}
           isTheaterMode={false}
@@ -966,16 +931,13 @@ function ParcellesPageContent() {
             if (drawMode) return;
             const all = parcelles.flatMap((p: Parcelle) => [p, ...(p.children || [])]);
             const found = all.find((p: Parcelle) => p.id === id);
-            if (found) selectParcelle(found, { openHistory: true });
+            if (found) selectParcelle(found);
           }}
           onChildParcelleClick={(childId: string, parentId: string) => {
             if (drawMode) return;
             const parent = parcelles.find((p: Parcelle) => p.id === parentId);
             const child = parent?.children?.find((c: Parcelle) => c.id === childId);
-            if (child && parent) {
-              setMapOverlayChild({ child, parent });
-              selectParcelle(child, { openHistory: true });
-            }
+            if (child) selectParcelle(child);
           }}
           onCreateSubParcelle={(parentId: string) => {
             const parent = parcelles.find((p: Parcelle) => p.id === parentId);
@@ -1003,140 +965,9 @@ function ParcellesPageContent() {
           trajectory={activeTab === "treatments" ? treatmentTrajectory : null}
           simulationPosition={activeTab === "treatments" && (isSimPlaying || simIndex > 0) ? simPosition : null}
           highlightParcelleId={activeTab === "treatments" ? selectedTreatmentItem?.parcelleId : selectedParcelle?.id}
+          detailPanelOpen={parcelleDrawerOpen}
+          detailPanelWidth={400}
         />
-        </div>
-
-        {/* ═══ SOUS-PARCELLE MAP OVERLAY SIDEBAR ═══ */}
-        {mapOverlayChild && (
-          <div
-            className="absolute top-0 right-0 bottom-0 z-[1100] w-80 flex flex-col animate-slide-in-right"
-            style={{ pointerEvents: "auto" }}
-          >
-            <div className="h-full m-3 ml-0 rounded-2xl bg-[#0d1a0d]/92 backdrop-blur-2xl border border-white/[0.12] shadow-2xl shadow-black/50 flex flex-col overflow-hidden">
-              {/* Header with color accent */}
-              <div className="relative p-4 pb-3">
-                <div
-                  className="absolute inset-x-0 top-0 h-1 rounded-t-2xl"
-                  style={{ background: `linear-gradient(90deg, ${mapOverlayChild.child.color}, ${mapOverlayChild.child.color}80)` }}
-                />
-                <div className="flex items-start justify-between mt-1">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      className="w-10 h-10 rounded-xl border-2 flex items-center justify-center shrink-0"
-                      style={{
-                        borderColor: mapOverlayChild.child.color,
-                        backgroundColor: mapOverlayChild.child.color + "20",
-                      }}
-                    >
-                      <Layers className="w-5 h-5" style={{ color: mapOverlayChild.child.color }} />
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="text-sm font-bold text-[var(--color-adaline-ink)]/90 truncate">{mapOverlayChild.child.name}</h3>
-                      <p className="text-[10px] text-[var(--color-adaline-ink)]/40 truncate">
-                        sous-parcelle de {mapOverlayChild.parent.name}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setMapOverlayChild(null)}
-                    className="p-1.5 rounded-lg hover:bg-white/[0.1] text-[var(--color-adaline-ink)]/40 hover:text-[var(--color-adaline-ink)]/70 transition-colors shrink-0"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Quick stats row */}
-              <div className="px-4 pb-3 grid grid-cols-2 gap-2">
-                <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08]">
-                  <span className="text-lg font-bold text-[var(--color-valley-green)] font-mono block">{formatHectares(mapOverlayChild.child.areaHectares)}</span>
-                  <span className="text-[9px] text-[var(--color-adaline-ink)]/40 uppercase tracking-wider">Surface</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08]">
-                  <span className="text-lg font-bold text-[var(--color-valley-green)] font-mono block">{mapOverlayChild.child.treatmentCount ?? 0}</span>
-                  <span className="text-[9px] text-[var(--color-adaline-ink)]/40 uppercase tracking-wider">Traitements</span>
-                </div>
-              </div>
-
-              {/* Details */}
-              <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
-                <div className="space-y-0">
-                  <DetailRow label="Culture" value={mapOverlayChild.child.cropType || "—"} />
-                  <DetailRow label="Variété" value={mapOverlayChild.child.variete || "—"} highlight="amber" />
-                  <DetailRow label="Sol" value={mapOverlayChild.child.soilType || "—"} />
-                  <DetailRow label="Irrigation" value={irrigationLabels[mapOverlayChild.child.irrigation] || mapOverlayChild.child.irrigation || "—"} />
-                  {mapOverlayChild.child.densitePlantation && (
-                    <DetailRow label="Densité" value={`${mapOverlayChild.child.densitePlantation} ${mapOverlayChild.child.densiteUnit}`} highlight="cyan" />
-                  )}
-                  <DetailRow label="Dernier traitement" value={
-                    mapOverlayChild.child.lastTreatmentDate
-                      ? new Date(mapOverlayChild.child.lastTreatmentDate).toLocaleDateString("fr-FR")
-                      : "Jamais"
-                  } />
-                  <DetailRow label="Secteur" value={mapOverlayChild.child.secteur || "—"} />
-                </div>
-
-                {/* Recent treatments */}
-                {treatments.filter((t: any) => t.sousParcelleId === mapOverlayChild.child.id).length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <Droplets className="w-3 h-3 text-[var(--color-valley-green)]" />
-                      <span className="text-[10px] font-semibold text-[var(--color-adaline-ink)]/55 uppercase tracking-wider">Récents</span>
-                    </div>
-                    <div className="space-y-1.5">
-                      {treatments
-                        .filter((t: any) => t.sousParcelleId === mapOverlayChild.child.id)
-                        .slice(0, 3)
-                        .map((t: any) => (
-                          <div key={t.id} className="flex items-center justify-between p-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-                            <div>
-                              <span className="text-[11px] text-[var(--color-adaline-ink)]/60">{t.products[0]?.productName || t.type}</span>
-                              <span className="text-[9px] text-[var(--color-adaline-ink)]/35 block">{new Date(t.plannedDate).toLocaleDateString("fr-FR")}</span>
-                            </div>
-                            <span className={cn(
-                              "badge text-[9px]",
-                              t.status === "completed" ? "badge-success" :
-                              t.status === "in_progress" ? "badge-warning" :
-                              t.status === "planned" ? "badge-info" : "badge-danger"
-                            )}>
-                              {t.status === "completed" ? "Terminé" :
-                               t.status === "in_progress" ? "En cours" :
-                               t.status === "planned" ? "Planifié" : "Annulé"}
-                            </span>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Action buttons */}
-              <div className="p-3 border-t border-white/[0.08] space-y-2">
-                <button
-                  onClick={() => {
-                    selectParcelle(mapOverlayChild.child);
-                    setMapOverlayChild(null);
-                    setScheduleOpen(true);
-                  }}
-                  className="w-full py-2.5 text-xs font-semibold rounded-xl bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/25 text-[var(--color-valley-green)] hover:bg-[var(--color-valley-green)]/25 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Droplets className="w-3.5 h-3.5" />
-                  Planifier un traitement
-                </button>
-                <button
-                  onClick={() => {
-                    selectParcelle(mapOverlayChild.child);
-                    setMapOverlayChild(null);
-                  }}
-                  className="w-full py-2 text-[11px] font-medium rounded-xl border border-[var(--color-stone-moss)] text-[var(--color-adaline-ink)]/50 hover:bg-white/[0.06] hover:text-[var(--color-adaline-ink)]/70 transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <Info className="w-3 h-3" />
-                  Voir tous les détails
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* ═══ GPS Walk mode: giant tap-to-add-position button ═══ */}
         {drawMode && drawTool === "gps" && !showDrawForm && (
@@ -1144,7 +975,7 @@ function ParcellesPageContent() {
             <button
               onClick={addGpsPoint}
               disabled={gpsLoading}
-              className="pointer-events-auto group relative flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-amber-500/90 to-amber-600/90 border-3 border-white/90 shadow-xl shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all disabled:opacity-60"
+              className="pointer-events-auto group relative flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-amber-500/90 to-amber-600/90 border-[3px] border-white/90 shadow-xl shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all disabled:opacity-60"
             >
               <div className="absolute inset-0 rounded-full border-2 border-emerald-400/40 animate-ping" />
               {gpsLoading ? (
@@ -1153,8 +984,8 @@ function ParcellesPageContent() {
                 <Navigation className="w-8 h-8 text-[var(--color-adaline-ink)] drop-shadow-lg relative z-10" />
               )}
             </button>
-            <div className="pointer-events-auto bg-black/80  px-4 py-2 rounded-xl border border-[var(--color-stone-moss)] max-w-xs text-center">
-              <p className="text-xs text-[var(--color-adaline-ink)]/80 font-medium">
+            <div className="pointer-events-auto lf-map-hud px-4 py-2 rounded-xl max-w-xs text-center">
+              <p className="text-xs text-[var(--color-adaline-ink)] font-medium">
                 {drawnPoints.length === 0
                   ? "Marchez au premier coin de votre parcelle"
                   : `Point ${drawnPoints.length} enregistré · Marchez au coin suivant`}
@@ -1169,21 +1000,25 @@ function ParcellesPageContent() {
         {/* Floating save form — inside the map, bottom bar */}
         {showDrawForm && (
           <div className={cn(
-            "lf-map-draw-panel absolute bottom-3 left-3 right-3 z-[1000] rounded-2xl shadow-2xl shadow-black/50 transition-all duration-300",
+            "lf-map-draw-panel absolute bottom-3 left-3 right-3 z-[1000] rounded-2xl transition-all duration-300",
             saveStatus === "success"
-              ? "bg-green-900/90 border border-green-400/40 "
-              : "bg-[#0d1f0d]/92 border border-white/15 "
+              ? "border-[var(--color-valley-green)]/40 bg-[var(--green-010)]"
+              : ""
           )}>
-            {/* Success state */}
             {saveStatus === "success" ? (
               <div className="p-5 flex items-center justify-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-green-400/20 flex items-center justify-center">
-                  <Check className="w-5 h-5 text-green-400" />
+                <div className="w-8 h-8 rounded-full bg-[var(--color-valley-green)]/15 flex items-center justify-center">
+                  <Check className="w-5 h-5 text-[var(--color-valley-green)]" />
                 </div>
-                <span className="text-sm font-semibold text-green-300">Parcelle enregistrée avec succès !</span>
+                <span className="text-sm font-semibold text-[var(--color-adaline-ink)]">Parcelle enregistrée avec succès !</span>
               </div>
             ) : (
               <div className="p-4">
+                {saveErrorMsg && (
+                  <div className="mb-3 px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700">
+                    {saveErrorMsg}
+                  </div>
+                )}
                 {drawingParentId && (
                   <div className="mb-3 flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--color-valley-green)]/10 border border-[var(--color-valley-green)]/25">
                     <Pencil className="w-3.5 h-3.5 text-[var(--color-valley-green)]" />
@@ -1220,10 +1055,10 @@ function ParcellesPageContent() {
                   <input
                     type="text"
                     className={cn(
-                      "w-full px-4 py-3 text-sm rounded-xl bg-black/40 border outline-none transition-all",
+                      "w-full px-4 py-3 text-sm rounded-xl bg-white border outline-none transition-all",
                       saveStatus === "error" && !newParcelle.name.trim()
-                        ? "border-emerald-500/50 ring-1 ring-emerald-500/30"
-                        : "border-white/15 focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/20"
+                        ? "border-red-400 ring-1 ring-red-200"
+                        : "border-[var(--color-stone-moss)] focus:border-[var(--color-valley-green)]/50 focus:ring-1 focus:ring-[var(--color-valley-green)]/20"
                     )}
                     placeholder="Nom de la parcelle (obligatoire)"
                     value={newParcelle.name}
@@ -1232,7 +1067,7 @@ function ParcellesPageContent() {
                     onKeyDown={(e) => { if (e.key === "Enter") saveParcelle(); if (e.key === "Escape") cancelDraw(); }}
                   />
                   {saveStatus === "error" && !newParcelle.name.trim() && (
-                    <span className="text-[10px] text-[var(--color-valley-green)] mt-1 block pl-1">Veuillez saisir un nom</span>
+                    <span className="text-[10px] text-red-600 mt-1 block pl-1">Veuillez saisir un nom</span>
                   )}
                 </div>
 
@@ -1241,28 +1076,22 @@ function ParcellesPageContent() {
                     <input
                       type="text"
                       className={cn(
-                        "w-full px-3 py-2 text-sm rounded-xl bg-black/40 border outline-none transition-all",
-                        saveStatus === "error" && !newParcelle.site.trim()
-                          ? "border-emerald-500/50 ring-1 ring-emerald-500/30"
-                          : "border-white/15 focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/20"
+                        "w-full px-3 py-2 text-sm rounded-xl bg-white border outline-none transition-all border-[var(--color-stone-moss)] focus:border-[var(--color-valley-green)]/50 focus:ring-1 focus:ring-[var(--color-valley-green)]/20"
                       )}
-                      placeholder="Site (obligatoire)"
+                      placeholder="Site (optionnel)"
                       value={newParcelle.site}
                       onChange={(e) => { setNewParcelle({ ...newParcelle, site: e.target.value }); setSaveStatus(null); }}
                     />
-                    {saveStatus === "error" && !newParcelle.site.trim() && (
-                      <span className="text-[10px] text-[var(--color-valley-green)] mt-1 block pl-1">Site obligatoire</span>
-                    )}
                   </div>
                   <div>
                     <input
                       type="text"
                       list="cultures-list"
                       className={cn(
-                        "w-full px-3 py-2 text-sm rounded-xl bg-black/40 border outline-none transition-all",
+                        "w-full px-3 py-2 text-sm rounded-xl bg-white border outline-none transition-all",
                         saveStatus === "error" && !newParcelle.cropType.trim()
-                          ? "border-emerald-500/50 ring-1 ring-emerald-500/30"
-                          : "border-white/15 focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/20"
+                          ? "border-red-400 ring-1 ring-red-200"
+                          : "border-[var(--color-stone-moss)] focus:border-[var(--color-valley-green)]/50 focus:ring-1 focus:ring-[var(--color-valley-green)]/20"
                       )}
                       placeholder="Culture (ex: Pommier)"
                       value={newParcelle.cropType}
@@ -1277,25 +1106,19 @@ function ParcellesPageContent() {
                       <option value="Céréales" />
                     </datalist>
                     {saveStatus === "error" && !newParcelle.cropType.trim() && (
-                      <span className="text-[10px] text-[var(--color-valley-green)] mt-1 block pl-1">Culture obligatoire</span>
+                      <span className="text-[10px] text-red-600 mt-1 block pl-1">Culture obligatoire</span>
                     )}
                   </div>
                   <div>
                     <input
                       type="text"
                       className={cn(
-                        "w-full px-3 py-2 text-sm rounded-xl bg-black/40 border outline-none transition-all",
-                        saveStatus === "error" && !newParcelle.variete.trim()
-                          ? "border-emerald-500/50 ring-1 ring-emerald-500/30"
-                          : "border-white/15 focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/20"
+                        "w-full px-3 py-2 text-sm rounded-xl bg-white border outline-none transition-all border-[var(--color-stone-moss)] focus:border-[var(--color-valley-green)]/50 focus:ring-1 focus:ring-[var(--color-valley-green)]/20"
                       )}
-                      placeholder="Variété (obligatoire)"
+                      placeholder="Variété (optionnel)"
                       value={newParcelle.variete}
                       onChange={(e) => { setNewParcelle({ ...newParcelle, variete: e.target.value }); setSaveStatus(null); }}
                     />
-                    {saveStatus === "error" && !newParcelle.variete.trim() && (
-                      <span className="text-[10px] text-[var(--color-valley-green)] mt-1 block pl-1">Variété obligatoire</span>
-                    )}
                   </div>
                 </div>
 
@@ -1320,7 +1143,7 @@ function ParcellesPageContent() {
 
                   <button
                     onClick={cancelDraw}
-                    className="px-3 py-2 text-xs rounded-xl lf-overlay-muted hover:text-white hover:bg-white/[0.08] transition-all"
+                    className="px-3 py-2 text-xs rounded-xl text-[var(--color-adaline-ink)]/60 hover:text-[var(--color-adaline-ink)] hover:bg-[var(--green-010)] transition-all"
                   >
                     Annuler
                   </button>
@@ -1330,9 +1153,9 @@ function ParcellesPageContent() {
                     disabled={saving}
                     className={cn(
                       "px-5 py-2.5 text-sm font-medium rounded-xl flex items-center gap-2 transition-all",
-                      newParcelle.name.trim()
-                        ? "bg-green-500/20 border border-green-500/30 text-green-300 hover:bg-green-500/30"
-                        : "bg-white/[0.06] border border-[var(--color-stone-moss)] text-[var(--color-adaline-ink)]/40"
+                      newParcelle.name.trim() && newParcelle.cropType.trim()
+                        ? "bg-[var(--color-valley-green)] text-white hover:opacity-90"
+                        : "bg-[var(--color-stone-moss)]/30 text-[var(--color-adaline-ink)]/40"
                     )}
                   >
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
@@ -1342,6 +1165,63 @@ function ParcellesPageContent() {
               </div>
             )}
           </div>
+        )}
+        </div>
+
+        {parcelles.length > 0 && !drawMode && (
+          <ParcelleBottomDropdown
+            parcelles={parcelles}
+            selectedId={
+              activeTab === "treatments"
+                ? selectedTreatmentItem?.sousParcelleId ||
+                  selectedTreatmentItem?.parcelleId ||
+                  null
+                : selectedParcelle?.id ?? null
+            }
+            onSelect={(id) => {
+              const found = findParcelleById(id);
+              if (!found) return;
+              if (activeTab === "treatments") {
+                if (found.center) setFocusCoords(found.center as [number, number]);
+                else if (found.boundary?.length) {
+                  setFocusCoords(found.boundary[0] as [number, number]);
+                }
+              } else {
+                selectParcelle(found);
+              }
+            }}
+          />
+        )}
+        </div>
+
+        {parcelleDrawerOpen && selectedParcelle && (
+          <ParcelleDetailDrawer
+            parcelle={selectedParcelle}
+            parcelles={parcelles}
+            treatments={treatments}
+            onClose={clearParcelleSelection}
+            onSelectChild={selectParcelle}
+            onDrawSubParcelle={() => {
+              startDrawingSubParcelle(selectedParcelle);
+              clearParcelleSelection();
+            }}
+            onHistory={() => setHistoryOpen(true)}
+            onFilterTreatments={() => {
+              setSelectedZoneFilter(selectedParcelle);
+              setActiveTab("treatments");
+              setSelectedTreatmentItem(null);
+            }}
+            onSchedule={() => setScheduleOpen(true)}
+            onEdit={() =>
+              setEditModal({
+                open: true,
+                name: selectedParcelle.name,
+                cropType: selectedParcelle.cropType,
+                color: selectedParcelle.color,
+              })
+            }
+            onDelete={() => confirmDeleteParcelle(selectedParcelle)}
+          />
         )}
       </div>
 
@@ -1394,7 +1274,7 @@ function ParcellesPageContent() {
         {activeTab === "parcelles" && (
         <>
         {/* Parcelle tree */}
-        <div className={cn(selectedParcelle ? "col-span-12 lg:col-span-7" : "col-span-12")}>
+        <div className="col-span-12">
           <div className="space-y-3">
             {parcelles.map((parcelle: Parcelle) => {
               const isExpanded = expandedParcelle === parcelle.id;
@@ -1442,6 +1322,18 @@ function ParcellesPageContent() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 flex-wrap justify-end">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            confirmDeleteParcelle(parcelle);
+                          }}
+                          className="inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+                          title="Supprimer la parcelle"
+                        >
+                          <Trash2 className="w-3 h-3.5" />
+                          Supprimer
+                        </button>
                         <Link
                           href={`/trace/${parcelle.id}`}
                           onClick={(e) => e.stopPropagation()}
@@ -1483,7 +1375,7 @@ function ParcellesPageContent() {
                         <span className="text-xs text-[var(--color-adaline-ink)]/55">{parcelle.zone || "—"} · {parcelle.secteur || "—"}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Droplets className="w-3.5 h-3.5 text-[var(--color-valley-green)]" />
+                        <Droplets className="w-3.5 h-3.5 text-sky-500" />
                         <span className="text-xs text-[var(--color-adaline-ink)]/55">{irrigationLabels[parcelle.irrigation] || parcelle.irrigation || "—"}</span>
                       </div>
                     </div>
@@ -1520,6 +1412,17 @@ function ParcellesPageContent() {
                               <span className="text-[10px] text-[var(--color-adaline-ink)]/40 shrink-0">{child.variete}</span>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  confirmDeleteParcelle(child);
+                                }}
+                                className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-md border border-red-200 text-red-600 hover:bg-red-50"
+                                title="Supprimer la sous-parcelle"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
                               <Link
                                 href={`/trace/${child.id}`}
                                 onClick={(e) => e.stopPropagation()}
@@ -1556,196 +1459,6 @@ function ParcellesPageContent() {
             })}
           </div>
         </div>
-
-        {/* Detail panel */}
-        {selectedParcelle && (
-          <div className="col-span-12 lg:col-span-5">
-            <div className="glass-card p-6 sticky top-[90px]">
-              <button
-                type="button"
-                onClick={clearParcelleSelection}
-                className="mb-3 inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-adaline-ink)]/55 hover:text-[var(--color-valley-green)] transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Retour à la liste
-              </button>
-              <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div
-                    className="w-5 h-5 rounded-lg border-2 shrink-0"
-                    style={{ borderColor: selectedParcelle.color || "#6b9e7a", backgroundColor: (selectedParcelle.color || "#6b9e7a") + "20" }}
-                  />
-                  <h3 className="text-lg font-bold text-[var(--color-adaline-ink)]/85 truncate">{selectedParcelle.name}</h3>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Link
-                    href={`/trace/${selectedParcelle.id}`}
-                    className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-xl border border-[var(--color-valley-green)]/30 text-[var(--color-valley-green)] hover:bg-[var(--color-valley-green)]/10 transition-colors"
-                  >
-                    <GitBranch className="w-3.5 h-3.5" />
-                    Traçabilité
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={clearParcelleSelection}
-                    aria-label="Fermer la fiche parcelle"
-                    className="p-1.5 rounded-lg hover:bg-white/[0.08] transition-colors text-[var(--color-adaline-ink)]/40 hover:text-[var(--color-adaline-ink)]/60"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {!selectedParcelle.parentId && (
-                <button
-                  onClick={() => { startDrawingSubParcelle(selectedParcelle); clearParcelleSelection(); }}
-                  className="w-full mb-5 glass-button py-2.5 flex items-center justify-center gap-2 text-xs font-semibold"
-                  style={{ borderColor: `${selectedParcelle.color}55` }}
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                  Dessiner une sous-parcelle
-                </button>
-              )}
-
-              <SectionTitle icon={Wheat} title="Culture" />
-              <div className="space-y-0 mb-5">
-                <DetailRow label="Type de culture" value={cultureTypeLabels[selectedParcelle.cultureType as CultureType] || selectedParcelle.cultureType || "—"} />
-                <DetailRow label="Culture" value={selectedParcelle.cropType || "—"} />
-                <DetailRow label="Variété" value={selectedParcelle.variete || "—"} highlight="amber" />
-                <DetailRow label="Surface" value={formatHectares(selectedParcelle.areaHectares)} highlight="amber" />
-                <DetailRow label="Sol" value={selectedParcelle.soilType || "—"} />
-                <DetailRow label="Irrigation" value={irrigationLabels[selectedParcelle.irrigation] || selectedParcelle.irrigation || "—"} />
-                {selectedParcelle.densitePlantation && (
-                  <DetailRow label="Densité plantation" value={`${selectedParcelle.densitePlantation} ${selectedParcelle.densiteUnit}`} highlight="cyan" />
-                )}
-                {selectedParcelle.dateImplantation && (
-                  <DetailRow label="Date implantation" value={new Date(selectedParcelle.dateImplantation).toLocaleDateString("fr-FR")} />
-                )}
-              </div>
-
-              <SectionTitle icon={MapPin} title="Localisation" />
-              <div className="space-y-0 mb-5">
-                <DetailRow label="Site" value={selectedParcelle.site || "—"} />
-                <DetailRow label="Zone" value={selectedParcelle.zone || "—"} />
-                <DetailRow label="Secteur" value={selectedParcelle.secteur || "—"} />
-                {selectedParcelle.altitude && (
-                  <DetailRow label="Altitude" value={`${selectedParcelle.altitude} m`} />
-                )}
-                {selectedParcelle.parentId && (
-                  <DetailRow label="Parcelle parente" value={
-                    parcelles.find(p => p.id === selectedParcelle.parentId)?.name || "—"
-                  } />
-                )}
-              </div>
-
-              {/* Sous-parcelles selector */}
-              {!selectedParcelle.parentId && selectedParcelle.children && selectedParcelle.children.length > 0 && (
-                <>
-                  <SectionTitle icon={Layers} title={`Sous-parcelles (${selectedParcelle.children.length})`} />
-                  <div className="space-y-1.5 mb-5">
-                    {selectedParcelle.children.map((child: Parcelle) => (
-                      <button
-                        key={`sp-${child.id}`}
-                        onClick={() => selectParcelle(child)}
-                        className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.12] transition-all text-left group"
-                      >
-                        <div
-                          className="w-3.5 h-3.5 rounded shrink-0"
-                          style={{ backgroundColor: child.color || "#6b9e7a", border: `1.5px solid ${child.color || "#6b9e7a"}` }}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <span className="text-xs font-medium text-[var(--color-adaline-ink)]/70 group-hover:text-[var(--color-adaline-ink)]/90 block truncate">{child.name}</span>
-                          <span className="text-[10px] text-[var(--color-adaline-ink)]/40">{child.variete || child.cropType} · {formatHectares(child.areaHectares)}</span>
-                        </div>
-                        <ChevronRight className="w-3.5 h-3.5 text-[var(--color-adaline-ink)]/20 group-hover:text-[var(--color-adaline-ink)]/50 shrink-0 transition-colors" />
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              <SectionTitle icon={Droplets} title="Traitements" />
-              <div className="space-y-0 mb-4">
-                <DetailRow label="Nombre total" value={String(selectedParcelle.treatmentCount ?? 0)} />
-                <DetailRow label="Dernier traitement" value={
-                  selectedParcelle.lastTreatmentDate
-                    ? new Date(selectedParcelle.lastTreatmentDate).toLocaleDateString("fr-FR")
-                    : "Jamais"
-                } />
-              </div>
-
-              {/* Historique CTA */}
-              <button
-                onClick={() => setHistoryOpen(true)}
-                className="w-full mb-3 flex items-center justify-between px-4 py-3 rounded-xl border border-[var(--color-valley-green)]/25 bg-[var(--color-forest-dew)] hover:bg-[var(--green-010)] transition-colors group"
-              >
-                <div className="flex items-center gap-2.5">
-                  <History className="w-4 h-4 text-[var(--color-valley-green)]" />
-                  <span className="text-sm font-semibold text-[var(--color-valley-green)]">Voir l'historique complet</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-[var(--color-valley-green)] bg-[var(--color-valley-green)]/10 px-2 py-0.5 rounded-full">
-                    {treatments.filter((t: any) =>
-                      t.parcelleName === selectedParcelle.name ||
-                      t.parcelleId === selectedParcelle.id ||
-                      t.sousParcelleId === selectedParcelle.id
-                    ).length} traitements
-                  </span>
-                  <ChevronRight className="w-4 h-4 text-[var(--color-valley-green)] group-hover:translate-x-0.5 transition-transform" />
-                </div>
-              </button>
-
-              {/* Filtrer par cette zone CTA */}
-              <button
-                onClick={() => {
-                  setSelectedZoneFilter(selectedParcelle);
-                  setActiveTab("treatments");
-                  setSelectedTreatmentItem(null);
-                }}
-                className="w-full mb-4 flex items-center justify-between px-4 py-3 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] transition-colors group text-left"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Filter className="w-4 h-4 text-[var(--color-adaline-ink)]/50" />
-                  <span className="text-sm font-semibold text-[var(--color-adaline-ink)]/70">Filtrer l'historique de cette zone</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-[var(--color-adaline-ink)]/30 group-hover:translate-x-0.5 transition-transform animate-pulse" />
-              </button>
-
-              {selectedParcelle.observations && (
-                <>
-                  <SectionTitle icon={Info} title="Observations" />
-                  <p className="text-xs text-[var(--color-adaline-ink)]/50 leading-relaxed mb-5">{selectedParcelle.observations}</p>
-                </>
-              )}
-
-              <button
-                onClick={() => setScheduleOpen(true)}
-                className="w-full glass-button py-2.5 text-sm mt-2 flex items-center justify-center gap-2"
-              >
-                <Droplets className="w-4 h-4" />
-                Planifier un traitement
-              </button>
-
-              {/* Edit / Delete actions */}
-              <div className="flex gap-2 mt-3">
-                <button
-                  onClick={() => setEditModal({ open: true, name: selectedParcelle.name, cropType: selectedParcelle.cropType, color: selectedParcelle.color })}
-                  className="flex-1 py-2 text-xs font-medium rounded-xl border border-[var(--color-stone-moss)] bg-white/[0.04] text-[var(--color-adaline-ink)]/60 hover:bg-white/[0.08] hover:text-[var(--color-adaline-ink)]/80 transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <Pencil className="w-3 h-3" />
-                  Modifier
-                </button>
-                <button
-                  onClick={() => setDeleteConfirm(true)}
-                  className="flex-1 py-2 text-xs font-medium rounded-xl border border-[var(--color-valley-green)]/20 bg-[var(--color-valley-green)]/[0.06] text-[var(--color-valley-green)]/70 hover:bg-[var(--color-valley-green)]/[0.12] hover:text-[var(--color-valley-green)] transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <Trash2 className="w-3 h-3" />
-                  Supprimer
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
         </>
         )}
 
@@ -1999,7 +1712,7 @@ function ParcellesPageContent() {
                         <div className="flex flex-col items-center justify-center p-1.5 rounded-lg bg-white/[0.02]">
                           <span className="text-[9px] text-[var(--color-adaline-ink)]/35 uppercase tracking-wider block mb-1">Débit</span>
                           <span className="text-xs font-mono font-bold text-[var(--color-valley-green)]">
-                            {simPosition.speed > 0 ? (12.5 + (simPosition.speed - 8) * 0.4).toFixed(1) : "0.0"} L/min
+                            {simPosition.speed > 0 ? Math.max(0, 12.5 + (simPosition.speed - 8) * 0.4).toFixed(1) : "0.0"} L/min
                           </span>
                         </div>
                       </div>
@@ -2302,7 +2015,20 @@ function ParcellesPageContent() {
                           <span className="text-[10px] font-bold uppercase tracking-wider">
                             {pin.type === "pest" ? "🐛 Ravageur" : pin.type === "irrigation" ? "💧 Irrigation" : pin.type === "weed" ? "🌾 Mauvaises Herbes" : "📌 Autre"}
                           </span>
-                          <span className="text-[9px] text-zinc-500 font-mono">{new Date(pin.createdAt).toLocaleDateString("fr-FR")}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[9px] text-zinc-500 font-mono">{new Date(pin.createdAt).toLocaleDateString("fr-FR")}</span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setGeoPins((prev) => prev.filter((p) => p.id !== pin.id));
+                              }}
+                              className="p-1 rounded-md text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                              title="Supprimer cette note"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
                         </div>
                         <p className="text-xs text-zinc-300 line-clamp-2 leading-relaxed">{pin.note}</p>
                       </div>
@@ -2648,10 +2374,15 @@ function ParcellesPageContent() {
 
             <p className="text-xs text-[var(--color-adaline-ink)]/60 leading-relaxed mb-4">
               {(selectedParcelle.children?.length || 0) > 0
-                ? <>Cette parcelle contient <b className="text-[var(--color-valley-green)]">{selectedParcelle.children?.length} sous-parcelle(s)</b> qui seront aussi supprimées. Cette action est irréversible.</>
+                ? <>Cette parcelle contient <b className="text-red-600">{selectedParcelle.children?.length} sous-parcelle(s)</b> qui seront aussi supprimées. Cette action est irréversible.</>
                 : <>Cette action est irréversible. La parcelle et toutes ses données associées seront supprimées.</>
               }
             </p>
+            {deleteErrorMsg && (
+              <div className="mb-4 px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700">
+                {deleteErrorMsg}
+              </div>
+            )}
 
             <div className="flex gap-2">
               <button
@@ -2666,16 +2397,24 @@ function ParcellesPageContent() {
                   setActionLoading(true);
                   try {
                     await deleteParcelle(selectedParcelle.id);
-                    await refetchParcelles();
+                    setLocalParcelles((prev) =>
+                      prev
+                        .filter((p) => p.id !== selectedParcelle.id)
+                        .map((p) => ({
+                          ...p,
+                          children: (p.children || []).filter((c) => c.id !== selectedParcelle.id),
+                        }))
+                    );
+                    void refetchParcelles?.();
                     setDeleteConfirm(false);
                     clearParcelleSelection();
                   } catch (err) {
-                    alert((err as Error).message);
+                    setDeleteErrorMsg(err instanceof Error ? err.message : "Erreur lors de la suppression");
                   } finally {
                     setActionLoading(false);
                   }
                 }}
-                className="flex-1 py-2.5 text-xs font-semibold rounded-xl bg-[var(--color-valley-green)]/20 border border-[var(--color-valley-green)]/30 text-[var(--color-valley-green)] hover:bg-[var(--color-valley-green)]/30 transition-colors disabled:opacity-40 flex items-center justify-center gap-1.5"
+                className="flex-1 py-2.5 text-xs font-semibold rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-40 flex items-center justify-center gap-1.5"
               >
                 {actionLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
                 Supprimer
@@ -3015,32 +2754,6 @@ function HistoriqueModal({
     </div>
   );
 }
-
-function SectionTitle({ icon: Icon, title }: { icon: typeof Info; title: string }) {
-  return (
-    <div className="flex items-center gap-2 mb-2 pt-3 border-t border-white/[0.08] first:border-t-0 first:pt-0">
-      <Icon className="w-3.5 h-3.5 text-[var(--color-valley-green)]" />
-      <span className="text-[10px] font-semibold text-[var(--color-adaline-ink)]/55 uppercase tracking-wider">{title}</span>
-    </div>
-  );
-}
-
-function DetailRow({ label, value, highlight }: { label: string; value: string; highlight?: "amber" | "cyan" }) {
-  return (
-    <div className="flex items-center justify-between py-1.5 border-b border-white/[0.05] last:border-b-0">
-      <span className="text-[11px] text-[var(--color-adaline-ink)]/55">{label}</span>
-      <span className={cn(
-        "text-[11px] font-medium text-right max-w-[55%]",
-        highlight === "amber" ? "text-[var(--color-valley-green)] font-mono" :
-        highlight === "cyan" ? "text-[var(--color-valley-green)] font-mono" : "text-[var(--color-adaline-ink)]/60"
-      )}>
-        {value}
-      </span>
-    </div>
-  );
-}
-
-
 
 function computeArea(points: [number, number][]): number {
   if (points.length < 3) return 0;

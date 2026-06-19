@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useId } from "react";
+import { useState, useRef, useEffect, useId, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,8 @@ import {
   Leaf,
   Tractor,
   Wheat,
+  BarChart2,
+  Sprout,
 } from "lucide-react";
 import CommandPalette from "./CommandPalette";
 import { useAlertsPanel } from "@/components/alerts/AlertsProvider";
@@ -72,33 +74,45 @@ const ITEM_ICONS: Record<string, React.ElementType> = {
   "/maladies": ScanEye,
   "/meteo": Droplets,
   "/admin": Users,
+  "/resultats": BarChart2,
+  "/recoltes": Sprout,
 };
+
+function deriveInitials(email: string | null): string {
+  if (!email) return "--";
+  const local = email.split("@")[0];
+  const parts = local.split(/[._-]+/).filter(Boolean);
+  return parts.length >= 2
+    ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+    : local.slice(0, 2).toUpperCase();
+}
 
 function useNavGroups(lowStock: number, alerts: number): NavGroup[] {
   const { profile } = useAccess();
-  if (!profile) return [];
-
-  const filtered = filterNavGroups(profile);
-  return filtered.map((group) => ({
-    id: group.id,
-    label: group.label,
-    icon: GROUP_ICONS[group.id] ?? LayoutDashboard,
-    badge:
-      group.id === "operations" && lowStock > 0
-        ? lowStock
-        : group.id === "audit" && alerts > 0
-          ? alerts
-          : undefined,
-    items: group.items.map((item) => ({
-      href: item.href,
-      label: item.label,
-      icon: ITEM_ICONS[item.href] ?? LayoutDashboard,
+  return useMemo(() => {
+    if (!profile) return [];
+    const filtered = filterNavGroups(profile);
+    return filtered.map((group) => ({
+      id: group.id,
+      label: group.label,
+      icon: GROUP_ICONS[group.id] ?? LayoutDashboard,
       badge:
-        item.href === "/stock" && lowStock > 0
+        group.id === "operations" && lowStock > 0
           ? lowStock
-          : undefined,
-    })),
-  }));
+          : group.id === "audit" && alerts > 0
+            ? alerts
+            : undefined,
+      items: group.items.map((item) => ({
+        href: item.href,
+        label: item.label,
+        icon: ITEM_ICONS[item.href] ?? LayoutDashboard,
+        badge:
+          item.href === "/stock" && lowStock > 0
+            ? lowStock
+            : undefined,
+      })),
+    }));
+  }, [profile, lowStock, alerts]);
 }
 
 function formatDockBadge(n: number): string {
@@ -136,7 +150,9 @@ export default function Sidebar({
   const [userOpen, setUserOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [isMac, setIsMac] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const initials = deriveInitials(userEmail);
 
   const shortcutLabel = isMac ? "⌘K" : "Ctrl+K";
   const showAlerts = can("alerts");
@@ -173,7 +189,7 @@ export default function Sidebar({
   }, [hoveredGroupId, mobileOpen, onFlyoutOpenChange]);
 
   useEffect(() => {
-    if (!mobileOpen) return;
+    if (!mobileOpen || navGroups.length === 0) return;
     const current =
       navGroups.find((g) => g.items.some((item) => isActiveHref(item.href))) ?? navGroups[0];
     setHoveredGroupId(current.id);
@@ -189,9 +205,22 @@ export default function Sidebar({
   }, [mobileOpen]);
 
   useEffect(() => {
-    if (typeof navigator !== "undefined") {
-      setIsMac(/Mac|iPod|iPhone|iPad/.test(navigator.platform));
-    }
+    if (typeof navigator === "undefined") return;
+    const platform = (navigator as any).userAgentData?.platform ?? navigator.platform ?? "";
+    setIsMac(/Mac|iPhone|iPad|iPod/i.test(platform));
+  }, []);
+
+  useEffect(() => {
+    const supabase = getSupabaseBrowser();
+    supabase.auth.getSession().then(({ data }: { data: { session: { user?: { email?: string } } | null } }) => {
+      setUserEmail(data.session?.user?.email ?? null);
+    });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -323,7 +352,7 @@ export default function Sidebar({
                 aria-haspopup="menu"
                 onClick={() => setUserOpen((v) => !v)}
               >
-                AK
+                {initials}
               </button>
               {userOpen && (
                 <div className="lf-dock-account-menu card-soft py-2 shadow-lg" role="menu">
@@ -385,6 +414,9 @@ export default function Sidebar({
                       <span className="flex-1">{item.label}</span>
                       {item.badge != null && item.badge > 0 && (
                         <span className="badge">{item.badge}</span>
+                      )}
+                      {item.href === "/treatments" && can("treatments.view") && !can("treatments.plan") && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-sky-100 text-sky-700 border border-sky-200 shrink-0">Lecture</span>
                       )}
                     </Link>
                   );

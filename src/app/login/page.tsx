@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
-import { getSupabaseBrowser } from "@/lib/supabase-browser";
+import { useAccessContext } from "@/components/auth/AccessProvider";
 
 const HERO_IMAGE_SRC =
   "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=2160&q=80";
@@ -19,7 +19,9 @@ export default function LoginPage() {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/dashboard";
+  const { refresh } = useAccessContext();
+  const rawRedirect = searchParams.get("redirect") || "/dashboard";
+  const redirect = rawRedirect.startsWith("/") ? rawRedirect : "/dashboard";
 
   const [email, setEmail] = useState(process.env.NEXT_PUBLIC_DEMO_EMAIL ?? "");
   const [password, setPassword] = useState("");
@@ -29,19 +31,23 @@ function LoginForm() {
 
   const doLogin = async (emailVal: string, passwordVal: string) => {
     setError("");
-    const supabase = getSupabaseBrowser();
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email: emailVal,
-      password: passwordVal,
-    });
-    if (authError) {
-      setError(
-        authError.message === "Invalid login credentials"
-          ? "Email ou mot de passe incorrect"
-          : authError.message
-      );
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email: emailVal, password: passwordVal }),
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        setError(data.error ?? "Connexion impossible");
+        return false;
+      }
+    } catch {
+      setError("Impossible de joindre le serveur. Vérifiez votre connexion.");
       return false;
     }
+    await refresh();
     router.push(redirect);
     router.refresh();
     return true;
@@ -144,6 +150,7 @@ function LoginForm() {
               </button>
             </div>
           </form>
+
         </div>
       </section>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -16,7 +16,6 @@ import {
   canTransition,
   deleteTreatment,
 } from "@/lib/data-provider";
-import { supabase } from "@/lib/supabase";
 import { dbPointsToTrajectory } from "@/lib/trajectory-utils";
 import {
   treatmentTypeLabels,
@@ -39,6 +38,10 @@ import {
 
 import { genererOrdreTraitementPDF } from "@/lib/pdf/ordreTraitement";
 import { genererRegistreMensuelPDF, type RegistreEntry } from "@/lib/pdf/registreMensuel";
+import FeatureGate from "@/components/auth/FeatureGate";
+import { useAccessContext } from "@/components/auth/AccessProvider";
+import { MagasinierPage } from "@/components/magasinier/MagasinierBranch";
+import MagTreatmentsPage from "@/components/magasinier/pages/MagTreatmentsPage";
 
 // ─── Status config ────────────────────────────────────────────────────────────
 
@@ -49,13 +52,13 @@ const STATUS_CONFIG: Record<string, {
   badgeClass: string;
 }> = {
   draft:            { label: "Brouillon",          icon: Circle,       color: "text-[#31200b]",  badgeClass: "badge-neutral"  },
-  pending_approval: { label: "En attente appro.",  icon: Clock,        color: "text-[var(--color-valley-green)]",  badgeClass: "badge-warning"  },
+  pending_approval: { label: "En attente appro.",  icon: Clock,        color: "text-amber-600",                    badgeClass: "badge-warning"  },
   approved:         { label: "Approuvé",           icon: ThumbsUp,     color: "text-[var(--color-valley-green)]",   badgeClass: "badge-info"     },
   planned:          { label: "Planifié",           icon: Calendar,     color: "text-[var(--color-valley-green)]",   badgeClass: "badge-info"     },
   in_progress:      { label: "En cours",           icon: Play,         color: "text-[#203b14]",  badgeClass: "badge-success"  },
   completed:        { label: "Terminé",            icon: CheckCircle,  color: "text-[#203b14]",  badgeClass: "badge-success"  },
   evaluated:        { label: "Évalué",             icon: Star,         color: "text-[var(--color-valley-green)]", badgeClass: "badge-neutral"  },
-  cancelled:        { label: "Annulé",             icon: XCircle,      color: "text-[var(--color-valley-green)]",    badgeClass: "badge-danger"   },
+  cancelled:        { label: "Annulé",             icon: XCircle,      color: "text-red-500",                      badgeClass: "badge-danger"   },
 };
 
 const ALL_STATUSES = ["all", "draft", "pending_approval", "approved", "planned", "in_progress", "completed", "evaluated", "cancelled"] as const;
@@ -74,9 +77,30 @@ const WORKFLOW_ACTIONS: Record<string, { to: string; label: string; icon: React.
   completed:        [{ to: "evaluated",   label: "Évaluer", icon: Star }],
 };
 
+// ─── Magasinier read-only notice ──────────────────────────────────────────────
+
+function MagasinierReadOnlyBanner() {
+  const { can } = useAccessContext();
+  if (can("treatments.plan") || !can("treatments.view")) return null;
+  return (
+    <InlineBanner tone="info">
+      <strong>Lecture seule — préparation produits.</strong>{" "}
+      Vous consultez les traitements pour préparer les produits. La planification reste au directeur d'exploitation.
+    </InlineBanner>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function TreatmentsPage() {
+  const { profile } = useAccessContext();
+  if (profile?.role === "magasinier") {
+    return <MagasinierPage mag={MagTreatmentsPage} />;
+  }
+  return <TreatmentsContent />;
+}
+
+function TreatmentsContent() {
   const searchParams = useSearchParams();
   const { data: treatmentsRaw, loading, refetch } = useTreatments();
   const { data: parcellesRaw } = useParcelles();
@@ -88,7 +112,6 @@ export default function TreatmentsPage() {
   const [editTreatment, setEditTreatment] = useState<Treatment | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const [detailTreatment, setDetailTreatment] = useState<Treatment | null>(null);
   const [filter, setFilter] = useState<FilterStatus>("all");
   const [search, setSearch] = useState("");
   const [selectedTreatment, setSelectedTreatment] = useState<Treatment | null>(null);
@@ -97,6 +120,7 @@ export default function TreatmentsPage() {
   const [loadingTrajectory, setLoadingTrajectory] = useState(false);
   const [transitioning, setTransitioning] = useState<string | null>(null);
   const [exportingPdf, setExportingPdf] = useState(false);
+  const pdfLoadingRef = useRef(false);
   const [completedBanner, setCompletedBanner] = useState<Treatment | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -137,8 +161,10 @@ export default function TreatmentsPage() {
   }, [treatments]);
 
   async function telechargerOrdre(treatmentId: string) {
+    if (pdfLoadingRef.current) return;
     const t = treatments.find(t => t.id === treatmentId);
     if (!t) return;
+    pdfLoadingRef.current = true;
     try {
       // Méthode 1 : utiliser l'API serveur (fiable, charge depuis Supabase directement)
       const res = await fetch(`/api/v1/treatments/${treatmentId}/pdf`);
@@ -211,6 +237,8 @@ export default function TreatmentsPage() {
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Erreur génération PDF:", err);
+    } finally {
+      pdfLoadingRef.current = false;
     }
   }
 
@@ -347,14 +375,18 @@ export default function TreatmentsPage() {
                   {exportingPdf ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
                   Registre FOR.PR6.004
                 </AdalineButton>
-                <AdalineButton variant="primary" onClick={() => setScheduleOpen(true)}>
-                  <Plus className="w-3.5 h-3.5" /> Planifier
-                </AdalineButton>
+                <FeatureGate feature="treatments.plan">
+                  <AdalineButton variant="primary" onClick={() => setScheduleOpen(true)}>
+                    <Plus className="w-3.5 h-3.5" /> Planifier
+                  </AdalineButton>
+                </FeatureGate>
               </>
             }
           />
 
           <div className="space-y-6 max-w-7xl">
+
+          <MagasinierReadOnlyBanner />
 
           {actionError && (
             <InlineBanner tone="error" onDismiss={() => setActionError(null)}>
@@ -440,7 +472,7 @@ export default function TreatmentsPage() {
                     <p className="text-[var(--color-adaline-ink)]/50 font-semibold">Aucun traitement trouvé</p>
                     <p className="text-xs text-[#31200b] mt-1">
                       {filter !== "all" ? "Changez le filtre ou " : ""}
-                      <button onClick={() => setScheduleOpen(true)} className="text-[#203b14] hover:underline">planifiez un traitement</button>
+                      <FeatureGate feature="treatments.plan"><button onClick={() => setScheduleOpen(true)} className="text-[#203b14] hover:underline">planifiez un traitement</button></FeatureGate>
                     </p>
                   </div>
                 </div>
@@ -476,19 +508,21 @@ export default function TreatmentsPage() {
                         <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
                           <button
                             title="Voir le détail"
-                            onClick={() => setDetailTreatment(t)}
+                            onClick={() => setSelectedTreatment(isSelected ? null : t)}
                             className="w-7 h-7 rounded-lg flex items-center justify-center border border-[var(--color-stone-moss)] text-[#31200b] hover:text-[var(--color-valley-green)] hover:border-emerald-400/40 hover:bg-emerald-400/10 transition-all"
                           ><Eye className="w-3.5 h-3.5" /></button>
-                          <button
-                            title="Modifier"
-                            onClick={() => { setEditTreatment(t); setEditOpen(true); }}
-                            className="w-7 h-7 rounded-lg flex items-center justify-center border border-[var(--color-stone-moss)] text-[#31200b] hover:text-[#203b14] hover:border-[#203b14]/40 hover:bg-[#203b14]/10 transition-all"
-                          ><Pencil className="w-3.5 h-3.5" /></button>
-                          <button
-                            title="Supprimer"
-                            onClick={() => setDeleteConfirmId(t.id)}
-                            className="w-7 h-7 rounded-lg flex items-center justify-center border border-[var(--color-stone-moss)] text-[#31200b] hover:text-[var(--color-valley-green)] hover:border-emerald-400/40 hover:bg-emerald-400/10 transition-all"
-                          ><Trash2 className="w-3.5 h-3.5" /></button>
+                          <FeatureGate feature="treatments.plan">
+                            <button
+                              title="Modifier"
+                              onClick={() => { setEditTreatment(t); setEditOpen(true); }}
+                              className="w-7 h-7 rounded-lg flex items-center justify-center border border-[var(--color-stone-moss)] text-[#31200b] hover:text-[#203b14] hover:border-[#203b14]/40 hover:bg-[#203b14]/10 transition-all"
+                            ><Pencil className="w-3.5 h-3.5" /></button>
+                            <button
+                              title="Supprimer"
+                              onClick={() => setDeleteConfirmId(t.id)}
+                              className="w-7 h-7 rounded-lg flex items-center justify-center border border-[var(--color-stone-moss)] text-[#31200b] hover:text-[var(--color-valley-green)] hover:border-emerald-400/40 hover:bg-emerald-400/10 transition-all"
+                            ><Trash2 className="w-3.5 h-3.5" /></button>
+                          </FeatureGate>
                           <ChevronRight className={cn("w-4 h-4 text-[var(--color-adaline-ink)]/30 flex-shrink-0 transition-transform", isSelected && "rotate-90")} />
                         </div>
                       </div>
@@ -545,7 +579,7 @@ export default function TreatmentsPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="text-sm font-black text-[var(--color-adaline-ink)]/90">{selectedTreatment.parcelleName}</h3>
-                      <p className="text-[10px] text-[#31200b] font-mono mt-0.5">{selectedTreatment.id}</p>
+                      <p className="text-[10px] text-[#31200b] font-mono mt-0.5">#{selectedTreatment.id.slice(0, 8).toUpperCase()}</p>
                     </div>
                     {selectedTreatment.status === "completed" && (
                       <button
@@ -748,6 +782,7 @@ export default function TreatmentsPage() {
                   </> ); })(/* end t=selectedTreatment as any */)}
 
                   {/* Workflow actions */}
+                  <FeatureGate feature="treatments.plan">
                   {WORKFLOW_ACTIONS[selectedTreatment.status] && (
                     <div className="pt-3 border-t border-[#e0e5d5] space-y-2">
                       <p className="text-[10px] text-[#31200b] uppercase tracking-widest">Actions</p>
@@ -778,6 +813,7 @@ export default function TreatmentsPage() {
                       })}
                     </div>
                   )}
+                  </FeatureGate>
 
                   {/* Télécharger FOR.PR6.003 */}
                   <div className="pt-3 border-t border-[#e0e5d5]">
@@ -801,6 +837,41 @@ export default function TreatmentsPage() {
         onClose={() => setScheduleOpen(false)}
         onSave={() => refetch?.()}
       />
+      <EditTraitementModal
+        open={editOpen}
+        treatment={editTreatment}
+        onClose={() => { setEditOpen(false); setEditTreatment(null); }}
+        onSaved={async () => { setEditOpen(false); setEditTreatment(null); await refetch?.(); }}
+      />
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setDeleteConfirmId(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center flex-shrink-0">
+                <Trash2 className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-[var(--color-adaline-ink)]/90">Supprimer ce traitement ?</p>
+                <p className="text-xs text-[#31200b] mt-0.5">Cette action est irréversible.</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="flex-1 py-2.5 text-sm rounded-xl border border-[var(--color-stone-moss)] text-[#31200b] hover:bg-[var(--color-stone-moss)]/30 transition-colors"
+              >Annuler</button>
+              <button
+                disabled={deleting}
+                onClick={() => doDelete(deleteConfirmId)}
+                className="flex-1 py-2.5 text-sm font-bold rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {selectedTreatment && (
         <TrajectoryReplayModal
           isOpen={trajectoryOpen}
@@ -887,15 +958,6 @@ function MetaItem({ icon, value, amber }: { icon: React.ReactNode; value: string
     <div className="flex items-center gap-1.5">
       {icon}
       <span className={cn("text-xs truncate", amber ? "text-[var(--color-valley-green)] font-mono" : "text-[#31200b]")}>{value}</span>
-    </div>
-  );
-}
-
-function DetailRow({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
-  return (
-    <div className="flex items-center justify-between py-1.5 border-b border-white/[0.05] last:border-0">
-      <span className="text-xs text-[#31200b]">{label}</span>
-      <span className={cn("text-xs font-semibold", accent ? "text-[#203b14]" : "text-[var(--color-adaline-ink)]/80")}>{value}</span>
     </div>
   );
 }
