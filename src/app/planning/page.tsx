@@ -521,7 +521,9 @@ export default function PlanningPage() {
               <div className="flex flex-col gap-3 text-xs bg-gray-50 p-4 rounded-xl border border-gray-200/50">
                 <div className="flex justify-between">
                   <span className="text-gray-400">Statut:</span>
-                  {getInterventionBadge(selectedPlanning.statut)}
+                  <span className={getInterventionBadge(selectedPlanning.statut)}>
+                    {selectedPlanning.statut}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">ID Parcelle:</span>
