@@ -39,6 +39,10 @@ WHERE id = (SELECT id FROM auth.users WHERE email = 'akram@leadfarm.dz' LIMIT 1)
 -- UPDATE user_profiles SET role = 'magasinier'
 -- WHERE id = (SELECT id FROM auth.users WHERE email = 'akram@leadfarm.dz' LIMIT 1);
 
+-- Agronome (planification phyto, satellite, pas exécution terrain)
+-- UPDATE user_profiles SET role = 'agronome'
+-- WHERE id = (SELECT id FROM auth.users WHERE email = 'akram@leadfarm.dz' LIMIT 1);
+
 -- Opérateur terrain
 -- UPDATE user_profiles SET role = 'operateur'
 -- WHERE id = (SELECT id FROM auth.users WHERE email = 'akram@leadfarm.dz' LIMIT 1);

@@ -4,9 +4,9 @@
     {
       "name": "leadfarm-dev",
       "runtimeExecutable": "cmd",
-      "runtimeArgs": ["/c", "npm", "run", "dev"],
-      "port": 3000,
-      "autoPort": true
+      "runtimeArgs": ["/c", "pnpm", "exec", "next", "dev", "-p", "3001"],
+      "port": 3001,
+      "autoPort": false
     }
   ]
 }
