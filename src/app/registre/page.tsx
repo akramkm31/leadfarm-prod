@@ -7,7 +7,8 @@ import { genererRegistreMensuelPDF, type RegistreEntry } from "@/lib/pdf/registr
 import { cn } from "@/lib/utils";
 import {
   FileDown, Calendar, MapPin, FlaskConical, Clock, CheckCircle,
-  Loader2, ChevronDown, BookOpen, TrendingUp, Layers, Users, Info
+  Loader2, ChevronDown, BookOpen, TrendingUp, Layers, Users, Info, TableIcon,
+  Target, Droplets, Wrench
 } from "lucide-react";
 
 // ── helpers ────────────────────────────────────────────────────────────────────
@@ -91,6 +92,7 @@ export default function RegistrePage() {
   const [selectedYear,  setSelectedYear]  = useState(now.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth()); // 0-based
   const [exporting, setExporting]         = useState(false);
+  const [exportingCsv, setExportingCsv]   = useState(false);
   const [expandedRow, setExpandedRow]     = useState<number | null>(null);
 
   // ── Filter treatments by selected month/year ─────────────────────────────────
@@ -130,6 +132,61 @@ export default function RegistrePage() {
     }
   }
 
+  function exportCSV() {
+    setExportingCsv(true);
+    try {
+      const moisStr = `${MONTHS_FR[selectedMonth]}_${selectedYear}`;
+      const headers = [
+        "Index","Date_Application","Parcelle","Culture","Variete",
+        "EPPO_Code","BBCH_Stage","Cible","Produits","N_Homologation",
+        "DAR_Jours","Date_Recolte_Permise","Volume_Bouillie_L",
+        "Dose","Quantite_Produit","Materiel","Operateur","Statut",
+      ];
+      const rows = filteredTreatments
+        .sort((a, b) => new Date(a.plannedDate).getTime() - new Date(b.plannedDate).getTime())
+        .map((t, i) => {
+          const raw = t as any;
+          const dateExec = t.executedDate || t.plannedDate || "";
+          const darJ: number = raw.dar_jours || 21;
+          const prodList: any[] = raw.produitsDetail?.length ? raw.produitsDetail : (t.products || []);
+          const produitsStr = prodList.map((p: any) => p.nom_commercial || p.productName || "").filter(Boolean).join("|");
+          const authNums = prodList.map((p: any) => p.product_auth_number || "").filter(Boolean).join("|");
+          const dose = prodList[0]?.dose_hl ? `${prodList[0].dose_hl} L/hl` : prodList[0]?.dosePerHectare ? `${prodList[0].dosePerHectare} L/ha` : "";
+          const qteProduit = prodList.map((p: any) => p.quantite_sortir || (p.quantityUsed ? `${p.quantityUsed}` : "")).filter(Boolean).join("|");
+          return [
+            i + 1,
+            dateExec,
+            t.parcelleName || "",
+            raw.culture || "",
+            raw.variete || "",
+            raw.eppo_crop_code || "",
+            raw.bbch_stage || "",
+            raw.cible || "",
+            produitsStr,
+            authNums,
+            darJ,
+            dateExec ? (() => { const d = new Date(dateExec); d.setDate(d.getDate() + darJ); return d.toISOString().slice(0, 10); })() : "",
+            t.volumeBouillie || "",
+            dose,
+            qteProduit,
+            raw.materiel || "",
+            t.operatorName || "",
+            t.status || "",
+          ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
+        });
+      const csv = "﻿" + [headers.join(","), ...rows].join("\r\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `FOR.PR6.004_${moisStr}_EU2023-564.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExportingCsv(false);
+    }
+  }
+
   const years = Array.from({ length: 4 }, (_, i) => now.getFullYear() - i);
 
   return (
@@ -163,14 +220,24 @@ export default function RegistrePage() {
                 </div>
               </div>
 
-              <button
-                onClick={exportPDF}
-                disabled={exporting || allEntries.length === 0}
-                className="flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl font-bold text-xs shadow-[0_4px_12px_rgba(45,90,39,0.12)] hover:shadow-[0_6px_16px_rgba(45,90,39,0.2)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-40 transition-all duration-200 shrink-0 text-white bg-gradient-to-r from-[var(--color-valley-green)] to-emerald-600 disabled:pointer-events-none"
-              >
-                {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
-                Télécharger PDF Officiel
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={exportCSV}
+                  disabled={exportingCsv || allEntries.length === 0}
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-xs border border-[var(--color-valley-green)]/40 text-[var(--color-valley-green)] hover:bg-[var(--color-valley-green)]/5 disabled:opacity-40 transition-all duration-200 disabled:pointer-events-none"
+                >
+                  {exportingCsv ? <Loader2 className="w-4 h-4 animate-spin" /> : <TableIcon className="w-4 h-4" />}
+                  CSV EU 2023/564
+                </button>
+                <button
+                  onClick={exportPDF}
+                  disabled={exporting || allEntries.length === 0}
+                  className="flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl font-bold text-xs shadow-[0_4px_12px_rgba(45,90,39,0.12)] hover:shadow-[0_6px_16px_rgba(45,90,39,0.2)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-40 transition-all duration-200 text-white bg-gradient-to-r from-[var(--color-valley-green)] to-emerald-600 disabled:pointer-events-none"
+                >
+                  {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+                  PDF Officiel
+                </button>
+              </div>
             </div>
           </div>
 
@@ -246,14 +313,14 @@ export default function RegistrePage() {
             ))}
           </div>
 
-          {/* ── CENTRAL DATA REGISTRY TABLE ── */}
+          {/* ── INTERVENTIONS TIMELINE ── */}
           <div className="glass-card overflow-hidden shadow-sm border border-[var(--color-mist-gray)]/60 bg-white/70 backdrop-blur-md">
-            {/* Table Header Bar info */}
+            {/* Header */}
             <div className="px-6 py-4 border-b border-[var(--color-mist-gray)]/50 bg-[var(--color-stone-moss)]/[0.04] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
                 <BookOpen className="w-4 h-4 text-[var(--color-valley-green)]" />
                 <span className="text-xs font-bold text-[var(--color-adaline-ink)]/85">
-                  Interventions Phytosanitaires de {MONTHS_FR[selectedMonth]} {selectedYear}
+                  Interventions Phytosanitaires — {MONTHS_FR[selectedMonth]} {selectedYear}
                 </span>
                 <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-[var(--color-stone-moss)]/40 text-[var(--color-adaline-ink)]/65 font-mono">
                   Campagne {selectedYear - 1}-{selectedYear}
@@ -261,7 +328,7 @@ export default function RegistrePage() {
               </div>
               <div className="flex items-center gap-2 text-[10px] text-[var(--color-adaline-ink)]/40 font-bold uppercase tracking-wider">
                 <Info className="w-3.5 h-3.5" />
-                <span>{allEntries.length} Enregistrement{allEntries.length !== 1 ? "s" : ""}</span>
+                <span>{allEntries.length} enregistrement{allEntries.length !== 1 ? "s" : ""}</span>
               </div>
             </div>
 
@@ -276,160 +343,170 @@ export default function RegistrePage() {
                   <BookOpen className="w-7 h-7 text-zinc-300" />
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--color-adaline-ink)]/70 font-bold">Aucune opération validée ce mois</p>
+                  <p className="text-sm text-[var(--color-adaline-ink)]/70 font-bold">Aucune opération ce mois</p>
                   <p className="text-xs text-[var(--color-adaline-ink)]/40 mt-1 max-w-xs">
-                    Veuillez sélectionner un autre mois ou valider des traitements depuis le registre principal.
+                    Sélectionnez un autre mois ou validez des traitements depuis le registre principal.
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <div className="min-w-[1280px]">
-                  {/* Table Column Header Rows */}
-                  <div className="grid text-[9px] font-bold text-[var(--color-adaline-ink)]/50 uppercase tracking-wider border-b border-[var(--color-mist-gray)]/40 bg-[var(--color-stone-moss)]/[0.02] px-6 py-3.5"
-                    style={{ gridTemplateColumns: "45px 95px 1.25fr 1.25fr 1.25fr 65px 105px 85px 85px 85px 1.25fr 1.25fr 36px" }}>
-                    <span>Index</span>
-                    <span>Date Applic.</span>
-                    <span>Parcelle</span>
-                    <span>Cible Biologique</span>
-                    <span>Produit Phyto.</span>
-                    <span className="text-center">DAR</span>
-                    <span>Harvest Permis</span>
-                    <span>Vol. Bouillie</span>
-                    <span>Dose Appliq.</span>
-                    <span>Qté Produit</span>
-                    <span>Matériel</span>
-                    <span>Opérateur</span>
-                    <span className="text-right" />
-                  </div>
+              <div className="divide-y divide-[var(--color-mist-gray)]/30">
+                {filteredTreatments.map((t, idx) => {
+                  const e = allEntries[idx];
+                  if (!e) return null;
+                  const st = STATUS_STYLE[t.status] || STATUS_STYLE.default;
+                  const isExpanded = expandedRow === idx;
+                  const raw = t as any;
+                  const produits: any[] = raw.produitsDetail?.length
+                    ? raw.produitsDetail
+                    : (t.products || []);
+                  const matchedParcelle = parcelles.find((p: any) =>
+                    p.name === e.parcelle || p.children?.some((c: any) => c.name === e.parcelle)
+                  );
+                  const pColor = matchedParcelle?.color || "#10b981";
 
-                  {/* Table Body Rows */}
-                  {allEntries.map((e, idx) => {
-                    const t = filteredTreatments[idx];
-                    const st = t ? (STATUS_STYLE[t.status] || STATUS_STYLE.default) : STATUS_STYLE.default;
-                    const isExpanded = expandedRow === idx;
+                  return (
+                    <div key={idx} className={cn("transition-colors", isExpanded && "bg-[var(--color-valley-green)]/[0.015]")}>
+                      <div className="flex gap-4 px-6 py-5">
 
-                    // Dynamically resolve parcel background indicator color from data hook
-                    const matchedParcelle = parcelles.find((p: any) => p.name === e.parcelle || p.children?.some((c: any) => c.name === e.parcelle));
-                    const pColor = matchedParcelle?.color || "#10b981";
-
-                    return (
-                      <div key={idx} className={cn("border-b border-[var(--color-mist-gray)]/40 last:border-0", isExpanded && "bg-[var(--color-valley-green)]/[0.015]")}>
-                        {/* Main Grid Row */}
-                        <div
-                          className={cn(
-                            "grid items-center px-6 py-3.5 cursor-pointer transition-all text-xs text-[var(--color-adaline-ink)]/75",
-                            isExpanded ? "bg-[var(--color-valley-green)]/[0.02]" : "hover:bg-[var(--color-valley-green)]/[0.015]"
-                          )}
-                          style={{ gridTemplateColumns: "45px 95px 1.25fr 1.25fr 1.25fr 65px 105px 85px 85px 85px 1.25fr 1.25fr 36px" }}
-                          onClick={() => setExpandedRow(isExpanded ? null : idx)}
-                        >
-                          {/* index */}
-                          <span className="font-mono font-bold text-[var(--color-adaline-ink)]/35 text-[11px]">
+                        {/* Left: number + timeline dot */}
+                        <div className="flex flex-col items-center shrink-0 w-10 pt-1">
+                          <span className="font-mono text-[9px] font-bold text-[var(--color-adaline-ink)]/30 mb-2">
                             {String(e.n).padStart(2, "0")}
                           </span>
+                          <div className={cn("w-3 h-3 rounded-full border-2 border-white shadow-md shrink-0", st.dot)} />
+                          {idx < filteredTreatments.length - 1 && (
+                            <div className="flex-1 w-px mt-2 bg-[var(--color-mist-gray)]/40 min-h-[20px]" />
+                          )}
+                        </div>
 
-                          {/* date */}
-                          <div className="flex items-center gap-1.5">
-                            <Calendar className="w-3.5 h-3.5 text-[var(--color-adaline-ink)]/30 shrink-0" />
-                            <span className="font-mono text-[var(--color-adaline-ink)]/70">{e.date_application}</span>
-                          </div>
+                        {/* Right: card content */}
+                        <div className="flex-1 min-w-0">
 
-                          {/* parcelle label */}
-                          <div className="flex items-center gap-2 pr-2">
-                            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: pColor, boxShadow: `0 0 6px ${pColor}80` }} />
-                            <span className="text-[var(--color-adaline-ink)]/80 font-bold truncate">{e.parcelle}</span>
-                          </div>
-
-                          {/* cible */}
-                          <span className="text-[var(--color-adaline-ink)]/65 truncate pr-2 font-medium">{e.cible}</span>
-
-                          {/* produits */}
-                          <div className="flex items-center gap-1.5 pr-2">
-                            <FlaskConical className="w-3.5 h-3.5 text-[var(--color-valley-green)]/60 shrink-0" />
-                            <span className="text-[var(--color-adaline-ink)]/70 font-semibold truncate">{e.produits}</span>
-                          </div>
-
-                          {/* dar badge */}
-                          <div className="flex justify-center">
-                            <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold tracking-wide w-fit bg-amber-500/10 text-amber-600 border border-amber-500/20">
-                              {e.dar}
+                          {/* Row 1: Parcelle + date + status */}
+                          <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-3 h-3 rounded-full border-2 border-white shadow-sm shrink-0" style={{ background: pColor }} />
+                              <span className="text-sm font-extrabold text-[var(--color-adaline-ink)]/85 truncate">{e.parcelle}</span>
+                              <span className="text-[10px] font-mono text-[var(--color-adaline-ink)]/40 shrink-0">
+                                <Calendar className="w-3 h-3 inline mr-0.5 -mt-0.5" />{e.date_application}
+                              </span>
+                            </div>
+                            <span className={cn("px-2.5 py-0.5 rounded-full text-[9px] font-extrabold border shrink-0", st.text, st.bg, st.border)}>
+                              {st.label}
                             </span>
                           </div>
 
-                          {/* date recolte */}
-                          <span className="text-[var(--color-valley-green)] font-mono font-bold text-[10.5px]">
-                            {e.date_recolte_permise}
-                          </span>
+                          {/* Row 2: Cible */}
+                          {e.cible !== "—" && (
+                            <p className="flex items-center gap-1.5 text-[11px] text-[var(--color-adaline-ink)]/60 mb-3">
+                              <Target className="w-3 h-3 shrink-0 text-red-400" />
+                              <span className="font-semibold text-[var(--color-adaline-ink)]/75">{e.cible}</span>
+                            </p>
+                          )}
 
-                          {/* vol bouillie */}
-                          <span className="font-mono text-[var(--color-adaline-ink)]/60">{e.quantite_melange}</span>
-
-                          {/* dose */}
-                          <span className="font-mono text-[var(--color-adaline-ink)]/60">{e.dose}</span>
-
-                          {/* qte produit */}
-                          <span className="text-[var(--color-adaline-ink)]/70 font-mono font-bold">{e.quantite_produit}</span>
-
-                          {/* materiel */}
-                          <span className="text-[var(--color-adaline-ink)]/60 truncate pr-2">{e.materiel}</span>
-
-                          {/* operateur */}
-                          <div className="flex items-center gap-2">
-                            <div className="w-5 h-5 rounded-full bg-[var(--color-forest-dew)] border border-[var(--color-stone-moss)] flex items-center justify-center shrink-0">
-                              <span className="text-[8px] font-black text-[var(--color-adaline-ink)]/70 uppercase">
-                                {(e.operateurs || "?")[0]}
-                              </span>
+                          {/* Row 3: Product chips */}
+                          {produits.filter(p => p.nom_commercial || p.productName || p.name).length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mb-3">
+                              {produits
+                                .filter(p => p.nom_commercial || p.productName || p.name)
+                                .map((p, pi) => (
+                                  <span key={pi} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[var(--color-valley-green)]/8 text-[var(--color-valley-green)] border border-[var(--color-valley-green)]/20">
+                                    <FlaskConical className="w-2.5 h-2.5 shrink-0" />
+                                    {p.nom_commercial || p.productName || p.name}
+                                    {p.dose_hl && (
+                                      <span className="text-[9px] opacity-60 font-semibold">{p.dose_hl} L/hl</span>
+                                    )}
+                                  </span>
+                                ))}
                             </div>
-                            <span className="text-[var(--color-adaline-ink)]/70 truncate font-medium text-[11px]">{e.operateurs}</span>
+                          )}
+
+                          {/* Row 4: Metric pills */}
+                          <div className="flex flex-wrap gap-2">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                              <Clock className="w-3 h-3" />DAR {e.dar}
+                            </span>
+                            {e.date_recolte_permise !== "—" && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">
+                                <CheckCircle className="w-3 h-3" />Récolte dès le {e.date_recolte_permise}
+                              </span>
+                            )}
+                            {e.quantite_melange !== "—" && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-blue-500/10 text-blue-600 border border-blue-500/20">
+                                <Droplets className="w-3 h-3" />{e.quantite_melange}
+                              </span>
+                            )}
+                            {e.dose !== "—" && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-violet-500/10 text-violet-600 border border-violet-500/20">
+                                {e.dose}
+                              </span>
+                            )}
+                            {e.materiel !== "—" && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                <Wrench className="w-3 h-3" />{e.materiel}
+                              </span>
+                            )}
+                            {e.operateurs !== "—" && (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                <div className="w-4 h-4 rounded-full bg-[var(--color-forest-dew)] border border-[var(--color-stone-moss)] flex items-center justify-center">
+                                  <span className="text-[7px] font-black text-[var(--color-adaline-ink)]/70 uppercase">{(e.operateurs || "?")[0]}</span>
+                                </div>
+                                {e.operateurs}
+                              </span>
+                            )}
                           </div>
 
-                          {/* expand toggle chevron */}
-                          <div className="flex justify-end">
-                            <ChevronDown className={cn("w-4 h-4 text-[var(--color-adaline-ink)]/40 transition-all duration-300", isExpanded && "rotate-180 text-[var(--color-valley-green)]")} />
+                          {/* Expand toggle */}
+                          <button
+                            onClick={() => setExpandedRow(isExpanded ? null : idx)}
+                            className="mt-3 flex items-center gap-1 text-[10px] font-bold text-[var(--color-adaline-ink)]/35 hover:text-[var(--color-valley-green)] transition-colors"
+                          >
+                            <ChevronDown className={cn("w-3 h-3 transition-transform duration-200", isExpanded && "rotate-180")} />
+                            {isExpanded ? "Réduire" : "Détails complets"}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Expanded details */}
+                      {isExpanded && (
+                        <div className="px-8 py-5 border-t border-[var(--color-mist-gray)]/30 bg-[var(--color-stone-moss)]/[0.02]">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                            {[
+                              { label: "Culture",              value: raw.culture },
+                              { label: "Variété",              value: raw.variete },
+                              { label: "Code EPPO",            value: raw.eppo_crop_code },
+                              { label: "Stade BBCH",           value: raw.bbch_stage },
+                              { label: "Mode d'application",   value: raw.mode_application },
+                              { label: "Heure début",          value: raw.heure_debut },
+                              { label: "Heure fin",            value: raw.heure_fin },
+                              { label: "Qté totale utilisée",  value: raw.quantite_utilisee },
+                              { label: "Nb citernes",          value: raw.nb_citernes },
+                              { label: "Bouillon / citerne",   value: raw.bouillon_citerne_l ? `${raw.bouillon_citerne_l} L` : null },
+                              { label: "Délai réentrée",       value: fmtDate(raw.date_reentree) },
+                              { label: "Statut",               value: (
+                                <span className={cn("px-2 py-0.5 text-[9px] font-extrabold rounded-full border inline-block", st.text, st.bg, st.border)}>
+                                  {st.label}
+                                </span>
+                              )},
+                            ].map(({ label, value }) => (
+                              <div key={label} className="bg-white/40 border border-[var(--color-mist-gray)]/40 rounded-xl p-3 flex flex-col gap-1 shadow-sm">
+                                <span className="text-[9px] text-[var(--color-adaline-ink)]/40 font-bold uppercase tracking-wider">{label}</span>
+                                <span className="text-xs text-[var(--color-adaline-ink)]/75 font-bold">{value || "—"}</span>
+                              </div>
+                            ))}
                           </div>
                         </div>
-
-                        {/* Expanded details sheet */}
-                        {isExpanded && t && (
-                          <div className="px-8 py-5 border-t border-[var(--color-mist-gray)]/30 bg-[var(--color-stone-moss)]/[0.02]">
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-                              {[
-                                { label: "Culture en place",     value: (t as any).culture },
-                                { label: "Variété Cultivée",     value: (t as any).variete },
-                                { label: "Méthode d'Application",value: (t as any).mode_application },
-                                { label: "Heure de Début",       value: (t as any).heure_debut },
-                                { label: "Heure de Fin",         value: (t as any).heure_fin },
-                                { label: "Quantité Totale",      value: (t as any).quantite_utilisee },
-                                { label: "Nombre de Citernes",   value: (t as any).nb_citernes },
-                                { label: "Bouillon par Citerne", value: (t as any).bouillon_citerne_l ? `${(t as any).bouillon_citerne_l} Litres` : null },
-                                { label: "Délai de Réentrée",    value: fmtDate((t as any).date_reentree) },
-                                { label: "Statut Opérationnel",  value: (
-                                  <span className={cn("px-2 py-0.5 text-[9px] font-extrabold rounded-full border shrink-0 inline-block w-fit", st.text, st.bg, st.border)}>
-                                    {st.label}
-                                  </span>
-                                )},
-                              ].map(({ label, value }) => (
-                                <div key={label} className="bg-white/40 border border-[var(--color-mist-gray)]/40 rounded-xl p-3 flex flex-col gap-1 shadow-sm">
-                                  <span className="text-[9px] text-[var(--color-adaline-ink)]/40 font-bold uppercase tracking-wider shrink-0">{label}</span>
-                                  <span className="text-xs text-[var(--color-adaline-ink)]/75 font-bold truncate">
-                                    {value || "—"}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
 
-            {/* Signature Visa footer section */}
+            {/* Footer */}
             {allEntries.length > 0 && (
-              <div className="px-6 py-4.5 border-t border-[var(--color-mist-gray)]/50 bg-[var(--color-stone-moss)]/[0.04] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="px-6 py-4 border-t border-[var(--color-mist-gray)]/50 bg-[var(--color-stone-moss)]/[0.04] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-2 text-[10px] font-semibold text-[var(--color-adaline-ink)]/50">
                   <CheckCircle className="w-4 h-4 text-[var(--color-valley-green)]" />
                   <span>Registre mis à jour en temps réel à chaque clôture d&apos;intervention.</span>

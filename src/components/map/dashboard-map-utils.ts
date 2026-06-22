@@ -264,17 +264,26 @@ export function buildHistoryRowsHtml(
 }
 
 export function collectParcelleBounds(parcelles: Parcelle[]): [number, number][] {
+  return collectParcelleBoundsFiltered(parcelles, () => true);
+}
+
+export function collectParcelleBoundsFiltered(
+  parcelles: Parcelle[],
+  includeId: (id: string) => boolean
+): [number, number][] {
   const points: [number, number][] = [];
 
   const visit = (p: Parcelle) => {
-    if (p.boundary?.length) {
-      for (const pt of p.boundary) {
-        if (Array.isArray(pt) && pt.length >= 2) {
-          points.push([Number(pt[0]), Number(pt[1])]);
+    if (includeId(p.id)) {
+      if (p.boundary?.length) {
+        for (const pt of p.boundary) {
+          if (Array.isArray(pt) && pt.length >= 2) {
+            points.push([Number(pt[0]), Number(pt[1])]);
+          }
         }
+      } else if (p.center && Array.isArray(p.center) && p.center.length >= 2) {
+        points.push([Number(p.center[0]), Number(p.center[1])]);
       }
-    } else if (p.center && Array.isArray(p.center) && p.center.length >= 2) {
-      points.push([Number(p.center[0]), Number(p.center[1])]);
     }
     p.children?.forEach(visit);
   };

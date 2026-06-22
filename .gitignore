@@ -55,6 +55,13 @@ next-env.d.ts
 # local dev scratch (DB probes, one-off scripts)
 scratch/
 
-# prisma local db (if used)
-*.db
-*.db-journal
+# ESP32 device secrets (copy from secrets.h.example)
+scripts/esp32-leadfarm/secrets.h
+
+# Playwright
+test-results/
+playwright-report/
+
+# ML models (large binaries — store outside repo)
+models/*.onnx
+models/*.pt

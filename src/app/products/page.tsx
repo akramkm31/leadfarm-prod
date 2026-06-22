@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import AppLayout from "@/components/layout/AppLayout";
+import { useAccessContext } from "@/components/auth/AccessProvider";
+import { MagasinierPage } from "@/components/magasinier/MagasinierBranch";
+import MagProductsPage from "@/components/magasinier/pages/MagProductsPage";
 import { useProducts, useStockLevels } from "@/hooks/useData";
 import {
   categoryLabels,
@@ -36,6 +39,14 @@ import {
 } from "lucide-react";
 
 export default function ProductsPage() {
+  const { profile } = useAccessContext();
+  if (profile?.role === "magasinier") {
+    return <MagasinierPage mag={MagProductsPage} />;
+  }
+  return <ProductsContent />;
+}
+
+function ProductsContent() {
   const { data: productsRaw, loading: productsLoading, refetch } = useProducts();
   const { data: stockLevelsRaw, loading: stockLoading } = useStockLevels();
   const products = useMemo(() => (productsRaw || []) as PhytoProduct[], [productsRaw]);
@@ -111,7 +122,7 @@ export default function ProductsPage() {
   return (
     <AppLayout>
       {/* ── Hero Header ── */}
-      <div className="glass-card p-5 mb-5 relative overflow-hidden">
+      <div className="lf-page-header mb-5 relative overflow-hidden">
         {/* Decorative background accents */}
         <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-[var(--color-valley-green)]/[0.06] blur-3xl pointer-events-none" />
         <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-[var(--color-valley-green)]/[0.05] blur-2xl pointer-events-none" />

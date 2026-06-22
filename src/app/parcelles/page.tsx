@@ -120,6 +120,7 @@ function ParcellesPageContent() {
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [editModal, setEditModal] = useState<{ open: boolean; name: string; cropType: string; color: string }>({ open: false, name: "", cropType: "", color: "" });
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [parcellePendingDelete, setParcellePendingDelete] = useState<Parcelle | null>(null);
   const [deleteErrorMsg, setDeleteErrorMsg] = useState<string | null>(null);
   const [editErrorMsg, setEditErrorMsg] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -161,7 +162,7 @@ function ParcellesPageContent() {
   );
 
   const confirmDeleteParcelle = useCallback((parcelle: Parcelle) => {
-    setSelectedParcelle(parcelle);
+    setParcellePendingDelete(parcelle);
     setDeleteErrorMsg(null);
     setDeleteConfirm(true);
   }, []);
@@ -2364,8 +2365,8 @@ function ParcellesPageContent() {
       )}
 
       {/* ═══ DELETE CONFIRMATION MODAL ═══ */}
-      {deleteConfirm && selectedParcelle && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 " onClick={() => setDeleteConfirm(false)}>
+      {deleteConfirm && parcellePendingDelete && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 " onClick={() => { setDeleteConfirm(false); setParcellePendingDelete(null); setDeleteErrorMsg(null); }}>
           <div className="glass-card w-full max-w-sm mx-4 p-5" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/25 flex items-center justify-center">
@@ -2373,13 +2374,13 @@ function ParcellesPageContent() {
               </div>
               <div>
                 <h3 className="text-sm font-bold text-[var(--color-adaline-ink)]/90">Supprimer la parcelle</h3>
-                <p className="text-[11px] text-[var(--color-adaline-ink)]/40">{selectedParcelle.name}</p>
+                <p className="text-[11px] text-[var(--color-adaline-ink)]/40">{parcellePendingDelete.name}</p>
               </div>
             </div>
 
             <p className="text-xs text-[var(--color-adaline-ink)]/60 leading-relaxed mb-4">
-              {(selectedParcelle.children?.length || 0) > 0
-                ? <>Cette parcelle contient <b className="text-red-600">{selectedParcelle.children?.length} sous-parcelle(s)</b> qui seront aussi supprimées. Cette action est irréversible.</>
+              {(parcellePendingDelete.children?.length || 0) > 0
+                ? <>Cette parcelle contient <b className="text-red-600">{parcellePendingDelete.children?.length} sous-parcelle(s)</b> qui seront aussi supprimées. Cette action est irréversible.</>
                 : <>Cette action est irréversible. La parcelle et toutes ses données associées seront supprimées.</>
               }
             </p>
@@ -2391,7 +2392,7 @@ function ParcellesPageContent() {
 
             <div className="flex gap-2">
               <button
-                onClick={() => setDeleteConfirm(false)}
+                onClick={() => { setDeleteConfirm(false); setParcellePendingDelete(null); setDeleteErrorMsg(null); }}
                 className="flex-1 py-2.5 text-xs font-medium rounded-xl border border-[var(--color-stone-moss)] text-[var(--color-adaline-ink)]/60 hover:bg-white/[0.06] transition-colors"
               >
                 Annuler
@@ -2399,20 +2400,26 @@ function ParcellesPageContent() {
               <button
                 disabled={actionLoading}
                 onClick={async () => {
+                  const target = parcellePendingDelete;
+                  if (!target) return;
                   setActionLoading(true);
                   try {
-                    await deleteParcelle(selectedParcelle.id);
+                    await deleteParcelle(target.id);
+                    setDeleteConfirm(false);
+                    setParcellePendingDelete(null);
+                    setDeleteErrorMsg(null);
                     setLocalParcelles((prev) =>
                       prev
-                        .filter((p) => p.id !== selectedParcelle.id)
+                        .filter((p) => p.id !== target.id)
                         .map((p) => ({
                           ...p,
-                          children: (p.children || []).filter((c) => c.id !== selectedParcelle.id),
+                          children: (p.children || []).filter((c) => c.id !== target.id),
                         }))
                     );
-                    void refetchParcelles?.();
-                    setDeleteConfirm(false);
-                    clearParcelleSelection();
+                    if (selectedParcelle?.id === target.id) {
+                      clearParcelleSelection();
+                    }
+                    await refetchParcelles?.();
                   } catch (err) {
                     setDeleteErrorMsg(err instanceof Error ? err.message : "Erreur lors de la suppression");
                   } finally {

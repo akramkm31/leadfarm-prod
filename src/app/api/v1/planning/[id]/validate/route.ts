@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from "@/lib/api-helpers";
+import { withAuthRbac } from "@/lib/api-helpers";
 import { createServerClient } from "@/lib/supabase/server";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> | { id: string } }) {
-  const auth = await withAuth(req);
+  const auth = await withAuthRbac(req);
   if (auth.error) return auth.error;
 
   const resolvedParams = await params;

@@ -3,6 +3,7 @@
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_CONFIGURED } from "@/lib/data-provider";
+import { allowMcdMockData } from "@/lib/dev-demo";
 import * as mock from "./mock-data";
 import type {
   Apprentissage,
@@ -28,11 +29,15 @@ async function fromTable<T>(
   fallback: T[],
   order?: { column: string; ascending?: boolean }
 ): Promise<T[]> {
-  if (!supabase || !SUPABASE_CONFIGURED) return fallback;
+  if (!supabase || !SUPABASE_CONFIGURED) return allowMcdMockData() ? fallback : [];
   let q = supabase.from(table).select("*");
   if (order) q = q.order(order.column, { ascending: order.ascending ?? false });
   const { data, error } = await q;
-  if (error || !data?.length) return fallback;
+  if (error) {
+    console.warn(`[mcd] ${table}:`, error.message);
+    return allowMcdMockData() ? fallback : [];
+  }
+  if (!data?.length) return allowMcdMockData() ? fallback : [];
   return data as T[];
 }
 
@@ -50,29 +55,28 @@ export async function fetchDonneesMeteo(
   exploitationId?: string
 ): Promise<DonneesMeteo[]> {
   if (!supabase || !SUPABASE_CONFIGURED) {
-    return exploitationId
-      ? mock.MOCK_METEO.filter((m) => m.exploitation_id === exploitationId)
-      : mock.MOCK_METEO;
+    return allowMcdMockData()
+      ? (exploitationId
+          ? mock.MOCK_METEO.filter((m) => m.exploitation_id === exploitationId)
+          : mock.MOCK_METEO)
+      : [];
   }
   let q = supabase.from("donnees_meteo").select("*").order("date_mesure", { ascending: false }).limit(60);
   if (exploitationId) q = q.eq("exploitation_id", exploitationId);
   const { data, error } = await q;
-  if (error || !data?.length) return mock.MOCK_METEO;
+  if (error) {
+    console.warn("[mcd] donnees_meteo:", error.message);
+    return allowMcdMockData() ? mock.MOCK_METEO : [];
+  }
+  if (!data?.length) return allowMcdMockData() ? mock.MOCK_METEO : [];
   return data as DonneesMeteo[];
 }
 
 export async function fetchDonneesSatellite(supabase: SupabaseClient | null): Promise<DonneesSatellite[]> {
-  if (!supabase || !SUPABASE_CONFIGURED) return mock.MOCK_SATELLITE;
-  const { data, error } = await supabase
-    .from("donnees_satellite")
-    .select("*, parcelles(name)")
-    .order("date_acquisition", { ascending: false })
-    .limit(100);
-  if (error || !data?.length) return mock.MOCK_SATELLITE;
-  return (data as Record<string, unknown>[]).map((r) => ({
-    ...(r as DonneesSatellite),
-    parcelle_name: (r.parcelles as { name?: string } | null)?.name,
-  }));
+  const { rows } = await import("@/lib/satellite/repository").then((m) =>
+    m.fetchDonneesSatellite(supabase)
+  );
+  return rows;
 }
 
 export async function fetchMaladies(supabase: SupabaseClient | null): Promise<Maladie[]> {
@@ -80,13 +84,13 @@ export async function fetchMaladies(supabase: SupabaseClient | null): Promise<Ma
 }
 
 export async function fetchEvenementsMaladie(supabase: SupabaseClient | null): Promise<EvenementMaladie[]> {
-  if (!supabase || !SUPABASE_CONFIGURED) return mock.MOCK_EVENEMENTS_MALADIE;
+  if (!supabase || !SUPABASE_CONFIGURED) return allowMcdMockData() ? mock.MOCK_EVENEMENTS_MALADIE : [];
   const { data, error } = await supabase
     .from("evenements_maladie")
     .select("*, maladies(nom), parcelles(name)")
     .order("date_observation", { ascending: false })
     .limit(100);
-  if (error || !data?.length) return mock.MOCK_EVENEMENTS_MALADIE;
+  if (error || !data?.length) return allowMcdMockData() ? mock.MOCK_EVENEMENTS_MALADIE : [];
   return (data as Record<string, unknown>[]).map((r) => ({
     id: r.id as string,
     maladie_id: r.maladie_id as string,
@@ -96,14 +100,14 @@ export async function fetchEvenementsMaladie(supabase: SupabaseClient | null): P
     notes: r.notes as string | null,
     source: r.source as string,
     maladie_nom: (r.maladies as { nom?: string })?.nom,
-    parcelle_name: (r.parcelles as { name?: string })?.name,
+    parcelle_name: (r.parcelles as { nom?: string })?.nom,
   }));
 }
 
 export async function fetchProtocoles(supabase: SupabaseClient | null): Promise<Protocole[]> {
-  if (!supabase || !SUPABASE_CONFIGURED) return mock.MOCK_PROTOCOLES;
+  if (!supabase || !SUPABASE_CONFIGURED) return allowMcdMockData() ? mock.MOCK_PROTOCOLES : [];
   const { data, error } = await supabase.from("protocoles").select("*").order("nom");
-  if (error || !data?.length) return mock.MOCK_PROTOCOLES;
+  if (error || !data?.length) return allowMcdMockData() ? mock.MOCK_PROTOCOLES : [];
   const protocoles = data as Protocole[];
   const { data: etapes } = await supabase.from("etapes_protocole").select("*").order("ordre");
   const byProt = new Map<string, NonNullable<Protocole["etapes"]>>();
@@ -116,12 +120,12 @@ export async function fetchProtocoles(supabase: SupabaseClient | null): Promise<
 }
 
 export async function fetchRecoltes(supabase: SupabaseClient | null): Promise<Recolte[]> {
-  if (!supabase || !SUPABASE_CONFIGURED) return mock.MOCK_RECOLTES;
+  if (!supabase || !SUPABASE_CONFIGURED) return allowMcdMockData() ? mock.MOCK_RECOLTES : [];
   const { data, error } = await supabase
     .from("recoltes")
     .select("*, parcelles(name), campagnes(nom)")
     .order("date_recolte", { ascending: false });
-  if (error || !data?.length) return mock.MOCK_RECOLTES;
+  if (error || !data?.length) return allowMcdMockData() ? mock.MOCK_RECOLTES : [];
   return (data as Record<string, unknown>[]).map((r) => ({
     id: r.id as string,
     parcelle_id: r.parcelle_id as string,
@@ -140,12 +144,12 @@ export async function fetchRevenus(supabase: SupabaseClient | null): Promise<Rev
 }
 
 export async function fetchResultats(supabase: SupabaseClient | null): Promise<Resultat[]> {
-  if (!supabase || !SUPABASE_CONFIGURED) return mock.MOCK_RESULTATS;
+  if (!supabase || !SUPABASE_CONFIGURED) return allowMcdMockData() ? mock.MOCK_RESULTATS : [];
   const { data, error } = await supabase
     .from("resultats")
     .select("*, parcelles(name)")
     .order("date_evaluation", { ascending: false });
-  if (error || !data?.length) return mock.MOCK_RESULTATS;
+  if (error || !data?.length) return allowMcdMockData() ? mock.MOCK_RESULTATS : [];
   return (data as Record<string, unknown>[]).map((r) => ({
     ...(r as Resultat),
     parcelle_name: (r.parcelles as { name?: string })?.name,
@@ -165,10 +169,9 @@ export async function fetchApprentissages(supabase: SupabaseClient | null): Prom
 }
 
 export async function fetchPnlCampagnes(supabase: SupabaseClient | null): Promise<PnlCampagne[]> {
-  if (!supabase || !SUPABASE_CONFIGURED) return mock.MOCK_PNL;
-
+  if (!supabase || !SUPABASE_CONFIGURED) return allowMcdMockData() ? mock.MOCK_PNL : [];
   const { data: campagnes } = await supabase.from("campagnes").select("id, nom");
-  if (!campagnes?.length) return mock.MOCK_PNL;
+  if (!campagnes?.length) return allowMcdMockData() ? mock.MOCK_PNL : [];
 
   const pnl: PnlCampagne[] = [];
   for (const c of campagnes as { id: string; nom: string }[]) {
@@ -180,7 +183,8 @@ export async function fetchPnlCampagnes(supabase: SupabaseClient | null): Promis
       .eq("campagne_id", c.id);
     const { count: trtCount } = await supabase
       .from("treatments")
-      .select("*", { count: "exact", head: true });
+      .select("*", { count: "exact", head: true })
+      .eq("campagne_id", c.id);
 
     const revenus_dzd = (rev || []).reduce((s, r) => s + Number((r as { montant_dzd: number }).montant_dzd), 0);
     const depenses_dzd = (dep || []).reduce((s, d) => s + Number((d as { montant_dzd: number }).montant_dzd), 0);
@@ -194,13 +198,13 @@ export async function fetchPnlCampagnes(supabase: SupabaseClient | null): Promis
       nb_traitements: trtCount ?? 0,
     });
   }
-  return pnl.length ? pnl : mock.MOCK_PNL;
+  return pnl.length ? pnl : (allowMcdMockData() ? mock.MOCK_PNL : []);
 }
 
 export async function fetchTenantUsers(supabase: SupabaseClient | null): Promise<TenantUser[]> {
-  if (!supabase || !SUPABASE_CONFIGURED) return mock.MOCK_TENANT_USERS;
+  if (!supabase || !SUPABASE_CONFIGURED) return allowMcdMockData() ? mock.MOCK_TENANT_USERS : [];
   const { data, error } = await supabase.from("user_profiles").select("id, role, exploitation_id, full_name");
-  if (error || !data?.length) return mock.MOCK_TENANT_USERS;
+  if (error || !data?.length) return allowMcdMockData() ? mock.MOCK_TENANT_USERS : [];
   return (data as Record<string, unknown>[]).map((u) => ({
     id: u.id as string,
     email: "",

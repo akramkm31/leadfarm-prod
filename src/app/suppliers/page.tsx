@@ -2,6 +2,9 @@
 
 import { useState, useCallback, useMemo } from "react";
 import AppLayout from "@/components/layout/AppLayout";
+import { useAccessContext } from "@/components/auth/AccessProvider";
+import { MagasinierPage } from "@/components/magasinier/MagasinierBranch";
+import MagSuppliersPage from "@/components/magasinier/pages/MagSuppliersPage";
 import { useSuppliers, useProducts, useMovements } from "@/hooks/useData";
 import { insertSupplier, updateSupplier } from "@/lib/data-provider";
 import { useInlineEdit } from "@/hooks/useInlineEdit";
@@ -37,7 +40,15 @@ const supplierTypeColors: Record<string, string> = {
 };
 
 export default function SuppliersPage() {
-  const { data: suppliersRaw, loading: suppliersLoading } = useSuppliers();
+  const { profile } = useAccessContext();
+  if (profile?.role === "magasinier") {
+    return <MagasinierPage mag={MagSuppliersPage} />;
+  }
+  return <SuppliersContent />;
+}
+
+function SuppliersContent() {
+  const { data: suppliersRaw, loading: suppliersLoading, refetch: refetchSuppliers } = useSuppliers();
   const { data: productsRaw, loading: productsLoading } = useProducts();
   const { data: movementsRaw, loading: movementsLoading } = useMovements();
   const suppliers = (suppliersRaw || []) as Supplier[];
@@ -59,7 +70,6 @@ export default function SuppliersPage() {
   }), [suppliers, products, stockEntries]);
 
   const totalDeliveries = useMemo(() => supplierStats.reduce((a: number, s: any) => a + (s.totalDeliveries ?? s.entryCount ?? 0), 0), [supplierStats]);
-  const totalValue = useMemo(() => suppliers.reduce((a: number, s: Supplier) => a + (s.totalValueDZD ?? 0), 0), [suppliers]);
   const selected = useMemo(() => selectedSupplier ? supplierStats.find((s: any) => s.id === selectedSupplier) : null, [selectedSupplier, supplierStats]);
 
   const supplierColMap = useMemo<Record<string, { dbCol: string; type: "text" | "number" | "date" }>>(() => ({
@@ -86,7 +96,7 @@ export default function SuppliersPage() {
   return (
     <AppLayout>
       {/* ── Hero Header ── */}
-      <div className="glass-card p-5 mb-5 relative overflow-hidden">
+      <div className="lf-page-header mb-5 relative overflow-hidden">
         {/* Decorative background accents */}
         <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-[var(--color-valley-green)]/[0.06] blur-3xl pointer-events-none" />
         <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-[var(--color-valley-green)]/[0.05] blur-2xl pointer-events-none" />
@@ -388,7 +398,7 @@ export default function SuppliersPage() {
       <div className="h-8" />
 
       {showAddModal && (
-        <AddSupplierModal onClose={() => setShowAddModal(false)} onSaved={() => { setShowAddModal(false); window.location.reload(); }} />
+        <AddSupplierModal onClose={() => setShowAddModal(false)} onSaved={() => { setShowAddModal(false); void refetchSuppliers(); }} />
       )}
     </AppLayout>
   );

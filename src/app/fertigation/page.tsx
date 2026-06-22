@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { supabase } from "@/lib/supabase";
 import { useParcelles } from "@/hooks/useData";
@@ -54,47 +54,39 @@ export default function FertigationPage() {
 
   const [history, setHistory] = useState<FertigationRecord[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [historyError, setHistoryError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [search, setSearch] = useState("");
 
   // Formulaire
   const [selectedParcelleId, setSelectedParcelleId] = useState("");
   const [nFertigation, setNFertigation] = useState("");
-  const [modeApp, setModeApp] = useState("Irrigation goutte-�-goutte");
+  const [modeApp, setModeApp] = useState("Irrigation goutte-à-goutte");
   const [materiel, setMateriel] = useState("Pompe doseuse + injecteur Venturi");
   const [pression, setPression] = useState(3);
   const [produits, setProduits] = useState<ProduitFertigation[]>([]);
   const [visa, setVisa] = useState("");
 
-  // Charger l'historique
-  useState(() => {
-    async function load() {
-      setLoadingHistory(true);
-      try {
-        const { data } = await supabase
-          .from("fertigations")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(20);
-        if (data) {
-          setHistory(data.map((r: any) => ({
-            id: r.id,
-            n_fertigation: r.n_fertigation,
-            parcelle_nom: r.parcelles?.nom || "",
-            culture: r.parcelles?.culture_actuelle || "",
-            date_fertigation: r.date_fertigation,
-            mode_application: r.mode_application || "",
-            produits: r.produits || [],
-            visa_responsable: r.visa_responsable,
-            created_at: r.created_at,
-          })));
-        }
-      } catch { /* silencieux */ }
+  const loadHistory = useCallback(async () => {
+    setLoadingHistory(true);
+    setHistoryError("");
+    try {
+      const res = await fetch("/api/v1/fertigations", { credentials: "include" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Erreur de chargement");
+      setHistory(json.data || []);
+    } catch (e) {
+      setHistoryError(e instanceof Error ? e.message : "Impossible de charger l'historique des fertigations.");
+    } finally {
       setLoadingHistory(false);
     }
-    load();
-  });
+  }, []);
+
+  useEffect(() => {
+    void loadHistory();
+  }, [loadHistory]);
 
   const selectedParcelle = parcelles.find((p) => p.id === selectedParcelleId);
 
@@ -148,6 +140,7 @@ export default function FertigationPage() {
   async function genererPDF() {
     if (!selectedParcelle) return;
     setGenerating(true);
+    setSaveError("");
     try {
       const num = nFertigation || genererNumero();
       const pdfBlob = await genererOrdreFertigationPDF({
@@ -168,26 +161,33 @@ export default function FertigationPage() {
 
       // Upload PDF
       const filename = `FOR.PR5.003_${num}.pdf`;
+      let pdfUrl: string | null = null;
       const { error: uploadError } = await supabase.storage
         .from("documents")
         .upload(filename, pdfBlob, { upsert: true });
 
-      if (uploadError) console.error("Upload error:", uploadError);
+      if (!uploadError) pdfUrl = filename;
+      else console.error("Upload error:", uploadError);
 
-      // Sauvegarder en base
-      await supabase.from("fertigations").insert({
-        n_fertigation: num,
-        parcelle_id: selectedParcelleId,
-        date_fertigation: new Date().toISOString().split("T")[0],
-        mode_application: modeApp,
-        materiel,
-        pression_bar: pression,
-        produits,
-        visa_responsable: visa || null,
-        pdf_url: uploadError ? null : filename,
+      const saveRes = await fetch("/api/v1/fertigations", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          parcelleId: selectedParcelleId,
+          nFertigation: num,
+          modeApplication: modeApp,
+          materiel,
+          pressionBar: pression,
+          produits,
+          visaResponsable: visa || undefined,
+          pdfUrl,
+        }),
       });
+      const saveJson = await saveRes.json();
+      if (!saveRes.ok) throw new Error(saveJson.error || "Enregistrement échoué");
 
-      // T�l�charger le PDF
+      // Télécharger le PDF
       const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement("a");
       a.href = url;
@@ -197,8 +197,10 @@ export default function FertigationPage() {
 
       setShowForm(false);
       resetForm();
+      await loadHistory();
     } catch (err) {
-      console.error("Erreur g�n�ration PDF:", err);
+      console.error("Erreur génération PDF:", err);
+      setSaveError("Échec de l'enregistrement de l'ordre. Vérifiez les champs et réessayez.");
     } finally {
       setGenerating(false);
     }
@@ -207,7 +209,7 @@ export default function FertigationPage() {
   function resetForm() {
     setSelectedParcelleId("");
     setNFertigation("");
-    setModeApp("Irrigation goutte-�-goutte");
+    setModeApp("Irrigation goutte-à-goutte");
     setMateriel("Pompe doseuse + injecteur Venturi");
     setPression(3);
     setProduits([]);
@@ -224,7 +226,7 @@ export default function FertigationPage() {
     <AppLayout>
       <div className="space-y-6">
         {/* Hero */}
-        <div className="glass-card p-5 relative overflow-hidden">
+        <div className="lf-page-header relative overflow-hidden">
           <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-[var(--color-valley-green)]/[0.06] blur-3xl pointer-events-none" />
           <div className="relative flex items-start justify-between gap-4">
             <div className="flex items-start gap-4">
@@ -296,6 +298,12 @@ export default function FertigationPage() {
               </button>
             </div>
 
+            {saveError && (
+              <div className="px-4 py-2.5 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
+                {saveError}
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="text-xs text-[var(--color-adaline-ink)]/50 block mb-1.5">N� Fertigation</label>
@@ -329,9 +337,9 @@ export default function FertigationPage() {
                   value={modeApp}
                   onChange={(e) => setModeApp(e.target.value)}
                 >
-                  <option>Irrigation goutte-�-goutte</option>
-                  <option>Irrigation localis�e</option>
-                  <option>Pulv�risation foliaire</option>
+                  <option>Irrigation goutte-à-goutte</option>
+                  <option>Irrigation localisée</option>
+                  <option>Pulvérisation foliaire</option>
                   <option>Fertirrigation</option>
                   <option>Hydroponie</option>
                 </select>
@@ -478,8 +486,18 @@ export default function FertigationPage() {
             <div className="flex items-center justify-center py-8">
               <Loader2 className="w-5 h-5 text-[var(--color-valley-green)] animate-spin" />
             </div>
+          ) : historyError ? (
+            <div className="flex flex-col items-center gap-3 py-8">
+              <p className="text-sm text-red-600">{historyError}</p>
+              <button
+                onClick={() => void loadHistory()}
+                className="px-4 py-2 text-xs font-semibold rounded-lg bg-[var(--color-valley-green)]/15 text-[var(--color-valley-green)] hover:bg-[var(--color-valley-green)]/25"
+              >
+                Réessayer
+              </button>
+            </div>
           ) : filteredHistory.length === 0 ? (
-            <p className="text-sm text-[var(--color-adaline-ink)]/40 italic text-center py-8">Aucun ordre de fertigation trouv�.</p>
+            <p className="text-sm text-[var(--color-adaline-ink)]/40 italic text-center py-8">Aucun ordre de fertigation trouvé.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="glass-table">

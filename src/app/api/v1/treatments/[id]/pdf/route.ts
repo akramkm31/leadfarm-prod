@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withAuthRbac, requireFeature } from "@/lib/api-helpers";
 import { CANONICAL_PARCELLE_TABLE } from "@/lib/parcelles/constants";
 import { genererOrdreTraitementPDF } from "@/lib/pdf/ordreTraitement";
+import { upsertTraceVerification, verifyPublicUrl } from "@/lib/trace/verification";
 
 export async function GET(
   req: NextRequest,
@@ -144,15 +145,37 @@ export async function GET(
       signe: ["completed", "evaluated", "approved", "terminé", "planifie"].includes(treatment.status),
     });
 
-    // 5. Audit log
+    // 5. Certificat traçabilité public
+    const traceHash = await upsertTraceVerification({
+      treatmentId: id,
+      siteName: parcelleNom,
+      status: treatment.status,
+      plannedDate: treatment.planned_date,
+      executedDate: treatment.executed_date ?? (pick("date_reelle", "date_reelle", null) as string),
+      culture: String(pick("culture", "culture")),
+      cible: String(pick("cible", "cible")),
+      products: produits.map((p: { nom_commercial: string; quantite_sortir: string }) => ({
+        name: p.nom_commercial,
+        quantity: p.quantite_sortir ? parseFloat(p.quantite_sortir) : null,
+        unit: "L",
+      })),
+      exploitationId: treatment.exploitation_id,
+    });
+
+    // 6. Audit log
     await supabase.from("audit_log").insert({
       table_name: "treatments",
       record_id: id,
       action: "PDF_GENERATED",
-      new_data: { generated_at: new Date().toISOString(), format: "FOR.PR6.003" },
+      new_data: {
+        generated_at: new Date().toISOString(),
+        format: "FOR.PR6.003",
+        trace_hash: traceHash,
+        verify_url: verifyPublicUrl(traceHash, req.nextUrl.origin),
+      },
     }).then(() => {});
 
-    // 6. Retourner le PDF
+    // 7. Retourner le PDF
     const pdfBuffer = Buffer.from(await pdfBlob.arrayBuffer());
 
     return new NextResponse(pdfBuffer, {

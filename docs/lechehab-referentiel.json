@@ -1,0 +1,3075 @@
+{
+  "generatedFrom": {
+    "resteStock": "RESTE_EN_STOCK 11.06.2026.xlsx",
+    "entrees": "Liste_des_Entrées des_Produits_Phytosanitaires_et_Les_Engrais_SBA_2026 2.5.26.xlsx",
+    "besoins": "RESTE DES BESOINS 2026 SBA.xlsx",
+    "fertigation": "PLANIFICATION ENGRAIS FERTIGATION TENIRA POMMIER.xlsx",
+    "stock2026": "GESTION DU STOCK SBA 2026.xlsx",
+    "stock2025": "GESTION DU STOCK SBA 2025 (1).xlsx"
+  },
+  "topCategories": [
+    "AUTRE",
+    "ENGRAIS",
+    "FONGICIDE",
+    "HERBICIDE",
+    "INSECTICIDE"
+  ],
+  "canonicalCategories": [
+    "FONGICIDE",
+    "HERBICIDE",
+    "INSECTICIDE",
+    "ENGRAIS",
+    "FER",
+    "ACIDE",
+    "DORMANCE",
+    "HORMONE",
+    "AUTRE"
+  ],
+  "subcategories": [
+    "AA",
+    "AC",
+    "ACIDIFIANT",
+    "AH",
+    "ALGUES",
+    "AN",
+    "ANTI SALINITE",
+    "AP",
+    "AS",
+    "B",
+    "B + ZN",
+    "CA",
+    "CU",
+    "GEL",
+    "K",
+    "MASTIQUE",
+    "MG",
+    "MN",
+    "MO",
+    "N",
+    "NOUVAU",
+    "OE",
+    "P",
+    "SAVON",
+    "SOUFRE",
+    "TALC",
+    "ZN",
+    "ZN + MN"
+  ],
+  "units": [
+    "KG",
+    "L"
+  ],
+  "cultures": [
+    "A NOYAU",
+    "A PEPINS POMMIER POIRIER",
+    "NOYAU",
+    "POMMIER",
+    "VIGNE"
+  ],
+  "activeIngredients": [
+    {
+      "name": "75 g/L méfentrifluconazole"
+    },
+    {
+      "name": "Abamectine 18 g/l"
+    },
+    {
+      "name": "Acequinocyl"
+    },
+    {
+      "name": "Acétamepride SL 200 g/l"
+    },
+    {
+      "name": "Acrinathrine 75 g/l"
+    },
+    {
+      "name": "Alpha-Cyperméthrine 100 g/l"
+    },
+    {
+      "name": "Bifénazate 240 g/l"
+    },
+    {
+      "name": "Bifenthrine"
+    },
+    {
+      "name": "Boscalid 200 g/l, Krésoxim-Methyl 100 g/l"
+    },
+    {
+      "name": "Boscalid 252 g/kg, Pyraclostrobine 128 g/kg"
+    },
+    {
+      "name": "Captan 50% WP"
+    },
+    {
+      "name": "Captan 80% WG"
+    },
+    {
+      "name": "Chlorpyriphos 2%"
+    },
+    {
+      "name": "Chlorpyriphos 480g/l"
+    },
+    {
+      "name": "CLOFENTEZINE+ BIFENTHRINE"
+    },
+    {
+      "name": "Cuivre 4,5%"
+    },
+    {
+      "name": "Cyantraniliprole"
+    },
+    {
+      "name": "Cycloxydine"
+    },
+    {
+      "name": "Cymoxanil 2,85% w/w + Fosetyl Aluminum 30% w/w + Cuivre 16% w/w"
+    },
+    {
+      "name": "Cyprodinil 37,5 %, Fludioxonil 25 %"
+    },
+    {
+      "name": "Cyprodinil 50%"
+    },
+    {
+      "name": "Deltamethrine 25g/l"
+    },
+    {
+      "name": "Difenoconazole 125 g/l, Azoxystrobine 200 g/l"
+    },
+    {
+      "name": "Difénoconazole 250 g/l"
+    },
+    {
+      "name": "Difenoconazole, Azoxystrobine"
+    },
+    {
+      "name": "Dimethomorphe 150 g/kg, Dithianon 350 g/kg"
+    },
+    {
+      "name": "Dimethomorphe 60 g/kg, cuivre 400 g/kg"
+    },
+    {
+      "name": "Dimethomorphe 72 g/l, Pyraclotrobine 40 g/l"
+    },
+    {
+      "name": "Dimétoate"
+    },
+    {
+      "name": "Dithianon 500 g/l"
+    },
+    {
+      "name": "Dithianon 70%"
+    },
+    {
+      "name": "Dodine 400 g/l"
+    },
+    {
+      "name": "Emamectin Benzoate 50 g/l"
+    },
+    {
+      "name": "Etofenprox 287,5 g/l"
+    },
+    {
+      "name": "Fenhexamid 500 g/kg"
+    },
+    {
+      "name": "Fenoxycarbe 25 %"
+    },
+    {
+      "name": "Fenpyroximate 5%"
+    },
+    {
+      "name": "FLUAZIFOP-P-BUTYL"
+    },
+    {
+      "name": "Fluazinam 500g/l"
+    },
+    {
+      "name": "Flupyradifurone 200 g/l"
+    },
+    {
+      "name": "Fo Métalaxyl-M 5%, Folpel 40 %"
+    },
+    {
+      "name": "Fosetyl Aluminium 500 g/kg, Folpel 250 g/kg"
+    },
+    {
+      "name": "Fosetyl Aluminium 666,7g/Kg, Fluopicolide 444g/Kg"
+    },
+    {
+      "name": "Fosétyl-Aluminium 80 %"
+    },
+    {
+      "name": "Glufosinate Ammonium 15 g/l"
+    },
+    {
+      "name": "Glyphosate"
+    },
+    {
+      "name": "Hexythiazox"
+    },
+    {
+      "name": "Huile Blanche"
+    },
+    {
+      "name": "Huile de paraffine 830 g/L"
+    },
+    {
+      "name": "Huile Minérale 76 %"
+    },
+    {
+      "name": "Hydroxyde de cuivre 400 g/l"
+    },
+    {
+      "name": "Imidaclopride"
+    },
+    {
+      "name": "Imidaclopride OD 200 g/l"
+    },
+    {
+      "name": "Indaziflam 500 g/L"
+    },
+    {
+      "name": "Keroxim Methyl 50%"
+    },
+    {
+      "name": "Lambda cyhalothrine"
+    },
+    {
+      "name": "Lufenuron 50 g/l"
+    },
+    {
+      "name": "Metrafenone 500 g/l"
+    },
+    {
+      "name": "Myclobutanil 240 g/L"
+    },
+    {
+      "name": "Oxychlorure de Cuivre 678,6 g/l"
+    },
+    {
+      "name": "Oxyfluorfen 240 g/l"
+    },
+    {
+      "name": "Penconazole 100 g/l"
+    },
+    {
+      "name": "Phosmet 50%"
+    },
+    {
+      "name": "Propineb 70%"
+    },
+    {
+      "name": "Proquinazid 200 g/l"
+    },
+    {
+      "name": "Pyridabene 20 %"
+    },
+    {
+      "name": "PYRIFLUQUINAZON 20 %"
+    },
+    {
+      "name": "Pyriproxifène 100 g/l"
+    },
+    {
+      "name": "Soufre Miconisé Atomisé"
+    },
+    {
+      "name": "Spinetoram 120 g/l"
+    },
+    {
+      "name": "Spinosad"
+    },
+    {
+      "name": "Spirodiclofen 240 g/l"
+    },
+    {
+      "name": "Spiromesifen 240 g/l"
+    },
+    {
+      "name": "Spirotetramat"
+    },
+    {
+      "name": "Spiroxamine 300 g/l"
+    },
+    {
+      "name": "Sulfate de cuivre 80%"
+    },
+    {
+      "name": "Tebuconazole 200 g/l, Fluopyram 200 g/l"
+    },
+    {
+      "name": "Tebuconazole 250 g/l"
+    },
+    {
+      "name": "Tebufenpyrad"
+    },
+    {
+      "name": "Teflubenzuron 150g/l"
+    },
+    {
+      "name": "Tetraconazole 40 g/l"
+    },
+    {
+      "name": "Thiaclopride 280 g/l"
+    },
+    {
+      "name": "Thiafloxystrobine 50%"
+    },
+    {
+      "name": "Thiamethoxam 200 g/l , chlorantraniliprole 100 g/l"
+    },
+    {
+      "name": "Thiamethoxam SC 25 %"
+    },
+    {
+      "name": "Thiamethoxam WG 25 %"
+    },
+    {
+      "name": "Thiophanate methyl"
+    },
+    {
+      "name": "Thiram 80 %"
+    },
+    {
+      "name": "Tolfenpyrad"
+    },
+    {
+      "name": "Triadimenol 250 g/L"
+    }
+  ],
+  "products": [
+    {
+      "name": "AMISTAR",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "AZOFOL",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "BLACK JAK",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "Citric Acide",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "CORSAL",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "CROX FER EDDHA",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "CROX FOLIAIR",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "CROX MICRO MULTI",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "DIAFERRANE",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "FERIK",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "FERTIGEL 00.52.34",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "FLOWERING",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "FLOXIDAN",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "FUSILAD MAX",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "GOLD FOS",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "GREEN ZINC",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "KAOFOURMI",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "KARATE",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "METHOATE",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "MICROTHEOL SOUFRE",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "NITRATE DE MAGNESIUM",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "REGALIS",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "STILO",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "VALLETTE",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "VAPCOMOR",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "VITENE TRIPLO",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "WUXAL CUIVRE",
+      "category": "",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "Abyss",
+      "category": "AUTRE",
+      "subcategory": "ALGUES",
+      "ma": "",
+      "unit": "L",
+      "composition": "Mannto 1%, AA 0.3%"
+    },
+    {
+      "name": "AgriM",
+      "category": "AUTRE",
+      "subcategory": "MO",
+      "ma": "",
+      "unit": "L",
+      "composition": "Matière Organique 40 % , Extrait humique 35 % ,Potassium organique 2,5 % , Azote organique 1 % ,Phosphore organique 0,1 %"
+    },
+    {
+      "name": "ANTISAL",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Arbofix",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Acide Alpha Naphtil acetique 1%"
+    },
+    {
+      "name": "Atlantica Nutricat ZN MN",
+      "category": "AUTRE",
+      "subcategory": "ZN + MN",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Mn 17% + Zn 28%"
+    },
+    {
+      "name": "Attrac",
+      "category": "AUTRE",
+      "subcategory": "N",
+      "ma": "",
+      "unit": "L",
+      "composition": "Azote 5%"
+    },
+    {
+      "name": "Auxym",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "B 0.4%+Fer 0.6%+Mn 0.6%+ Cu 0.2%+ Zn 0.4%+ Mo 13%"
+    },
+    {
+      "name": "Azofol SR",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Azote 355 G/L + OE"
+    },
+    {
+      "name": "Baypotass",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Potassium 39%"
+    },
+    {
+      "name": "BB5",
+      "category": "AUTRE",
+      "subcategory": "ACIDIFIANT",
+      "ma": "",
+      "unit": "L",
+      "composition": "N 3% + P2O5 18,1%"
+    },
+    {
+      "name": "BIO GRAND",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Glycine 40%+ Acide gibberellique 0,7%+ ANA 25%"
+    },
+    {
+      "name": "BIOCLEAR",
+      "category": "AUTRE",
+      "subcategory": "SAVON",
+      "ma": "",
+      "unit": "L",
+      "composition": "Savon potassique"
+    },
+    {
+      "name": "Blackjak",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "ACIDE HUMIQUE"
+    },
+    {
+      "name": "Boraminal",
+      "category": "AUTRE",
+      "subcategory": "B",
+      "ma": "",
+      "unit": "L",
+      "composition": "Azote total 4,1 % , Bore 4,6 % , Acides aminés 7,2% ,Matiere Organique 27 %"
+    },
+    {
+      "name": "BoroZinc",
+      "category": "AUTRE",
+      "subcategory": "B + ZN",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Bore Zinc"
+    },
+    {
+      "name": "Brevis",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Metamitron puro150 g/kg coformulanti q.b.a"
+    },
+    {
+      "name": "C0RSAL",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Oxyde ca 9%+ Oxyde Mg 1%"
+    },
+    {
+      "name": "Calboron",
+      "category": "AUTRE",
+      "subcategory": "CA",
+      "ma": "",
+      "unit": "KG",
+      "composition": "oxyde de Ca 30%+ bore 1%"
+    },
+    {
+      "name": "CAPFOL",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Chlorure de Ca+Zn"
+    },
+    {
+      "name": "CarboFer",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "P 8%, K 10%, Fer 1.8%, Carbohydrate 40%"
+    },
+    {
+      "name": "Citoquin Mix",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "N 4%, P 8%, K 10,4%, B 0,42%, Mo 0,2%"
+    },
+    {
+      "name": "CLEAR",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Acides aminés + micronutriments chélatés"
+    },
+    {
+      "name": "Clerthin",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "ana -amida 8.4,%p/p (84g/kg)"
+    },
+    {
+      "name": "Corex Zn Mn",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Zn Mn"
+    },
+    {
+      "name": "CROX FOLIAIRE",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Engrais foliaire NPK + oligo-éléments"
+    },
+    {
+      "name": "CROX MICRO",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Fer eddha 4,8%"
+    },
+    {
+      "name": "CROX MULTI",
+      "category": "AUTRE",
+      "subcategory": "NOUVAU",
+      "ma": "",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "CroxX kelp",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Les algues 30%, oxyde de potassium 3,4 %, Oxyde de soufre 2,4 %, Glucides 1%, Carbone organique 0,6%"
+    },
+    {
+      "name": "CURANE",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "P 58%, K 38%"
+    },
+    {
+      "name": "Decco shield",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Ca"
+    },
+    {
+      "name": "Delphos Ca",
+      "category": "AUTRE",
+      "subcategory": "P",
+      "ma": "",
+      "unit": "L",
+      "composition": "N 3% +P2O5 21% + CaO 6,3%"
+    },
+    {
+      "name": "Deltamicro combi 1",
+      "category": "AUTRE",
+      "subcategory": "OE",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Bore 1,4 % , Cuivre 0,7 % , Fer 4 % , Manganèse 3,2% , Zinc 3,8 % Magnésium 1 %"
+    },
+    {
+      "name": "Deltamicro combi Mg",
+      "category": "AUTRE",
+      "subcategory": "MG",
+      "ma": "",
+      "unit": "KG",
+      "composition": "oxyde de magnésium 6.1%"
+    },
+    {
+      "name": "DELTAQUIN",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Potassium + micronutriments (biostimulant de maturation)"
+    },
+    {
+      "name": "DIAFFERANE",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Fer EDDHA"
+    },
+    {
+      "name": "Easimix",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "P2O5 19,5%"
+    },
+    {
+      "name": "EFFICIENT",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "N 28%+ FORMALDEHYD 17 P/P"
+    },
+    {
+      "name": "Ennerfruit",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "CaO 3%, MgO 3%, B 0,2%, Mo 0,4 %, Mn 0,1%, Zn 0,1%"
+    },
+    {
+      "name": "ETHREL",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Éthéphon (régulateur de croissance libérant l’éthylène)"
+    },
+    {
+      "name": "Excellent Fe+AA",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Fer + Acide aminés"
+    },
+    {
+      "name": "Exilis",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Benzyladenine"
+    },
+    {
+      "name": "FeriK Fer",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Fer Eddha"
+    },
+    {
+      "name": "Fixa Soufre",
+      "category": "AUTRE",
+      "subcategory": "SOUFRE",
+      "ma": "",
+      "unit": "L",
+      "composition": "N 9% , SO3 75%"
+    },
+    {
+      "name": "FLORGIB",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "FLOWRING",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Phosphore + potassium + bore (stimulation floraison)"
+    },
+    {
+      "name": "FOLIXDAN",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Azote + phosphore + bore + molybdène (bio-activateur nutritif)"
+    },
+    {
+      "name": "FRUIT AUXINE",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Acide Naphtylacétique"
+    },
+    {
+      "name": "Fruka",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "K2O, Mo, Algues"
+    },
+    {
+      "name": "FULVISTAR",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "ACIDE HUMIQUE"
+    },
+    {
+      "name": "GA3 RIVA",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "acide gibbérellique 10%"
+    },
+    {
+      "name": "Goemar",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "N 4,1% B 2,07%, Mgo 4,8%, Mo 0,02%"
+    },
+    {
+      "name": "GOLTIX",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Metamitrin"
+    },
+    {
+      "name": "Green Zn",
+      "category": "AUTRE",
+      "subcategory": "ZN",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Zn 21%"
+    },
+    {
+      "name": "Hockley phone",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Ethephon 480 g/l"
+    },
+    {
+      "name": "HUMIK",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "ACIDE HUMIQUE"
+    },
+    {
+      "name": "Humistar/Humagreen",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "ACIDE HUMIQUE"
+    },
+    {
+      "name": "Kitosamine",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Mn 2.7%, Zn 2.3%, Carbohydrate 50%"
+    },
+    {
+      "name": "KMT-BDNK-23",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Non mentionné"
+    },
+    {
+      "name": "Kudos",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Prohexadione calcium 100g/Kg"
+    },
+    {
+      "name": "Lait",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Lait de levée de dormance"
+    },
+    {
+      "name": "LI700 STAR",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "488 g/L lécithine"
+    },
+    {
+      "name": "Liqui K",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Azote 3% , Oxyde de potassium 32% ,agent séquestrant 1%"
+    },
+    {
+      "name": "Liqui K express",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "K POTASSIUM"
+    },
+    {
+      "name": "Mastique",
+      "category": "AUTRE",
+      "subcategory": "MASTIQUE",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Mastique"
+    },
+    {
+      "name": "MAXIM",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Triclopyr 10%"
+    },
+    {
+      "name": "Moliboro",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Bore+ Molybdene"
+    },
+    {
+      "name": "Moussagri",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Savon potassique"
+    },
+    {
+      "name": "Neostren Forte",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Calcium 17 % Bore 1,5 %"
+    },
+    {
+      "name": "Novagib",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "10g/l Gibberillines GA4/7"
+    },
+    {
+      "name": "Phosphite One",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "N 3%, P2O5 30%, K2O 15%"
+    },
+    {
+      "name": "Phylgreen Alya",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Extrait D'algues 13,5% P/P, Bore 9,2% P/P"
+    },
+    {
+      "name": "Plyaminol",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "AA"
+    },
+    {
+      "name": "Polidel",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Azote 2,3 % , Oxyde de potassium 25,5 % , Agent séquestrant HEDTA 25,5 %"
+    },
+    {
+      "name": "Prefectos",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Acides Aminées"
+    },
+    {
+      "name": "Presto",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Ethéphon 40 %"
+    },
+    {
+      "name": "Regalis plus",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "prohexadione-calcium 100 g/kg"
+    },
+    {
+      "name": "Rombi K",
+      "category": "AUTRE",
+      "subcategory": "K",
+      "ma": "",
+      "unit": "L",
+      "composition": "Azote Total 3 % , Azote Uréique 3% ,Oxyde de potassium hydrosoluble 32%"
+    },
+    {
+      "name": "Saltrad Ca",
+      "category": "AUTRE",
+      "subcategory": "ANTI SALINITE",
+      "ma": "",
+      "unit": "L",
+      "composition": "CaO 7,5%"
+    },
+    {
+      "name": "Selekter kinine",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Cytokinine 1,6%, Matiere organique 5%"
+    },
+    {
+      "name": "Seniphos",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": "N 3% +P2O5 23.6% + CaO 4,3%"
+    },
+    {
+      "name": "Sequestrene",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Fer Eddha"
+    },
+    {
+      "name": "Siberio",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "15 % Azote Total , 6 % Azote Nitrique , 3 % Azote Ammoniacal , 6 % Azote Uréique, 4,5 % Oxyde de calcium 0, ,05 % Fer chélaté EDTA , 0,05 % Zinc Chélaté EDTA"
+    },
+    {
+      "name": "Specialcare amino acide",
+      "category": "AUTRE",
+      "subcategory": "AA",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Amino acide 43% , Organic matier 20% Nitrogène 17 %"
+    },
+    {
+      "name": "Stilo racinaire",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "AA 10.5% N 2.7% Fer 4.5% Mn 1%"
+    },
+    {
+      "name": "SULIT",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "0.93% Bore, 5.82% Molybdene"
+    },
+    {
+      "name": "Talc",
+      "category": "AUTRE",
+      "subcategory": "TALC",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Talc"
+    },
+    {
+      "name": "Terracan",
+      "category": "AUTRE",
+      "subcategory": "AH",
+      "ma": "",
+      "unit": "L",
+      "composition": "Extrait Humique total + Oxyde de Potassium"
+    },
+    {
+      "name": "Tonofol sp",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Mn+Zn"
+    },
+    {
+      "name": "TOPPER/TERBEL",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Triclopyr 10%"
+    },
+    {
+      "name": "Tradebor",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Bore 11%"
+    },
+    {
+      "name": "Tradecitrus",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Mn 6% , Zn 8%"
+    },
+    {
+      "name": "Tradecorp Cu",
+      "category": "AUTRE",
+      "subcategory": "CU",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Cuivre EDTA 14% p/p"
+    },
+    {
+      "name": "Tradecorp Mn",
+      "category": "AUTRE",
+      "subcategory": "MN",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Mn 13%"
+    },
+    {
+      "name": "Tradecorp Zn",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "14% ZINC EDTA"
+    },
+    {
+      "name": "Trainer",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Mo, N organique"
+    },
+    {
+      "name": "UltraFerro",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Fer Eddha"
+    },
+    {
+      "name": "Vitanica",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Algues"
+    },
+    {
+      "name": "Wuxal cu",
+      "category": "AUTRE",
+      "subcategory": "CU",
+      "ma": "",
+      "unit": "L",
+      "composition": "cu"
+    },
+    {
+      "name": "Wuxal Fer",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Fer EDTA"
+    },
+    {
+      "name": "Wuxal Macromix",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "24 % Azote Total , 24 % Phosphate , 18 % Potassium +OE"
+    },
+    {
+      "name": "ZINBORE",
+      "category": "AUTRE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Bore Zinc"
+    },
+    {
+      "name": "Acide citrique",
+      "category": "ENGRAIS",
+      "subcategory": "AC",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Acide citrique"
+    },
+    {
+      "name": "ACIDE NITRIQUE",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "ACIDE PHOSPHORIQUE",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "Agriphos",
+      "category": "ENGRAIS",
+      "subcategory": "AP",
+      "ma": "",
+      "unit": "L",
+      "composition": "Acide Phosphorique"
+    },
+    {
+      "name": "Agrisulf",
+      "category": "ENGRAIS",
+      "subcategory": "AS",
+      "ma": "",
+      "unit": "L",
+      "composition": "Acide sulfurique"
+    },
+    {
+      "name": "Agrizote",
+      "category": "ENGRAIS",
+      "subcategory": "AN",
+      "ma": "",
+      "unit": "L",
+      "composition": "Acide Nitrique"
+    },
+    {
+      "name": "DAP P44 MAGNUM",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "N18-P44"
+    },
+    {
+      "name": "FERTIGEL",
+      "category": "ENGRAIS",
+      "subcategory": "GEL",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Hydro speed",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Sulfate D'ammoniaque"
+    },
+    {
+      "name": "KSC1",
+      "category": "ENGRAIS",
+      "subcategory": "P",
+      "ma": "",
+      "unit": "KG",
+      "composition": "14 % N, 40% P2o5, 5 % K2o, 13 % So3, 0,1 % B ,0,05 % Cu, 0,1 % Fe, 0,01 % Mo ,0,1 % Zn"
+    },
+    {
+      "name": "MAP 12-61-00",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Np 12-61"
+    },
+    {
+      "name": "Matière organique",
+      "category": "ENGRAIS",
+      "subcategory": "MO",
+      "ma": "",
+      "unit": "L",
+      "composition": "Matiere organique liquide"
+    },
+    {
+      "name": "Nitrate calcium",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "Nitrate de Calcium",
+      "category": "ENGRAIS",
+      "subcategory": "CA",
+      "ma": "",
+      "unit": "KG",
+      "composition": "N 15% - Cao 26,5%"
+    },
+    {
+      "name": "Nitrate de Magnésium",
+      "category": "ENGRAIS",
+      "subcategory": "MG",
+      "ma": "",
+      "unit": "KG",
+      "composition": "N 10,5%, Mgo 16%"
+    },
+    {
+      "name": "Nitrate de Potassium",
+      "category": "ENGRAIS",
+      "subcategory": "K",
+      "ma": "",
+      "unit": "KG",
+      "composition": "N13- P 0 - K 46"
+    },
+    {
+      "name": "NITRATE MAGNESIUM",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "Nitrate magnésium",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "Nitrate potassium",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "NPK SOP",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Npk 12.12.17+2+Te"
+    },
+    {
+      "name": "POTASSIUM ACID",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "ACIDE + N13- P 0 - K 46"
+    },
+    {
+      "name": "Potassium acide 13,9.0.45",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "Rombiquel Magnesio",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "Oxyde De Magnésium 8,5 %"
+    },
+    {
+      "name": "Sulfate d’ammonium",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "N21"
+    },
+    {
+      "name": "Sulfate de Mg",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "Mgo 16%+So3 32%"
+    },
+    {
+      "name": "Sulfate de Potassium",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "K2o 51%+So3 45%"
+    },
+    {
+      "name": "Sulphate ammonium",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "UAN 32%",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": "N 32%"
+    },
+    {
+      "name": "UREA PHOSPHATE",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": "17.44.00"
+    },
+    {
+      "name": "Urea phosphaté(N17,5 P44)",
+      "category": "ENGRAIS",
+      "subcategory": "",
+      "ma": "",
+      "unit": "",
+      "composition": ""
+    },
+    {
+      "name": "Urée 46",
+      "category": "ENGRAIS",
+      "subcategory": "N",
+      "ma": "",
+      "unit": "KG",
+      "composition": "N 46%"
+    },
+    {
+      "name": "Aktuan",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Dimethomorphe 150 g/kg, Dithianon 350 g/kg",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Aliette flash",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Fosétyl-Aluminium 80 %",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Amistar top",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Difenoconazole 125 g/l, Azoxystrobine 200 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Antracol",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Propineb 70%",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Bayfidan",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Triadimenol 250 g/L",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "BELANTY",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "75 g/L méfentrifluconazole",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Bellis",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Boscalid 252 g/kg, Pyraclostrobine 128 g/kg",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Bouillie bordelaise",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Sulfate de cuivre 80%",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Cabrio",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Dimethomorphe 72 g/l, Pyraclotrobine 40 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Chorus",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Cyprodinil 50%",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Click",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Dithianon 70%",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Collis",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Boscalid 200 g/l, Krésoxim-Methyl 100 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Corail",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Tebuconazole 250 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Criptan",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Captan 50% WP",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Delan",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Dithianon 500 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Domarek",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Tetraconazole 40 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Flint",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Thiafloxystrobine 50%",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "FOLIETTE/GOLDFOS",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Fongichell",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Cuivre 4,5%",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Helio cuivre",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Hydroxyde de cuivre 400 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Inacop",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Oxychlorure de Cuivre 678,6 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Luna experience",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Tebuconazole 200 g/l, Fluopyram 200 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Malvin",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Captan 80% WG",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Merit",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Difenoconazole, Azoxystrobine",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Methyl Thiophanate",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Thiophanate methyl",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Microtheol 80",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Soufre Miconisé Atomisé",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Mikal flash",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Fosetyl Aluminium 500 g/kg, Folpel 250 g/kg",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Nando",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Fluazinam 500g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Profiler",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Fosetyl Aluminium 666,7g/Kg, Fluopicolide 444g/Kg",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Prosper",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Spiroxamine 300 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Ridomil",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Fo Métalaxyl-M 5%, Folpel 40 %",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Score",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Difénoconazole 250 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Stroby",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Keroxim Methyl 50%",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Switch",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Cyprodinil 37,5 %, Fludioxonil 25 %",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Syllit",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Dodine 400 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Systhane",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Myclobutanil 240 g/L",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Talendo",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Proquinazid 200 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Teldor",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Fenhexamid 500 g/kg",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Thiramchim",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Thiram 80 %",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Tizca",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Topaze",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Penconazole 100 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Valette",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Valtera",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "VAPCOTOP",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Vitene Triplo R",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Cymoxanil 2,85% w/w + Fosetyl Aluminum 30% w/w + Cuivre 16% w/w",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Vivando",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Metrafenone 500 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Volar cu",
+      "category": "FONGICIDE",
+      "subcategory": "",
+      "ma": "Dimethomorphe 60 g/kg, cuivre 400 g/kg",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Alion",
+      "category": "HERBICIDE",
+      "subcategory": "",
+      "ma": "Indaziflam 500 g/L",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Basta",
+      "category": "HERBICIDE",
+      "subcategory": "",
+      "ma": "Glufosinate Ammonium 15 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "FLUENT",
+      "category": "HERBICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Focus",
+      "category": "HERBICIDE",
+      "subcategory": "",
+      "ma": "Cycloxydine",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "FUSILAD",
+      "category": "HERBICIDE",
+      "subcategory": "",
+      "ma": "FLUAZIFOP-P-BUTYL",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Ground UP",
+      "category": "HERBICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "HADDAF",
+      "category": "HERBICIDE",
+      "subcategory": "",
+      "ma": "Oxyfluorfen 240 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Rivasate",
+      "category": "HERBICIDE",
+      "subcategory": "",
+      "ma": "Glyphosate",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "TOPPER",
+      "category": "HERBICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Absolute",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Actara",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Thiamethoxam WG 25 %",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Agroil Blue",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Huile de paraffine 830 g/L",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "ALEMBRA",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "APOLLO",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "CLOFENTEZINE+ BIFENTHRINE",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Bactimec",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Abamectine 18 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "BATON",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Bifenthrine",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Beidazit",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Huile Minérale 76 %",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Calypso",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Thiaclopride 280 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Cetan",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "COLT",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "PYRIFLUQUINAZON 20 %",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Cominal",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Commando",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Imidaclopride",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Confidor",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Imidaclopride OD 200 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Decis expert",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Deltamethrine 25g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "DEKAPLUS",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "DIMETHOATE",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "DRAGON",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Spinosad",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Eltoro",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Thiamethoxam SC 25 %",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Envidor",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Spirodiclofen 240 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Exirel",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Cyantraniliprole",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Fastac",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Alpha-Cyperméthrine 100 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Floramite",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Bifénazate 240 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Foslete",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Phosmet 50%",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Fourmicide",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Chlorpyriphos 2%",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "General",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Pyriproxifène 100 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Hexithiazox",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Hexythiazox",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Insegar",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Fenoxycarbe 25 %",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "KANEMITE",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Acequinocyl",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "KAOROFOURMI",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Karaté",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Lambda cyhalothrine",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Masai",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Tebufenpyrad",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Match Gold",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Lufenuron 50 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Metheoate",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Dimétoate",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Mitigate",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Fenpyroximate 5%",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Movento",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Spirotetramat",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "NEGMITE",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "NOMOLT",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Teflubenzuron 150g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "NUMECTINE",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Oberon",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Spiromesifen 240 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Picador",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Acétamepride SL 200 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "ProAct",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Emamectin Benzoate 50 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Pyrical",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Chlorpyriphos 480g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Radiant",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Spinetoram 120 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Riben",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Pyridabene 20 %",
+      "unit": "KG",
+      "composition": ""
+    },
+    {
+      "name": "Rufast",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Acrinathrine 75 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Sam Huile",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Huile Blanche",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Shirudo",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Tolfenpyrad",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Sivanto",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Flupyradifurone 200 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Smash",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "SPANOCEST",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "SPINOX",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Tebumight",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Tracer",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Trebon",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Etofenprox 287,5 g/l",
+      "unit": "L",
+      "composition": ""
+    },
+    {
+      "name": "Voliam flexi",
+      "category": "INSECTICIDE",
+      "subcategory": "",
+      "ma": "Thiamethoxam 200 g/l , chlorantraniliprole 100 g/l",
+      "unit": "L",
+      "composition": ""
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "ACI",
+      "roles": [
+        "manufacturer"
+      ]
+    },
+    {
+      "name": "AGRICHEM",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "AGRO HERO",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "AGROTECH",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "AGROTODAY",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "ANGLO GULF",
+      "roles": [
+        "manufacturer"
+      ]
+    },
+    {
+      "name": "ASMIDAF",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "BAYER",
+      "roles": [
+        "manufacturer"
+      ]
+    },
+    {
+      "name": "BIGAGRI",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "BLIDA",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "CASAP",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "DAHRA CHEMICALS",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "DEVAGRI",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "DOUDAH",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "FILAHIA",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "FITOPHARM",
+      "roles": [
+        "manufacturer"
+      ]
+    },
+    {
+      "name": "FMC",
+      "roles": [
+        "manufacturer"
+      ]
+    },
+    {
+      "name": "HYGINDUST",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "MAHALIA",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "MAHALIA TAYEB",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "MAHALIYA TAYEB",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "MOSTA BOUSTANE",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "PROFERT",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "SIPCAM",
+      "roles": [
+        "manufacturer"
+      ]
+    },
+    {
+      "name": "SOMEDIA",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "SRID",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "TAYEB MAHALIA",
+      "roles": [
+        "distributor"
+      ]
+    },
+    {
+      "name": "VAPCO",
+      "roles": [
+        "manufacturer"
+      ]
+    },
+    {
+      "name": "ZEGLA",
+      "roles": [
+        "distributor"
+      ]
+    }
+  ],
+  "geography": {
+    "regions": [
+      "KOUANKA",
+      "MAGUER",
+      "MEZAOUROU",
+      "SEFYOUN",
+      "SIDIHMAD",
+      "SYS V",
+      "TENIRA",
+      "TIRMANE"
+    ],
+    "zones": [
+      "A NOYAU",
+      "A NOYAU KOUANKA",
+      "A NOYAU MAGUER",
+      "A NOYAU SIDIHMAD",
+      "A NOYAU SYS V",
+      "A NOYAU TIRMANE",
+      "A PEPINS HJIRA",
+      "A PEPINS LYCEE",
+      "A PEPINS MAGUER",
+      "A PEPINS SEFYOUN",
+      "A PEPINS TENIRA",
+      "POIRIER MEAOUROU",
+      "POIRIER MEZAOUROU",
+      "POMMIER HJIRA",
+      "POMMIER LYCEE",
+      "POMMIER SEFYOUN",
+      "POMMIER Tenira",
+      "VIGNE TIRMANE"
+    ],
+    "sites": [
+      "13HA LA BASE",
+      "13ha la base",
+      "13ha système V pom",
+      "18HA TIRMANE",
+      "28HA",
+      "44HA TIRMAN",
+      "A NOYAU",
+      "A NOYAU 18HA",
+      "A NOYAU 44HA",
+      "A NOYAU KOUANKA",
+      "A NOYAU MAGUER",
+      "A NOYAU MEZAOUROU",
+      "A NOYAU NV 40HA",
+      "A NOYAU SIDIHMAD",
+      "A NOYAU SYS V",
+      "A NOYAU TIRMANE",
+      "A PEPINS LYCEE",
+      "A PEPINS SEFYOUN",
+      "ALIAOUI",
+      "BLIDA",
+      "BOUHSSIDA KOUANKA",
+      "CARRIERE",
+      "CERISIER MAGUER",
+      "Carrière",
+      "HAJA FATMA",
+      "HAJA FATMA GRANDE",
+      "HAJA FATMA PETITE",
+      "HILAL",
+      "HJIRA",
+      "HJIRA G",
+      "HJIRA GRANDE",
+      "HJIRA KBIRA",
+      "HJIRA P",
+      "HJIRA PETITE",
+      "HJIRA SGHIRA",
+      "HOUARI BOUGARA",
+      "HOUARI HAJA FATMA",
+      "HOUARI LES DEUX",
+      "HYGINDIST",
+      "Hjira",
+      "KOUANKA",
+      "Kouanka",
+      "LA BASE",
+      "LYCEE",
+      "LYCEE P",
+      "MAGUER",
+      "MAGUER CERISE",
+      "MAGUER GRANDE",
+      "MAGUER PETITE 24Ha",
+      "Maguer kbira",
+      "Maguer sghira",
+      "Maguer srira",
+      "NADJI",
+      "P SYS V",
+      "POIRIER MEAOUROU",
+      "POIRIER MEZAOUROU",
+      "POMMIER 28HA LAKHDAR",
+      "POMMIER 2HA",
+      "POMMIER CARRIERE",
+      "POMMIER CARRIERE LAKHDAR",
+      "POMMIER LABASE ISMAIL",
+      "POMMIER LAKHDAR",
+      "POMMIER MAGUER KBIRA",
+      "POMMIER SEFYOUN",
+      "POMMIER TENIRA ISMAIL",
+      "POMMIER TENIRA LAKHDAR",
+      "ROUMILIYA",
+      "SEFYOUN",
+      "SIDIHMAD",
+      "SIDIHMAD NADJI",
+      "SIdi Ahmed NADJI",
+      "STATION LA BASE",
+      "SYS V 32HA A NOYAU",
+      "SYS V A N",
+      "SYS V NOYAU",
+      "SYS V P",
+      "SYS V POMMIER",
+      "Sefyoun",
+      "Sidi Ahmed",
+      "Système V",
+      "TENIRA LA BASE",
+      "TIRMAN",
+      "TIRMANE",
+      "TIRMANE MZ",
+      "Teghalimat",
+      "Teghalimat 18HA",
+      "Teghalimat 44HA",
+      "Tighalimat",
+      "VIGNE",
+      "VIGNE 25Ha TIRMANE",
+      "VIGNE ROUMILIYA",
+      "ZEGLA",
+      "ZEGLA ZOHIR",
+      "Zone Tenira",
+      "sidi hmad"
+    ]
+  },
+  "stations": [
+    {
+      "name": "STATION CARRIERE",
+      "sectors": [
+        {
+          "code": "CARRIERE",
+          "surface_ha": 6.79
+        },
+        {
+          "code": "CARRIERE",
+          "surface_ha": 7.3
+        },
+        {
+          "code": "CARRIERE",
+          "surface_ha": 8.9
+        },
+        {
+          "code": "CARRIERE",
+          "surface_ha": 6.46
+        }
+      ]
+    },
+    {
+      "name": "STATION 25Ha",
+      "sectors": [
+        {
+          "code": "25Ha",
+          "surface_ha": 5.33
+        },
+        {
+          "code": "25Ha",
+          "surface_ha": 5.82
+        },
+        {
+          "code": "25Ha",
+          "surface_ha": 4.96
+        },
+        {
+          "code": "25Ha",
+          "surface_ha": 4.5
+        }
+      ]
+    },
+    {
+      "name": "STATION 13Ha devil gala",
+      "sectors": [
+        {
+          "code": "13Ha devil gala",
+          "surface_ha": 6.5
+        },
+        {
+          "code": "13Ha devil gala",
+          "surface_ha": 6.5
+        }
+      ]
+    },
+    {
+      "name": "STATION 2Ha SYS V",
+      "sectors": [
+        {
+          "code": "2Ha SYS V",
+          "surface_ha": 4
+        }
+      ]
+    },
+    {
+      "name": "STATION Maguer Grande",
+      "sectors": [
+        {
+          "code": "Maguer Grande",
+          "surface_ha": 13
+        },
+        {
+          "code": "Maguer Grande",
+          "surface_ha": 9.5
+        },
+        {
+          "code": "Maguer Grande",
+          "surface_ha": 11.5
+        },
+        {
+          "code": "Maguer Grande",
+          "surface_ha": 3
+        }
+      ]
+    },
+    {
+      "name": "STATION Maguer Petite",
+      "sectors": [
+        {
+          "code": "Maguer Petite",
+          "surface_ha": 7
+        },
+        {
+          "code": "Maguer Petite",
+          "surface_ha": 7
+        },
+        {
+          "code": "Maguer Petite",
+          "surface_ha": 7
+        }
+      ]
+    },
+    {
+      "name": "STATION LYCEE",
+      "sectors": [
+        {
+          "code": "LYCEE",
+          "surface_ha": 5
+        },
+        {
+          "code": "LYCEE",
+          "surface_ha": 5
+        },
+        {
+          "code": "LYCEE",
+          "surface_ha": 5
+        },
+        {
+          "code": "LYCEE",
+          "surface_ha": 5
+        }
+      ]
+    },
+    {
+      "name": "STATION HJIRA GRANDE",
+      "sectors": [
+        {
+          "code": "HJIRA GRANDE",
+          "surface_ha": 5
+        },
+        {
+          "code": "HJIRA GRANDE",
+          "surface_ha": 5
+        },
+        {
+          "code": "HJIRA GRANDE",
+          "surface_ha": 5
+        }
+      ]
+    },
+    {
+      "name": "STATION HJIRA PETITE",
+      "sectors": [
+        {
+          "code": "HJIRA PETITE",
+          "surface_ha": 3
+        },
+        {
+          "code": "HJIRA PETITE",
+          "surface_ha": 3
+        },
+        {
+          "code": "HJIRA PETITE",
+          "surface_ha": 3
+        },
+        {
+          "code": "HJIRA PETITE",
+          "surface_ha": 3
+        },
+        {
+          "code": "HJIRA PETITE",
+          "surface_ha": 3
+        },
+        {
+          "code": "HJIRA PETITE",
+          "surface_ha": 3
+        },
+        {
+          "code": "HJIRA PETITE",
+          "surface_ha": 3
+        },
+        {
+          "code": "HJIRA PETITE",
+          "surface_ha": 3
+        }
+      ]
+    },
+    {
+      "name": "STATION HADJA FATMA",
+      "sectors": [
+        {
+          "code": "HADJA FATMA",
+          "surface_ha": 8.1
+        },
+        {
+          "code": "HADJA FATMA",
+          "surface_ha": 8
+        },
+        {
+          "code": "HADJA FATMA",
+          "surface_ha": 8.3
+        },
+        {
+          "code": "HADJA FATMA",
+          "surface_ha": 10.3
+        }
+      ]
+    },
+    {
+      "name": "STATION LA BASE 1",
+      "sectors": [
+        {
+          "code": "LA BASE",
+          "surface_ha": 21.7
+        },
+        {
+          "code": "LA BASE",
+          "surface_ha": 16
+        },
+        {
+          "code": "LA BASE",
+          "surface_ha": 20.03
+        },
+        {
+          "code": "LA BASE",
+          "surface_ha": 20.5
+        }
+      ]
+    },
+    {
+      "name": "STATION LA BASE 2",
+      "sectors": [
+        {
+          "code": "LA BASE 2",
+          "surface_ha": 10
+        },
+        {
+          "code": "LA BASE 2",
+          "surface_ha": 19.1
+        },
+        {
+          "code": "LA BASE 2",
+          "surface_ha": 11.6
+        }
+      ]
+    },
+    {
+      "name": "STATION LA BASE 3",
+      "sectors": [
+        {
+          "code": "13Ha la base",
+          "surface_ha": 3.5
+        },
+        {
+          "code": "13Ha la base",
+          "surface_ha": 3.5
+        },
+        {
+          "code": "13Ha la base",
+          "surface_ha": 3.5
+        },
+        {
+          "code": "13Ha la base",
+          "surface_ha": 3.5
+        }
+      ]
+    }
+  ]
+}

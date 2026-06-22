@@ -255,7 +255,7 @@ GROUP BY l.id, l.produit_id, l.exploitation_id, l.numero_lot,
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_stock_temps_reel_lot ON stock_temps_reel(lot_id);
 
--- ── RLS ─────────────────────────────────────────────────────────
+-- ── RLS ──────────────────────────────────────────────────────────────────────
 
 ALTER TABLE exploitations        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE parcelles            ENABLE ROW LEVEL SECURITY;
@@ -266,33 +266,38 @@ ALTER TABLE traitements          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE traitement_points    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE dossiers_export      ENABLE ROW LEVEL SECURITY;
 
--- Base policy: user accesses only their own exploitation
-CREATE POLICY IF NOT EXISTS "own_exploitation_parcelles" ON parcelles
+DROP POLICY IF EXISTS "own_exploitation_parcelles" ON parcelles;
+CREATE POLICY "own_exploitation_parcelles" ON parcelles
   USING (exploitation_id IN (
     SELECT exploitation_id FROM user_profiles WHERE id = auth.uid()
   ));
 
-CREATE POLICY IF NOT EXISTS "own_exploitation_traitements" ON traitements
+DROP POLICY IF EXISTS "own_exploitation_traitements" ON traitements;
+CREATE POLICY "own_exploitation_traitements" ON traitements
   USING (exploitation_id IN (
     SELECT exploitation_id FROM user_profiles WHERE id = auth.uid()
-  ) OR device_id IS NOT NULL);  -- IoT device inserts allowed
+  ) OR device_id IS NOT NULL);
 
-CREATE POLICY IF NOT EXISTS "own_exploitation_stock" ON lots_stock
-  USING (exploitation_id IN (
-    SELECT exploitation_id FROM user_profiles WHERE id = auth.uid()
-  ));
-
-CREATE POLICY IF NOT EXISTS "own_exploitation_mvts" ON stock_movements
+DROP POLICY IF EXISTS "own_exploitation_stock" ON lots_stock;
+CREATE POLICY "own_exploitation_stock" ON lots_stock
   USING (exploitation_id IN (
     SELECT exploitation_id FROM user_profiles WHERE id = auth.uid()
   ));
 
--- Audit log: read-only for all authenticated users, insert-only (no update/delete)
-CREATE POLICY IF NOT EXISTS "audit_log_insert" ON audit_log
+DROP POLICY IF EXISTS "own_exploitation_mvts" ON stock_movements;
+CREATE POLICY "own_exploitation_mvts" ON stock_movements
+  USING (exploitation_id IN (
+    SELECT exploitation_id FROM user_profiles WHERE id = auth.uid()
+  ));
+
+DROP POLICY IF EXISTS "audit_log_insert" ON audit_log;
+CREATE POLICY "audit_log_insert" ON audit_log
   FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
-CREATE POLICY IF NOT EXISTS "audit_log_select" ON audit_log
-  FOR SELECT USING (auth.uid() IS NOT NULL);
 
+DROP POLICY IF EXISTS "audit_log_select" ON audit_log;
+CREATE POLICY "audit_log_select" ON audit_log
+  FOR SELECT USING (auth.uid() IS NOT NULL);
+  
 -- ── REALTIME ────────────────────────────────────────────────────
 
 ALTER PUBLICATION supabase_realtime ADD TABLE traitements;

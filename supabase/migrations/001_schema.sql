@@ -4,33 +4,33 @@
 -- ============================================================
 
 -- ENUMS
-CREATE TYPE product_category AS ENUM (
+DO $ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'product_category') THEN CREATE TYPE product_category AS ENUM (
   'fongicide', 'insecticide', 'herbicide', 'engrais', 'adjuvant', 'acaricide',
   'acide_nitrique', 'acide_sulfurique', 'acide_phosphorique', 'acide_humique',
   'matiere_organique', 'fer', 'drmx', 'autre'
 );
 
-CREATE TYPE culture_type AS ENUM ('a_pepins', 'a_noyau', 'vigne', 'agrumes', 'autre');
+DO $ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'culture_type') THEN CREATE TYPE culture_type AS ENUM ('a_pepins', 'a_noyau', 'vigne', 'agrumes', 'autre');
 
-CREATE TYPE movement_type AS ENUM ('transfert', 'entree', 'retour', 'sortie');
+DO $ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'movement_type') THEN CREATE TYPE movement_type AS ENUM ('transfert', 'entree', 'retour', 'sortie');
 
-CREATE TYPE supplier_role AS ENUM ('fabricant', 'distributeur');
+DO $ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'supplier_role') THEN CREATE TYPE supplier_role AS ENUM ('fabricant', 'distributeur');
 
-CREATE TYPE treatment_status AS ENUM ('planned', 'in_progress', 'completed', 'cancelled');
+DO $ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'treatment_status') THEN CREATE TYPE treatment_status AS ENUM ('planned', 'in_progress', 'completed', 'cancelled');
 
-CREATE TYPE alert_severity AS ENUM ('info', 'warning', 'critical');
+DO $ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'alert_severity') THEN CREATE TYPE alert_severity AS ENUM ('info', 'warning', 'critical');
 
-CREATE TYPE alert_type AS ENUM (
+DO $ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'alert_type') THEN CREATE TYPE alert_type AS ENUM (
   'low_stock', 'critical_stock', 'stock_expiry', 'treatment_overdue',
   'parcel_untreated', 'dar_violation', 'transfer_pending', 'negative_stock'
 );
 
-CREATE TYPE stock_status AS ENUM ('ok', 'low', 'critical', 'overstock', 'negative');
+DO $ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'stock_status') THEN CREATE TYPE stock_status AS ENUM ('ok', 'low', 'critical', 'overstock', 'negative');
 
 -- ============================================================
 -- EXPLOITATIONS
 -- ============================================================
-CREATE TABLE exploitations (
+CREATE TABLE IF NOT EXISTS exploitations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   registration_number TEXT,
@@ -44,7 +44,7 @@ CREATE TABLE exploitations (
 -- ============================================================
 -- SUPPLIERS (Fournisseurs + Distributeurs)
 -- ============================================================
-CREATE TABLE suppliers (
+CREATE TABLE IF NOT EXISTS suppliers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL UNIQUE,
   role supplier_role NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE suppliers (
 -- ============================================================
 -- PRODUCTS (Produits phytosanitaires, engrais, acides, etc.)
 -- ============================================================
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   trade_name TEXT NOT NULL,
   category product_category NOT NULL DEFAULT 'autre',
@@ -81,19 +81,19 @@ CREATE TABLE products (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_products_category ON products(category);
-CREATE INDEX idx_products_trade_name ON products(trade_name);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+CREATE INDEX IF NOT EXISTS idx_products_trade_name ON products(trade_name);
 
 -- ============================================================
 -- REGIONS → ZONES → SITES (Hierarchical parcelle system)
 -- ============================================================
-CREATE TABLE regions (
+CREATE TABLE IF NOT EXISTS regions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL UNIQUE,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE zones (
+CREATE TABLE IF NOT EXISTS zones (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   region_id UUID REFERENCES regions(id) ON DELETE CASCADE,
@@ -101,9 +101,9 @@ CREATE TABLE zones (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_zones_region ON zones(region_id);
+CREATE INDEX IF NOT EXISTS idx_zones_region ON zones(region_id);
 
-CREATE TABLE sites (
+CREATE TABLE IF NOT EXISTS sites (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   zone_id UUID REFERENCES zones(id) ON DELETE CASCADE,
@@ -114,12 +114,12 @@ CREATE TABLE sites (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_sites_zone ON sites(zone_id);
+CREATE INDEX IF NOT EXISTS idx_sites_zone ON sites(zone_id);
 
 -- ============================================================
 -- MOVEMENTS (Main stock journal — 6915+ rows)
 -- ============================================================
-CREATE TABLE movements (
+CREATE TABLE IF NOT EXISTS movements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   date DATE NOT NULL,
   product_id UUID REFERENCES products(id) ON DELETE SET NULL,
@@ -141,17 +141,17 @@ CREATE TABLE movements (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_movements_date ON movements(date);
-CREATE INDEX idx_movements_product ON movements(product_id);
-CREATE INDEX idx_movements_category ON movements(category);
-CREATE INDEX idx_movements_type ON movements(movement_type);
-CREATE INDEX idx_movements_culture ON movements(culture);
-CREATE INDEX idx_movements_site ON movements(site_name);
+CREATE INDEX IF NOT EXISTS idx_movements_date ON movements(date);
+CREATE INDEX IF NOT EXISTS idx_movements_product ON movements(product_id);
+CREATE INDEX IF NOT EXISTS idx_movements_category ON movements(category);
+CREATE INDEX IF NOT EXISTS idx_movements_type ON movements(movement_type);
+CREATE INDEX IF NOT EXISTS idx_movements_culture ON movements(culture);
+CREATE INDEX IF NOT EXISTS idx_movements_site ON movements(site_name);
 
 -- ============================================================
 -- STOCK LEVELS (Computed from movements)
 -- ============================================================
-CREATE TABLE stock_levels (
+CREATE TABLE IF NOT EXISTS stock_levels (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id UUID REFERENCES products(id) ON DELETE CASCADE UNIQUE,
   current_quantity NUMERIC NOT NULL DEFAULT 0,
@@ -161,12 +161,12 @@ CREATE TABLE stock_levels (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_stock_product ON stock_levels(product_id);
+CREATE INDEX IF NOT EXISTS idx_stock_product ON stock_levels(product_id);
 
 -- ============================================================
 -- OPERATORS
 -- ============================================================
-CREATE TABLE operators (
+CREATE TABLE IF NOT EXISTS operators (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   role TEXT DEFAULT 'operateur',
@@ -179,7 +179,7 @@ CREATE TABLE operators (
 -- ============================================================
 -- TREATMENTS
 -- ============================================================
-CREATE TABLE treatments (
+CREATE TABLE IF NOT EXISTS treatments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   site_id UUID REFERENCES sites(id) ON DELETE SET NULL,
   site_name TEXT,
@@ -202,10 +202,10 @@ CREATE TABLE treatments (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_treatments_status ON treatments(status);
-CREATE INDEX idx_treatments_date ON treatments(planned_date);
+CREATE INDEX IF NOT EXISTS idx_treatments_status ON treatments(status);
+CREATE INDEX IF NOT EXISTS idx_treatments_date ON treatments(planned_date);
 
-CREATE TABLE treatment_products (
+CREATE TABLE IF NOT EXISTS treatment_products (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   treatment_id UUID REFERENCES treatments(id) ON DELETE CASCADE,
   product_id UUID REFERENCES products(id) ON DELETE SET NULL,
@@ -214,12 +214,12 @@ CREATE TABLE treatment_products (
   dose_per_hectare NUMERIC
 );
 
-CREATE INDEX idx_tp_treatment ON treatment_products(treatment_id);
+CREATE INDEX IF NOT EXISTS idx_tp_treatment ON treatment_products(treatment_id);
 
 -- ============================================================
 -- ALERTS
 -- ============================================================
-CREATE TABLE alerts (
+CREATE TABLE IF NOT EXISTS alerts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   type alert_type NOT NULL,
   severity alert_severity DEFAULT 'info',
@@ -230,8 +230,8 @@ CREATE TABLE alerts (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_alerts_ack ON alerts(acknowledged);
-CREATE INDEX idx_alerts_severity ON alerts(severity);
+CREATE INDEX IF NOT EXISTS idx_alerts_ack ON alerts(acknowledged);
+CREATE INDEX IF NOT EXISTS idx_alerts_severity ON alerts(severity);
 
 -- ============================================================
 -- VIEWS for common queries

@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
+import { useAccessContext } from "@/components/auth/AccessProvider";
+import { MagasinierPage } from "@/components/magasinier/MagasinierBranch";
+import MagReportsPage from "@/components/magasinier/pages/MagReportsPage";
 import { useTreatments } from "@/hooks/useData";
 import { treatmentTypeLabels, type Treatment } from "@/lib/mock-data";
 import { cn, formatHectares } from "@/lib/utils";
@@ -25,61 +28,93 @@ const typeColors: Record<string, string> = {
 };
 
 export default function ReportsPage() {
+  const { profile } = useAccessContext();
+  if (profile?.role === "magasinier") {
+    return <MagasinierPage mag={MagReportsPage} />;
+  }
+  return <ReportsContent />;
+}
+
+function ReportsContent() {
   const { data: treatmentsRaw, loading } = useTreatments();
   const treatments = (treatmentsRaw || []) as any[];
 
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [exportingAll, setExportingAll] = useState(false);
+  const [exportError, setExportError] = useState("");
+
+  const buildPdfBlob = (treatment: any) =>
+    genererOrdreTraitementPDF({
+      site: "Domaine Khelifa",
+      n_traitement: treatment.id,
+      date_prevue: treatment.plannedDate,
+      date_reelle: treatment.dateReelle ?? treatment.executedDate ?? undefined,
+      parcelle_nom: treatment.parcelleName,
+      superficie_ha: treatment.areaTreatedHectares,
+      culture: treatment.culture || "",
+      variete: treatment.variete || "",
+      cible: treatment.cible || "",
+      mode_application: treatment.modeApplication || "",
+      materiel_utilise: treatment.materiel || "",
+      operateur_nom: treatment.operatorName,
+      heure_debut: treatment.heureDebut ?? undefined,
+      heure_fin: treatment.heureFin ?? undefined,
+      vitesse_avancement_kmh: treatment.vitesseKmh ?? undefined,
+      pression_service_bar: treatment.pressionBar ?? undefined,
+      dar_jours: treatment.darJours ?? undefined,
+      date_reentree: treatment.dateReentree ?? undefined,
+      visa_rt: treatment.visaRt || "",
+      efficacite: treatment.efficacite || "",
+      produits: treatment.products.map((p: any) => ({
+        nom_commercial: p.productName,
+        matiere_active: "",
+        dose_hl: p.dosePerHectare ? `${p.dosePerHectare} L/ha` : "",
+        quantite_sortir: p.quantityUsed != null ? `${p.quantityUsed} ${p.unit}` : "",
+      })),
+      signe: true,
+    });
+
+  const downloadBlob = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const handleDownloadPDF = async (treatment: any) => {
     setDownloading(treatment.id);
+    setExportError("");
     try {
-      const pdfData = {
-        site: "Domaine Khelifa",
-        n_traitement: treatment.id,
-        date_prevue: treatment.plannedDate,
-        date_reelle: treatment.dateReelle ?? treatment.executedDate ?? null,
-        parcelle_nom: treatment.parcelleName,
-        superficie_ha: treatment.areaTreatedHectares,
-        // Use real DB columns — no hardcoded fallbacks
-        culture: treatment.culture || "",
-        variete: treatment.variete || "",
-        cible: treatment.cible || "",
-        mode_application: treatment.modeApplication || "",
-        materiel_utilise: treatment.materiel || "",
-        operateur_nom: treatment.operatorName,
-        heure_debut: treatment.heureDebut ?? null,
-        heure_fin: treatment.heureFin ?? null,
-        vitesse_kmh: treatment.vitesseKmh ?? null,
-        pression_bar: treatment.pressionBar ?? null,
-        dar_jours: treatment.darJours ?? null,
-        date_reentree: treatment.dateReentree ?? null,
-        visa_rt: treatment.visaRt || "",
-        efficacite: treatment.efficacite || "",
-        produits: treatment.products.map((p: any) => ({
-          nom_commercial: p.productName,
-          matiere_active: "",  // Fetched from product catalog if needed
-          dose_hl: p.dosePerHectare ? `${p.dosePerHectare} L/ha` : "",
-          quantite_sortir: p.quantityUsed != null ? `${p.quantityUsed} ${p.unit}` : "",
-        })),
-        signe: true,
-      };
-
-      const blob = await genererOrdreTraitementPDF(pdfData);
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `FOR_PR6_003_${treatment.id}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      const blob = await buildPdfBlob(treatment);
+      downloadBlob(blob, `FOR_PR6_003_${treatment.id}.pdf`);
     } catch (error) {
       console.error("Failed to generate PDF:", error);
-      alert("Erreur lors de la génération du PDF. Vérifiez la console.");
+      setExportError("Erreur lors de la génération du PDF.");
     } finally {
       setDownloading(null);
+    }
+  };
+
+  const handleExportAll = async (list: any[]) => {
+    if (!list.length) return;
+    setExportingAll(true);
+    setExportError("");
+    try {
+      for (const treatment of list) {
+        const blob = await buildPdfBlob(treatment);
+        downloadBlob(blob, `FOR_PR6_003_${treatment.id}.pdf`);
+      }
+    } catch (error) {
+      console.error("Failed to export all PDFs:", error);
+      setExportError("Erreur lors de l'export groupé. Certaines fiches n'ont pas été générées.");
+    } finally {
+      setExportingAll(false);
     }
   };
 
@@ -110,7 +145,7 @@ export default function ReportsPage() {
 
   return (
     <AppLayout>
-      <div className="mb-8 p-6 rounded-[var(--radius-apple)] border border-[var(--black-008)] bg-[var(--surface-pure)] shadow-sm relative overflow-hidden">
+      <div className="lf-page-header mb-8 relative overflow-hidden">
         <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-[var(--green-010)] blur-3xl pointer-events-none" />
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -125,13 +160,27 @@ export default function ReportsPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[var(--surface-pure)] border border-[var(--black-008)] text-sm font-bold text-[var(--text-primary)] hover:bg-[var(--black-004)] transition-all shadow-sm">
-              <Printer className="w-4 h-4" />
-              Exporter tout (PDF)
+            <button
+              onClick={() => handleExportAll(completedTreatments)}
+              disabled={exportingAll || completedTreatments.length === 0}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[var(--surface-pure)] border border-[var(--black-008)] text-sm font-bold text-[var(--text-primary)] hover:bg-[var(--black-004)] transition-all shadow-sm disabled:opacity-50"
+            >
+              {exportingAll ? (
+                <div className="w-4 h-4 border-2 border-[var(--interactive-green)] border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Printer className="w-4 h-4" />
+              )}
+              {exportingAll ? "Export en cours…" : `Exporter tout (${completedTreatments.length})`}
             </button>
           </div>
         </div>
       </div>
+
+      {exportError && (
+        <div className="mb-6 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
+          {exportError}
+        </div>
+      )}
 
       <div className="flex items-center gap-3 mb-6">
         <div className="relative flex-1 max-w-md">

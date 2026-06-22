@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from "@/lib/api-helpers";
+import { withAuthRbac } from "@/lib/api-helpers";
 import { createServerClient } from "@/lib/supabase/server";
 import { checkPlanningMeteo } from "@/lib/services/meteo";
 
 export async function GET(req: NextRequest) {
-  const auth = await withAuth(req);
+  const auth = await withAuthRbac(req);
   if (auth.error) return auth.error;
 
   const { searchParams } = new URL(req.url);

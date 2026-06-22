@@ -6,13 +6,15 @@
 #include <Adafruit_ST7735.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <Preferences.h>
+#include "secrets.h"
 
-// ===================== WIFI CONFIG =====================
-const char* WIFI_SSID      = "Redmi Note";
-const char* WIFI_PASSWORD   = "12345678";
-const char* API_URL         = "https://leadfarm-iot.vercel.app/api/readings/";
-const char* DEVICE_ID       = "ESP32-001";
-const char* DEVICE_KEY      = "leadfarm-esp32-2026";
+// Copy secrets.h.example → secrets.h (gitignored) before flashing.
+
+// ===================== OFFLINE QUEUE (NVS) =====================
+Preferences prefs;
+const char* QUEUE_NS = "lf_queue";
+const int MAX_QUEUE = 20;
 
 // ===================== PINS =====================
 #define FLOW1_PIN 14
@@ -416,7 +418,50 @@ void setupWiFi() {
   }
 }
 
+void queuePayload(const char* json) {
+  prefs.begin(QUEUE_NS, false);
+  int count = prefs.getInt("count", 0);
+  if (count >= MAX_QUEUE) count = MAX_QUEUE - 1;
+  char key[8];
+  snprintf(key, sizeof(key), "p%d", count);
+  prefs.putString(key, json);
+  prefs.putInt("count", count + 1);
+  prefs.end();
+  Serial.println("QUEUE: payload buffered");
+}
+
+bool flushQueue() {
+  if (WiFi.status() != WL_CONNECTED) return false;
+  prefs.begin(QUEUE_NS, false);
+  int count = prefs.getInt("count", 0);
+  bool sentAny = false;
+  for (int i = 0; i < count; i++) {
+    char key[8];
+    snprintf(key, sizeof(key), "p%d", i);
+    String payload = prefs.getString(key, "");
+    if (payload.length() == 0) continue;
+
+    HTTPClient http;
+    http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+    http.begin(API_URL);
+    http.addHeader("Content-Type", "application/json");
+    http.addHeader("x-device-key", DEVICE_KEY);
+    int code = http.POST(payload);
+    http.end();
+    if (code == 200) sentAny = true;
+    else break;
+  }
+  if (sentAny) {
+    prefs.clear();
+    prefs.putInt("count", 0);
+  }
+  prefs.end();
+  return sentAny;
+}
+
 void sendToAPI() {
+  flushQueue();
+
   if (WiFi.status() != WL_CONNECTED) {
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     return;
@@ -462,6 +507,7 @@ void sendToAPI() {
   } else {
     Serial.print("API: ERR ");
     Serial.println(httpCode);
+    queuePayload(json);
   }
   http.end();
 }

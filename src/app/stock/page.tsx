@@ -2,6 +2,9 @@
 
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import AppLayout from "@/components/layout/AppLayout";
+import { useAccessContext } from "@/components/auth/AccessProvider";
+import { MagasinierPage } from "@/components/magasinier/MagasinierBranch";
+import MagStockPage from "@/components/magasinier/pages/MagStockPage";
 import { PageScreen, PageHero, AdalineButton } from "@/components/adaline/PageScreen";
 import { useProducts, useSuppliers, useMovements, useStockLevels, useParcelles } from "@/hooks/useData";
 import {
@@ -87,10 +90,13 @@ import { KpiCard, StockCard, ProductDetailPanel, DetailRow, MovementRow, Operati
 import { NewEntryModal, ConsommationModal, AjustementModal, ControleModal } from "./stock-modals";
 import InventaireGuideModal from "@/components/stock/InventaireGuideModal";
 import StockConformiteTab from "@/components/stock/StockConformiteTab";
+import RealStockView from "@/components/stock/RealStockView";
 import { PageSkeleton } from "@/components/ui/Skeleton";
+import FeatureGate from "@/components/auth/FeatureGate";
+import { daysUntil } from "@/components/dashboard/magasinier/WidgetShell";
 
 // ── Types ──────────────────────────────────────────────
-type Tab = "overview" | "products" | "movements" | "operations" | "analyses" | "conformite";
+type Tab = "stock_reel" | "overview" | "products" | "movements" | "operations" | "analyses" | "conformite";
 type ViewMode = "grid" | "list";
 type SortField = "name" | "quantity" | "value" | "status" | "category";
 type SortDir = "asc" | "desc";
@@ -118,13 +124,13 @@ const entryTypeIcons: Record<string, typeof ArrowUpRight> = {
 };
 
 const entryTypeColors: Record<string, string> = {
-  entry: "text-green-400 bg-green-400/10 border-emerald-400/20",
-  exit: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
-  treatment_consumption: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
-  adjustment: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
-  transfer: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
-  return: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
-  stock_initial: "text-[var(--color-valley-green)] bg-emerald-400/10 border-emerald-400/20",
+  entry: "text-green-400 bg-green-400/10 border-green-400/20",
+  exit: "text-red-400 bg-red-400/10 border-red-400/20",
+  treatment_consumption: "text-red-400 bg-red-400/10 border-red-400/20",
+  adjustment: "text-amber-400 bg-amber-400/10 border-amber-400/20",
+  transfer: "text-blue-400 bg-blue-400/10 border-blue-400/20",
+  return: "text-slate-400 bg-slate-400/10 border-slate-400/20",
+  stock_initial: "text-purple-400 bg-purple-400/10 border-purple-400/20",
 };
 
 const statusLabels: Record<string, string> = {
@@ -136,6 +142,14 @@ const statusLabels: Record<string, string> = {
 };
 
 export default function StockPage() {
+  const { profile } = useAccessContext();
+  if (profile?.role === "magasinier") {
+    return <MagasinierPage mag={MagStockPage} />;
+  }
+  return <StockContent />;
+}
+
+function StockContent() {
   const { data: stockLevelsRaw, loading: stockLoading, refetch: refetchStock } = useStockLevels();
   const { data: stockEntriesRaw, loading: entriesLoading, refetch: refetchMovements } = useMovements();
   const { data: productsRaw, loading: productsLoading } = useProducts();
@@ -156,6 +170,8 @@ export default function StockPage() {
   // ── Derived data ────────────────────────────────────────
   const uniqueCategories = useMemo(() => new Set(stockLevels.map((s: StockLevel) => s.category)).size, [stockLevels]);
   const lowStockItems = useMemo(() => stockLevels.filter((s: StockLevel) => s.status === "low" || s.status === "critical"), [stockLevels]);
+  const expiringItems = useMemo(() => stockLevels.filter((s: StockLevel) => s.expiryDate && daysUntil(s.expiryDate) <= 30), [stockLevels]);
+  const expiredItems = useMemo(() => stockLevels.filter((s: StockLevel) => s.expiryDate && daysUntil(s.expiryDate) <= 0), [stockLevels]);
   const totalEntries = useMemo(() => stockEntries.filter((e: StockEntry) => e.type === "entry").length, [stockEntries]);
   const totalExits = useMemo(() => stockEntries.filter((e: StockEntry) => e.type === "exit" || e.type === "treatment_consumption").length, [stockEntries]);
   const totalTransfers = useMemo(() => stockEntries.filter((e: StockEntry) => e.type === "transfer").length, [stockEntries]);
@@ -182,7 +198,7 @@ export default function StockPage() {
     });
     return Object.entries(byCat).map(([category, d]: [string, { quantity: number; count: number }]) => ({ category, quantity: d.quantity, count: d.count }));
   }, [stockLevels]);
-  const [tab, setTab] = useState<Tab>("products");
+  const [tab, setTab] = useState<Tab>("stock_reel");
   const [search, setSearch] = useState("");
   const [entryFilter, setEntryFilter] = useState<EntryFilter>("all");
   const [stockFilter, setStockFilter] = useState<StockFilter>("all");
@@ -193,6 +209,7 @@ export default function StockPage() {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [showNewEntryModal, setShowNewEntryModal] = useState(false);
   const [defaultMovementType, setDefaultMovementType] = useState("entree");
+  const [defaultProductName, setDefaultProductName] = useState("");
 
   const [showInventoryModal, setShowInventoryModal] = useState(false);
   const [showConsommationModal, setShowConsommationModal] = useState(false);
@@ -380,8 +397,9 @@ export default function StockPage() {
   const selectedStockItem = selectedProduct ? stockLevels.find((s: StockLevel) => s.productId === selectedProduct) : null;
 
   const tabs: { id: Tab; label: string; icon: typeof Package }[] = [
+    { id: "stock_reel", label: "Stock réel", icon: Warehouse },
     { id: "overview", label: "Vue d'ensemble", icon: LayoutGrid },
-    { id: "products", label: "Produits en stock", icon: Boxes },
+    { id: "products", label: "Produits", icon: Boxes },
     { id: "movements", label: "Mouvements", icon: ArrowRightLeft },
     { id: "operations", label: "Opérations", icon: ClipboardCheck },
     { id: "analyses", label: "Analyses", icon: BarChart3 },
@@ -418,40 +436,49 @@ export default function StockPage() {
         lede="Suivi en temps réel — entrées, sorties et traçabilité complète."
         actions={
           <>
-            <AdalineButton variant="tertiary" onClick={() => setShowInventoryModal(true)}>
-              <ClipboardCheck className="w-3.5 h-3.5" />
-              Inventaire
-            </AdalineButton>
+            <FeatureGate feature="stock.edit">
+              <AdalineButton variant="tertiary" onClick={() => setShowInventoryModal(true)}>
+                <ClipboardCheck className="w-3.5 h-3.5" />
+                Inventaire
+              </AdalineButton>
+            </FeatureGate>
             <AdalineButton variant="tertiary" onClick={handleExport}>
               <Download className="w-3.5 h-3.5" />
               Exporter
             </AdalineButton>
-            <AdalineButton
-              variant="tertiary"
-              onClick={() => {
-                setDefaultMovementType("sortie");
-                setShowNewEntryModal(true);
-              }}
-            >
-              <ArrowDownRight className="w-3.5 h-3.5" />
-              Sortie
-            </AdalineButton>
-            <AdalineButton
-              variant="primary"
-              onClick={() => {
-                setDefaultMovementType("entree");
-                setShowNewEntryModal(true);
-              }}
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Nouvelle entrée
-            </AdalineButton>
+            <FeatureGate feature="stock.edit">
+              <AdalineButton
+                variant="tertiary"
+                onClick={() => {
+                  setDefaultMovementType("sortie");
+                  setDefaultProductName("");
+                  setShowNewEntryModal(true);
+                }}
+              >
+                <ArrowDownRight className="w-3.5 h-3.5" />
+                Sortie
+              </AdalineButton>
+            </FeatureGate>
+            <FeatureGate feature="stock.edit">
+              <AdalineButton
+                variant="primary"
+                onClick={() => {
+                  setDefaultMovementType("entree");
+                  setDefaultProductName("");
+                  setShowNewEntryModal(true);
+                }}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Nouvelle entrée
+              </AdalineButton>
+            </FeatureGate>
           </>
         }
       />
 
-        {/* KPI row */}
-        <div className="relative grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 mt-5">
+        {/* KPI row (mock — masqué sur l'onglet Stock réel) */}
+        {tab !== "stock_reel" && (
+        <div className="relative grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 mt-5">
           {/* Products count */}
           <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.06] transition-colors">
             <div className="w-9 h-9 rounded-lg bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/20 flex items-center justify-center">
@@ -506,23 +533,58 @@ export default function StockPage() {
             <div className={cn(
               "w-9 h-9 rounded-lg flex items-center justify-center",
               lowStockItems.length > 0
-                ? "bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/20"
+                ? "bg-red-500/15 border border-red-500/20"
                 : "bg-white/[0.06] border border-white/[0.08]"
             )}>
-              <AlertTriangle className={cn("w-4 h-4", lowStockItems.length > 0 ? "text-[var(--color-valley-green)]" : "text-[var(--color-adaline-ink)]/40")} />
+              <AlertTriangle className={cn("w-4 h-4", lowStockItems.length > 0 ? "text-red-400" : "text-[var(--color-adaline-ink)]/40")} />
             </div>
             <div>
               <p className={cn(
                 "text-lg font-bold font-mono tabular-nums leading-none",
-                lowStockItems.length > 0 ? "text-[var(--color-valley-green)]" : "text-[var(--color-adaline-ink)]/55"
+                lowStockItems.length > 0 ? "text-red-400" : "text-[var(--color-adaline-ink)]/55"
               )}>{lowStockItems.length}</p>
               <p className="text-[10px] text-[var(--color-adaline-ink)]/50 mt-0.5 uppercase tracking-wider">Critiques</p>
             </div>
           </div>
+
+          {/* Expiry ≤30j */}
+          <div className={cn(
+            "flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors",
+            expiredItems.length > 0
+              ? "bg-red-500/[0.06] border-red-500/20"
+              : expiringItems.length > 0
+              ? "bg-amber-500/[0.06] border-amber-500/20"
+              : "bg-white/[0.04] border-white/[0.08]"
+          )}>
+            <div className={cn(
+              "w-9 h-9 rounded-lg flex items-center justify-center",
+              expiredItems.length > 0
+                ? "bg-red-500/15 border border-red-500/20"
+                : expiringItems.length > 0
+                ? "bg-amber-500/15 border border-amber-500/20"
+                : "bg-white/[0.06] border border-white/[0.08]"
+            )}>
+              <Clock className={cn("w-4 h-4",
+                expiredItems.length > 0 ? "text-red-400" :
+                expiringItems.length > 0 ? "text-amber-400" :
+                "text-[var(--color-adaline-ink)]/40"
+              )} />
+            </div>
+            <div>
+              <p className={cn(
+                "text-lg font-bold font-mono tabular-nums leading-none",
+                expiredItems.length > 0 ? "text-red-400" :
+                expiringItems.length > 0 ? "text-amber-400" :
+                "text-[var(--color-adaline-ink)]/55"
+              )}>{expiringItems.length}</p>
+              <p className="text-[10px] text-[var(--color-adaline-ink)]/50 mt-0.5 uppercase tracking-wider">Péremption ≤30j</p>
+            </div>
+          </div>
         </div>
+        )}
 
       {/* ── Tab navigation ── */}
-      <div className="flex items-center gap-0.5 mb-6 p-1 bg-black/40  rounded-xl w-fit border border-[var(--color-stone-moss)]">
+      <div className="flex items-center gap-0.5 mb-6 p-1 rounded-xl w-fit border border-[var(--color-stone-moss)]">
         {tabs.map((t: { id: Tab; label: string; icon: typeof Package }) => (
           <button
             key={t.id}
@@ -539,6 +601,37 @@ export default function StockPage() {
           </button>
         ))}
       </div>
+
+      {/* ══════════════════════════════════════════════════
+          TAB: STOCK RÉEL (données Groupe Lechehab)
+         ══════════════════════════════════════════════════ */}
+      {tab === "stock_reel" && (
+        <>
+          {(lowStockItems.length > 0 || expiringItems.length > 0) && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {expiredItems.length > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-red-500/10 border border-red-500/25 text-red-400">
+                  <Clock className="w-3.5 h-3.5" /> {expiredItems.length} produit{expiredItems.length > 1 ? "s" : ""} périmé{expiredItems.length > 1 ? "s" : ""}
+                </span>
+              )}
+              {expiringItems.length > expiredItems.length && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/10 border border-amber-500/25 text-amber-400">
+                  <Clock className="w-3.5 h-3.5" /> {expiringItems.length - expiredItems.length} expirant dans ≤30j
+                </span>
+              )}
+              {lowStockItems.length > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[var(--color-valley-green)]/10 border border-[var(--color-valley-green)]/25 text-[var(--color-valley-green)]">
+                  <AlertTriangle className="w-3.5 h-3.5" /> {lowStockItems.length} stock{lowStockItems.length > 1 ? "s" : ""} bas/critique{lowStockItems.length > 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+          )}
+          <RealStockView
+            onEntree={(name) => { setDefaultProductName(name); setDefaultMovementType("entree"); setShowNewEntryModal(true); }}
+            onSortie={(name) => { setDefaultProductName(name); setDefaultMovementType("sortie"); setShowNewEntryModal(true); }}
+          />
+        </>
+      )}
 
       {/* ══════════════════════════════════════════════════
           TAB: OVERVIEW
@@ -694,7 +787,8 @@ export default function StockPage() {
                               <div
                                 className={cn(
                                   "h-full rounded-full",
-                                  stock.status === "critical" ? "bg-emerald-400" : "bg-emerald-400"
+                                  stock.status === "critical" ? "bg-red-500" :
+                                  stock.status === "low" ? "bg-amber-400" : "bg-emerald-400"
                                 )}
                                 style={{ width: `${fillPercent}%` }}
                               />
@@ -838,9 +932,9 @@ export default function StockPage() {
                         const isNeg = stock.currentQuantity < 0;
                         const maxCap = stock.maxCapacity > 1 ? stock.maxCapacity : Math.max(stock.currentQuantity * 1.5, 100);
                         const fillPercent = isNeg ? 0 : Math.min((stock.currentQuantity / maxCap) * 100, 100);
-                        const qtyColor = isNeg ? "text-[var(--color-valley-green)]" :
-                          stock.status === "critical" ? "text-[var(--color-valley-green)]" :
-                          stock.status === "low" ? "text-[var(--color-valley-green)]" : "text-green-400";
+                        const qtyColor = isNeg ? "text-red-400" :
+                          stock.status === "critical" ? "text-red-400" :
+                          stock.status === "low" ? "text-amber-400" : "text-green-400";
                         const statusLabel = isNeg ? "Négatif" :
                           stock.status === "critical" ? "Critique" :
                           stock.status === "low" ? "Bas" :
@@ -877,9 +971,9 @@ export default function StockPage() {
                                 <div
                                   className={cn(
                                     "h-full rounded-full",
-                                    isNeg ? "bg-emerald-400" :
-                                    stock.status === "critical" ? "bg-emerald-400" :
-                                    stock.status === "low" ? "bg-emerald-400" : "bg-green-400"
+                                    isNeg ? "bg-red-500" :
+                                    stock.status === "critical" ? "bg-red-500" :
+                                    stock.status === "low" ? "bg-amber-400" : "bg-green-400"
                                   )}
                                   style={{ width: `${Math.max(fillPercent, 3)}%` }}
                                 />
@@ -1412,8 +1506,8 @@ export default function StockPage() {
                             <div
                               className={cn(
                                 "h-full rounded-full",
-                                stock.status === "critical" ? "bg-emerald-400" :
-                                stock.status === "low" ? "bg-emerald-400" : "bg-green-400"
+                                stock.status === "critical" ? "bg-red-500" :
+                                stock.status === "low" ? "bg-amber-400" : "bg-green-400"
                               )}
                               style={{ width: `${fillPercent}%` }}
                             />
@@ -1437,7 +1531,7 @@ export default function StockPage() {
       {/* ── Modals ── */}
       {tab === "conformite" && <StockConformiteTab />}
 
-      {showNewEntryModal && <NewEntryModal products={products} suppliers={suppliers} defaultType={defaultMovementType} onClose={() => setShowNewEntryModal(false)} onSaved={refetchAll} />}
+      {showNewEntryModal && <NewEntryModal products={products} suppliers={suppliers} defaultType={defaultMovementType} defaultProductName={defaultProductName} onClose={() => { setShowNewEntryModal(false); setDefaultProductName(""); }} onSaved={refetchAll} />}
       {showInventoryModal && <InventaireGuideModal stockLevels={stockLevels} onClose={() => setShowInventoryModal(false)} onSaved={refetchAll} />}
       {showConsommationModal && <ConsommationModal products={products} parcelles={parcelles} stockLevels={stockLevels} onClose={() => setShowConsommationModal(false)} onSaved={refetchAll} />}
       {showAjustementModal && <AjustementModal stockLevels={stockLevels} onClose={() => setShowAjustementModal(false)} onSaved={refetchAll} />}

@@ -3,8 +3,14 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { Parcelle } from "@/lib/mock-data";
 import type { Trajectory } from "@/lib/trajectory-utils";
+import { cn } from "@/lib/utils";
 import { Maximize2, Layers, Target, MousePointer2, Pencil, ZoomIn, ZoomOut, Hand, LocateFixed } from "lucide-react";
-import { parcelleLabelHtml, parcelleLabelIconAnchor } from "@/lib/map-labels";
+import {
+  attachParcelleMapLabel,
+  parcelleLabelHtml,
+  parcelleLabelIconAnchor,
+  parcelleLabelIconSize,
+} from "@/lib/map-labels";
 
 export type DrawTool = "polygon" | "rectangle" | "gps";
 
@@ -39,6 +45,9 @@ interface ParcelleMapProps {
   onViewportBoundsChange?: (bounds: any) => void;
   geoPins?: any[];
   focusCoordinates?: [number, number] | null;
+  /** When a detail drawer opens beside the map, refit size and nudge the view. */
+  detailPanelOpen?: boolean;
+  detailPanelWidth?: number;
 }
 
 export default function ParcelleMap({
@@ -68,6 +77,8 @@ export default function ParcelleMap({
   onViewportBoundsChange,
   geoPins = [],
   focusCoordinates = null,
+  detailPanelOpen = false,
+  detailPanelWidth = 400,
 }: ParcelleMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
@@ -153,51 +164,37 @@ export default function ParcelleMap({
       hybrid.addTo(map);
       L.control.layers({ Hybrid: hybrid, Satellite: satellite }, {}, { position: "bottomright", collapsed: true }).addTo(map);
 
-      // Debounce double-click: track last click time to prevent
-      // adding duplicate points when user double-clicks to finish
-      let lastClickTime = 0;
-      let clickTimeout: ReturnType<typeof setTimeout> | null = null;
-
       map.on("click", (e: any) => {
+        map.invalidateSize({ animate: false, pan: false });
+        const latlng = e.originalEvent
+          ? map.containerPointToLatLng(map.mouseEventToContainerPoint(e.originalEvent))
+          : e.latlng;
+
         if (!drawModeRef.current) {
-          onMapClickRef.current?.(e.latlng.lat, e.latlng.lng);
+          onMapClickRef.current?.(latlng.lat, latlng.lng);
           return;
         }
-        // Only polygon mode uses click-to-place
         if (drawToolRef.current !== "polygon") return;
         const pts = drawnPointsRef.current || [];
-        const now = Date.now();
 
-        // Snap-to-close: if clicking near first point and we have 3+ points
         if (pts.length >= 3) {
           const firstPt = pts[0];
-          const clickPx = map.latLngToContainerPoint(e.latlng);
+          const clickPx = map.latLngToContainerPoint(latlng);
           const firstPx = map.latLngToContainerPoint(L.latLng(firstPt[0], firstPt[1]));
-          const dist = clickPx.distanceTo(firstPx);
-          if (dist < 20) {
-            if (clickTimeout) clearTimeout(clickTimeout);
+          if (clickPx.distanceTo(firstPx) < 20) {
             onSnapCloseRef.current?.();
             return;
           }
         }
 
-        // Debounce: delay adding point to distinguish single vs double click
-        if (clickTimeout) clearTimeout(clickTimeout);
-        clickTimeout = setTimeout(() => {
-          onMapClickRef.current?.(e.latlng.lat, e.latlng.lng);
-        }, 200);
-
-        lastClickTime = now;
+        onMapClickRef.current?.(latlng.lat, latlng.lng);
       });
 
-      // Double-click listener on map
       map.on("dblclick", (e: any) => {
-        if (!drawModeRef.current) {
-          return;
-        }
-        if (clickTimeout) clearTimeout(clickTimeout);
+        L.DomEvent.stopPropagation(e);
+        if (!drawModeRef.current) return;
         const pts = drawnPointsRef.current || [];
-        if (pts.length >= 3) {
+        if (drawToolRef.current === "polygon" && pts.length >= 3) {
           onSnapCloseRef.current?.();
         }
       });
@@ -311,6 +308,10 @@ export default function ParcelleMap({
 
       mapInstance.current = map;
       setLoaded(true);
+      const fitMap = () => map.invalidateSize({ animate: false, pan: false });
+      requestAnimationFrame(fitMap);
+      window.setTimeout(fitMap, 120);
+      window.setTimeout(fitMap, 400);
     };
 
     initMap();
@@ -377,28 +378,10 @@ export default function ParcelleMap({
         });
         childPoly.bringToFront();
         parcelleLayersRef.current.push(childPoly);
-
-        if (child.center) {
-          const childLabelIcon = L.divIcon({
-            className: "",
-            html: parcelleLabelHtml(String(child.name), child.color),
-            iconAnchor: parcelleLabelIconAnchor(),
-          });
-          const childLabel = L.marker(child.center as L.LatLngExpression, {
-            icon: childLabelIcon,
-            interactive: false,
-          }).addTo(map);
-          parcelleLayersRef.current.push(childLabel);
-        }
+        attachParcelleMapLabel(childPoly, child, true);
       });
 
-      const labelIcon = L.divIcon({
-        className: "",
-        html: parcelleLabelHtml(String(parcelle.name), parcelle.color),
-        iconAnchor: parcelleLabelIconAnchor(),
-      });
-      const label = L.marker(parcelle.center as L.LatLngExpression, { icon: labelIcon, interactive: false }).addTo(map);
-      parcelleLayersRef.current.push(label);
+      attachParcelleMapLabel(polygon, parcelle, false);
     });
   }, [parcelles, loaded]);
 
@@ -450,17 +433,64 @@ export default function ParcelleMap({
     }
   }, [drawMode, drawTool]);
 
-  // Invalidate map size when expanded changes
+  // Keep Leaflet click coords aligned when layout/size changes (draw mode, expand, drawer)
   useEffect(() => {
-    if (mapInstance.current) {
-      setTimeout(() => mapInstance.current?.invalidateSize(), 350);
-    }
-  }, [expanded]);
+    if (!mapInstance.current || !mapRef.current) return;
+    const map = mapInstance.current;
+    const syncSize = () => map.invalidateSize({ animate: false, pan: false });
+    syncSize();
+    const t1 = window.setTimeout(syncSize, 80);
+    const t2 = window.setTimeout(syncSize, 400);
+    const ro = new ResizeObserver(syncSize);
+    ro.observe(mapRef.current);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      ro.disconnect();
+    };
+  }, [expanded, drawMode, loaded]);
 
-  // Auto-expand map in draw mode
+  // Polygon/rectangle draw: lock pan so clicks place vertices (hand tool re-enables drag)
   useEffect(() => {
-    if (drawMode) setExpanded(true);
-  }, [drawMode]);
+    const map = mapInstance.current;
+    if (!map || !loaded) return;
+    if (drawMode && drawTool !== "gps") {
+      map.dragging.disable();
+    } else {
+      map.dragging.enable();
+    }
+  }, [drawMode, drawTool, loaded]);
+
+  // Scroll du contenu page → resync coords Leaflet
+  useEffect(() => {
+    if (!loaded || !mapRef.current) return;
+    const scrollParent = mapRef.current.closest(".lf-content");
+    if (!scrollParent) return;
+    const onScroll = () => {
+      mapInstance.current?.invalidateSize({ animate: false, pan: false });
+    };
+    scrollParent.addEventListener("scroll", onScroll, { passive: true });
+    return () => scrollParent.removeEventListener("scroll", onScroll);
+  }, [loaded]);
+
+  const detailPanelOpenRef = useRef(detailPanelOpen);
+  useEffect(() => {
+    if (!mapInstance.current || !loaded) return;
+    const wasOpen = detailPanelOpenRef.current;
+    detailPanelOpenRef.current = detailPanelOpen;
+    const timer = window.setTimeout(() => {
+      const map = mapInstance.current;
+      if (!map) return;
+      map.invalidateSize();
+      if (detailPanelOpen && !wasOpen) {
+        map.panBy([-Math.round(detailPanelWidth * 0.22), 0], {
+          animate: true,
+          duration: 0.38,
+        });
+      }
+    }, 380);
+    return () => window.clearTimeout(timer);
+  }, [detailPanelOpen, detailPanelWidth, loaded]);
 
   // Update drawn polygon and markers
   useEffect(() => {
@@ -558,22 +588,15 @@ export default function ParcelleMap({
       const lng =
         drawnPoints.reduce((s, p) => s + p[1], 0) / drawnPoints.length;
       const labelIcon = L.divIcon({
-        className: "",
+        className: "parc-map-label-wrap",
         html: parcelleLabelHtml(previewLabel, drawColor),
         iconAnchor: parcelleLabelIconAnchor(),
+        iconSize: parcelleLabelIconSize(),
       });
       drawLabelRef.current = L.marker([lat, lng], {
         icon: labelIcon,
         interactive: false,
       }).addTo(map);
-    }
-
-    // Auto zoom-to-fit as polygon grows (with padding)
-    if (drawnPoints.length >= 2) {
-      const bounds = L.latLngBounds(drawnPoints as L.LatLngExpression[]);
-      if (!map.getBounds().contains(bounds)) {
-        map.fitBounds(bounds.pad(0.3), { animate: true, duration: 0.3 });
-      }
     }
   }, [drawnPoints, drawColor, previewLabel]);
 
@@ -818,7 +841,7 @@ export default function ParcelleMap({
           box-shadow:0 0 12px ${color}80, 0 3px 6px rgba(0,0,0,0.4);
           display:flex;align-items:center;justify-content:center;
           font-size:12px;cursor:pointer;
-        ">${emoji}<div style="position:absolute;inset:-4px;border-radius:50%;border:1.5px solid ${color};opacity:0.5;animation:pulse 2s infinite;"></div></div>`,
+        ">${emoji}</div>`,
         iconSize: [26, 26],
         iconAnchor: [13, 13],
       });
@@ -861,7 +884,7 @@ export default function ParcelleMap({
       : 0;
 
   return (
-    <div className="glass-card overflow-hidden relative">
+    <div className="glass-card lf-map-card overflow-hidden relative flex flex-col flex-1 min-h-0 h-full">
       <div className="flex items-center justify-between p-4 pb-0">
         <div>
           <h3 className="text-sm font-semibold text-[var(--color-adaline-ink)]/85">Carte des Parcelles</h3>
@@ -919,24 +942,26 @@ export default function ParcelleMap({
         </div>
       </div>
 
-      {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#1a2e1a]/80 z-10">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-6 h-6 border-2 border-[var(--color-valley-green)]/30 border-t-amber-400 rounded-full animate-spin" />
-            <span className="text-xs text-[var(--color-adaline-ink)]/30">Chargement de la carte...</span>
-          </div>
-        </div>
-      )}
+      <div className={cn("lf-map-stage", expanded && "lf-map-stage--expanded")}>
+        <div ref={mapRef} className="lf-map-stage-inner" />
 
-      {/* Draw mode HUD — on-map floating toolbar */}
-      {drawMode && loaded && !hideHud && (
-        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-3 bg-black/80  rounded-2xl px-5 py-2.5 border border-[var(--color-valley-green)]/30 shadow-lg shadow-black/30">
-          <MousePointer2 className="w-4 h-4 text-[var(--color-valley-green)] animate-pulse" />
-          <div className="flex flex-col">
-            <span className="text-xs text-[var(--color-valley-green)] font-semibold">
-              {drawTool === "rectangle"
-                ? "Cliquez-glissez pour dessiner un rectangle"
-                : drawTool === "gps"
+        {!loaded && (
+          <div className="absolute inset-0 flex items-center justify-center bg-[#f5f8ec]/90 z-10">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-6 h-6 border-2 border-[var(--color-valley-green)]/30 border-t-[var(--color-valley-green)] rounded-full animate-spin" />
+              <span className="text-xs text-[var(--color-adaline-ink)]/50">Chargement de la carte...</span>
+            </div>
+          </div>
+        )}
+
+        {drawMode && loaded && !hideHud && (
+          <div className="lf-map-hud absolute top-3 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-3 rounded-2xl px-5 py-2.5">
+            <MousePointer2 className="w-4 h-4 text-[var(--color-valley-green)] shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-xs text-[var(--color-adaline-ink)] font-semibold">
+                {drawTool === "rectangle"
+                  ? "Cliquez-glissez pour dessiner un rectangle"
+                  : drawTool === "gps"
                   ? `Marchez votre parcelle, tapez « Ajouter ma position » à chaque coin (${drawnPoints?.length || 0} pts)`
                   : !drawnPoints || drawnPoints.length === 0
                     ? "Cliquez pour placer le premier sommet"
@@ -945,33 +970,32 @@ export default function ParcelleMap({
                       : "Double-clic ou cliquez le 1er point pour fermer"}
             </span>
             {liveArea > 0 && (
-              <span className="text-[10px] text-[var(--color-adaline-ink)]/50 font-mono mt-0.5">
+              <span className="text-[10px] text-[var(--color-adaline-ink)]/55 font-mono mt-0.5">
                 Surface: {liveArea.toFixed(2)} ha · {drawnPoints?.length} sommets
               </span>
             )}
           </div>
           {drawnPoints && drawnPoints.length >= 3 && (
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse ml-1" title="Prêt à fermer" />
+            <div className="w-2 h-2 rounded-full bg-[var(--color-valley-green)] animate-pulse ml-1" title="Prêt à fermer" />
           )}
         </div>
       )}
 
-      {/* Custom map controls — zoom, hand, locate */}
       {loaded && (
-        <div className="absolute top-14 right-3 z-[1000] flex flex-col gap-1.5">
+        <div className="absolute top-3 right-3 z-[1000] flex flex-col gap-1.5">
           <button
             onClick={() => mapInstance.current?.zoomIn()}
-            className="w-9 h-9 rounded-lg bg-black/70  border border-white/15 flex items-center justify-center text-[var(--color-adaline-ink)]/60 hover:text-[var(--color-adaline-ink)] hover:bg-white/15 transition-all shadow-lg"
+            className="lf-map-control-btn w-9 h-9 rounded-lg flex items-center justify-center transition-all"
             title="Zoom avant"
           >
-            <ZoomIn className="w-4.5 h-4.5" />
+            <ZoomIn className="w-4 h-4" />
           </button>
           <button
             onClick={() => mapInstance.current?.zoomOut()}
-            className="w-9 h-9 rounded-lg bg-black/70  border border-white/15 flex items-center justify-center text-[var(--color-adaline-ink)]/60 hover:text-[var(--color-adaline-ink)] hover:bg-white/15 transition-all shadow-lg"
+            className="lf-map-control-btn w-9 h-9 rounded-lg flex items-center justify-center transition-all"
             title="Zoom arrière"
           >
-            <ZoomOut className="w-4.5 h-4.5" />
+            <ZoomOut className="w-4 h-4" />
           </button>
           <div className="h-px bg-[var(--color-stone-moss)] mx-1" />
           <button
@@ -981,10 +1005,10 @@ export default function ParcelleMap({
               map.dragging.enable();
               map.scrollWheelZoom.enable();
             }}
-            className="w-9 h-9 rounded-lg bg-black/70  border border-white/15 flex items-center justify-center text-[var(--color-adaline-ink)]/60 hover:text-[var(--color-adaline-ink)] hover:bg-white/15 transition-all shadow-lg"
+            className="lf-map-control-btn w-9 h-9 rounded-lg flex items-center justify-center transition-all"
             title="Mode déplacement"
           >
-            <Hand className="w-4.5 h-4.5" />
+            <Hand className="w-4 h-4" />
           </button>
           <button
             onClick={() => {
@@ -998,27 +1022,21 @@ export default function ParcelleMap({
                 map.fitBounds(L.latLngBounds(allBounds as L.LatLngExpression[]).pad(0.1));
               }
             }}
-            className="w-9 h-9 rounded-lg bg-black/70  border border-white/15 flex items-center justify-center text-[var(--color-adaline-ink)]/60 hover:text-[var(--color-adaline-ink)] hover:bg-white/15 transition-all shadow-lg"
+            className="lf-map-control-btn w-9 h-9 rounded-lg flex items-center justify-center transition-all"
             title="Recentrer sur les parcelles"
           >
-            <LocateFixed className="w-4.5 h-4.5" />
+            <LocateFixed className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      <div
-        ref={mapRef}
-        className="mt-3 rounded-b-2xl transition-all duration-300"
-        style={{ height: isTheaterMode ? "100%" : expanded ? 700 : 500 }}
-      />
-
       {/* Legend */}
       {parcelles.length > 0 && !drawMode && (
-        <div className="absolute bottom-4 left-4 z-[1000] flex flex-col gap-1.5 p-3 rounded-xl bg-[#1a2e1a]/85  border border-white/[0.12] max-w-[180px]">
+        <div className="lf-map-hud absolute bottom-4 left-4 z-[1000] flex flex-col gap-1.5 p-3 rounded-xl max-w-[180px]">
           {parcelles.map((p) => (
             <div key={p.id} className="flex items-center gap-2">
               <div className="w-3 h-3 rounded shrink-0" style={{ backgroundColor: p.color + "30", border: `1.5px solid ${p.color}` }} />
-              <span className="text-[10px] text-zinc-300 truncate">{p.name}</span>
+              <span className="text-[10px] text-[var(--color-adaline-ink)]/75 truncate">{p.name}</span>
             </div>
           ))}
         </div>
@@ -1026,15 +1044,16 @@ export default function ParcelleMap({
 
       {/* Draw mode shortcut legend */}
       {drawMode && loaded && !hideHud && (
-        <div className="absolute bottom-4 left-4 z-[1000] p-3 rounded-xl bg-black/70  border border-[var(--color-stone-moss)] text-[10px] text-zinc-400 space-y-1">
-          <div><kbd className="px-1 py-0.5 rounded bg-[var(--color-stone-moss)] text-zinc-200 font-mono">clic</kbd> Placer un sommet</div>
-          <div><kbd className="px-1 py-0.5 rounded bg-[var(--color-stone-moss)] text-zinc-200 font-mono">double-clic</kbd> Terminer</div>
-          <div><kbd className="px-1 py-0.5 rounded bg-[var(--color-stone-moss)] text-zinc-200 font-mono">glisser</kbd> Déplacer un sommet</div>
+        <div className="lf-map-hud absolute bottom-4 left-4 z-[1000] p-3 rounded-xl text-[10px] text-[var(--color-adaline-ink)]/70 space-y-1">
+          <div><kbd className="lf-map-kbd">clic</kbd> Placer un sommet</div>
+          <div><kbd className="lf-map-kbd">double-clic</kbd> Terminer</div>
+          <div><kbd className="lf-map-kbd">glisser</kbd> Déplacer un sommet</div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full border-2 border-current" /> Clic sur 1er point = fermer
+            <div className="w-3 h-3 rounded-full border-2 border-[var(--color-valley-green)]" /> Clic sur ① = fermer
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

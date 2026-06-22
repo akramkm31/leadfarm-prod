@@ -12,6 +12,6 @@ export async function syncParcelleMirror(
   const row = regionToParcelleMirrorRow(region, exploitationId);
   const { error } = await supabase.from("parcelles").upsert(row, { onConflict: "id" });
   if (error) {
-    console.warn("[syncParcelleMirror]", error.message);
+    throw new Error(`syncParcelleMirror: ${error.message}`);
   }
 }

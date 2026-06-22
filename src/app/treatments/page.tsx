@@ -7,6 +7,8 @@ import dynamic from "next/dynamic";
 import AppLayout from "@/components/layout/AppLayout";
 import { PageScreen, PageHero, AdalineButton } from "@/components/adaline/PageScreen";
 import PlanifierTraitementModal from "@/components/treatments/PlanifierTraitementModal";
+import ClotureTraitementModal from "@/components/treatments/ClotureTraitementModal";
+import EvaluerTraitementModal from "@/components/treatments/EvaluerTraitementModal";
 import EditTraitementModal from "@/components/treatments/EditTraitementModal";
 import TrajectoryReplayModal from "@/components/treatments/TrajectoryReplayModal";
 import { useTreatments, useParcelles } from "@/hooks/useData";
@@ -15,7 +17,13 @@ import {
   transitionTreatmentStatus,
   canTransition,
   deleteTreatment,
+  signTreatmentVisa,
 } from "@/lib/data-provider";
+import {
+  getWorkflowActions,
+  workflowPermissionFlags,
+  type WorkflowAction,
+} from "@/lib/treatments/workflow";
 import { dbPointsToTrajectory } from "@/lib/trajectory-utils";
 import {
   treatmentTypeLabels,
@@ -64,18 +72,7 @@ const STATUS_CONFIG: Record<string, {
 const ALL_STATUSES = ["all", "draft", "pending_approval", "approved", "planned", "in_progress", "completed", "evaluated", "cancelled"] as const;
 type FilterStatus = typeof ALL_STATUSES[number];
 
-// ─── Workflow transitions available per status ─────────────────────────────────
-
-const WORKFLOW_ACTIONS: Record<string, { to: string; label: string; icon: React.ElementType; danger?: boolean }[]> = {
-  draft:            [{ to: "pending_approval", label: "Soumettre pour approbation", icon: Send }],
-  pending_approval: [
-    { to: "approved", label: "Approuver", icon: ThumbsUp },
-    { to: "draft",    label: "Renvoyer en brouillon", icon: RotateCcw },
-  ],
-  approved:         [{ to: "in_progress", label: "Démarrer", icon: Play }],
-  in_progress:      [{ to: "completed",   label: "Clôturer", icon: CheckCircle2 }],
-  completed:        [{ to: "evaluated",   label: "Évaluer", icon: Star }],
-};
+// ─── Workflow transitions (RBAC + état) — voir lib/treatments/workflow.ts ─────
 
 // ─── Magasinier read-only notice ──────────────────────────────────────────────
 
@@ -102,6 +99,8 @@ export default function TreatmentsPage() {
 
 function TreatmentsContent() {
   const searchParams = useSearchParams();
+  const { can } = useAccessContext();
+  const workflowPerms = workflowPermissionFlags(can);
   const { data: treatmentsRaw, loading, refetch } = useTreatments();
   const { data: parcellesRaw } = useParcelles();
   const treatments = (treatmentsRaw || []) as any[];
@@ -123,6 +122,10 @@ function TreatmentsContent() {
   const pdfLoadingRef = useRef(false);
   const [completedBanner, setCompletedBanner] = useState<Treatment | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [clotureTarget, setClotureTarget] = useState<Treatment | null>(null);
+  const [evaluateTarget, setEvaluateTarget] = useState<Treatment | null>(null);
+  const [visaDraft, setVisaDraft] = useState("");
+  const [visaSaving, setVisaSaving] = useState(false);
 
   useEffect(() => {
     const statusParam = searchParams.get("status");
@@ -153,13 +156,16 @@ function TreatmentsContent() {
     });
   }, [selectedTreatment?.id, selectedTreatment?.status]);
 
-  // Keep selected treatment in sync after refetch
+  useEffect(() => {
+    const raw = selectedTreatment as { visa_rt?: string } | null;
+    setVisaDraft(raw?.visa_rt ?? "");
+  }, [selectedTreatment?.id, selectedTreatment]);
+
   useEffect(() => {
     if (!selectedTreatment) return;
-    const updated = treatments.find(t => t.id === selectedTreatment.id);
+    const updated = treatments.find((t) => t.id === selectedTreatment.id);
     if (updated) setSelectedTreatment(updated);
-  }, [treatments]);
-
+  }, [treatments, selectedTreatment?.id]);
   async function telechargerOrdre(treatmentId: string) {
     if (pdfLoadingRef.current) return;
     const t = treatments.find(t => t.id === treatmentId);
@@ -249,6 +255,18 @@ function TreatmentsContent() {
       t.operatorName?.toLowerCase().includes(search.toLowerCase());
     return matchStatus && matchSearch;
   });
+
+  async function runWorkflowAction(treatment: Treatment, action: WorkflowAction) {
+    if (action.requiresModal === "cloture") {
+      setClotureTarget(treatment);
+      return;
+    }
+    if (action.requiresModal === "evaluation") {
+      setEvaluateTarget(treatment);
+      return;
+    }
+    await doTransition(treatment.id, action.to);
+  }
 
   async function doTransition(treatmentId: string, newStatus: string) {
     setTransitioning(newStatus);
@@ -781,38 +799,81 @@ function TreatmentsContent() {
 
                   </> ); })(/* end t=selectedTreatment as any */)}
 
-                  {/* Workflow actions */}
+                  {/* Workflow actions (plan + exécution + évaluation) */}
+                  {(() => {
+                    const actions = getWorkflowActions(selectedTreatment.status, workflowPerms);
+                    if (actions.length === 0) return null;
+                    return (
+                      <div className="pt-3 border-t border-[#e0e5d5] space-y-2">
+                        <p className="text-[10px] text-[#31200b] uppercase tracking-widest">Actions</p>
+                        {actions.map((action) => {
+                          const ActionIcon = action.icon;
+                          const isLoading = transitioning === action.to;
+                          const primary =
+                            action.kind === "execute" ||
+                            action.to === "approved" ||
+                            action.to === "in_progress" ||
+                            action.to === "completed";
+                          return (
+                            <button
+                              key={`${action.to}-${action.kind}`}
+                              onClick={() => void runWorkflowAction(selectedTreatment, action)}
+                              disabled={!!transitioning || !canTransition(selectedTreatment.status, action.to)}
+                              className={cn(
+                                "w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all",
+                                primary
+                                  ? "btn-lf-primary"
+                                  : action.to === "pending_approval"
+                                    ? "bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/30 text-[var(--color-valley-green)] hover:bg-[var(--color-valley-green)]/25"
+                                    : "bg-white/[0.04] border border-white/[0.08] text-[#31200b] hover:text-[var(--color-adaline-ink)]/70",
+                                "disabled:opacity-40 disabled:cursor-not-allowed"
+                              )}
+                            >
+                              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ActionIcon className="w-4 h-4" />}
+                              {action.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+
+                  {/* Visa RT — après exécution, avant registre définitif */}
                   <FeatureGate feature="treatments.plan">
-                  {WORKFLOW_ACTIONS[selectedTreatment.status] && (
-                    <div className="pt-3 border-t border-[#e0e5d5] space-y-2">
-                      <p className="text-[10px] text-[#31200b] uppercase tracking-widest">Actions</p>
-                      {WORKFLOW_ACTIONS[selectedTreatment.status].map(action => {
-                        const ActionIcon = action.icon;
-                        const isLoading = transitioning === action.to;
-                        return (
-                          <button
-                            key={action.to}
-                            onClick={() => doTransition(selectedTreatment.id, action.to)}
-                            disabled={!!transitioning || !canTransition(selectedTreatment.status, action.to)}
-                            className={cn(
-                              "w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all",
-                              action.to === "approved" || action.to === "in_progress" || action.to === "completed"
-                                ? "btn-lf-primary"
-                                : action.to === "pending_approval"
-                                ? "bg-[var(--color-valley-green)]/15 border border-[var(--color-valley-green)]/30 text-[var(--color-valley-green)] hover:bg-[var(--color-valley-green)]/25"
-                                : "bg-white/[0.04] border border-white/[0.08] text-[#31200b] hover:text-[var(--color-adaline-ink)]/70",
-                              "disabled:opacity-40 disabled:cursor-not-allowed"
-                            )}
-                          >
-                            {isLoading
-                              ? <Loader2 className="w-4 h-4 animate-spin" />
-                              : <ActionIcon className="w-4 h-4" />}
-                            {action.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                    {selectedTreatment.status === "completed" || selectedTreatment.status === "evaluated" ? (
+                      <div className="pt-3 border-t border-[#e0e5d5] space-y-2">
+                        <p className="text-[10px] text-[#31200b] uppercase tracking-widest">Visa Responsable Technique</p>
+                        <p className="text-[10px] text-[#31200b]/60">
+                          À apposer après constat de l&apos;exécution terrain (opérateur).
+                        </p>
+                        <input
+                          value={visaDraft}
+                          onChange={(e) => setVisaDraft(e.target.value)}
+                          placeholder="Initiales / signature RT"
+                          className="glass-input w-full px-3 py-2 text-sm"
+                        />
+                        <button
+                          type="button"
+                          disabled={visaSaving || !visaDraft.trim()}
+                          onClick={async () => {
+                            setVisaSaving(true);
+                            setActionError(null);
+                            try {
+                              await signTreatmentVisa(selectedTreatment.id, visaDraft);
+                              await refetch?.();
+                            } catch (err) {
+                              setActionError(err instanceof Error ? err.message : "Visa impossible");
+                            } finally {
+                              setVisaSaving(false);
+                            }
+                          }}
+                          className="w-full py-2.5 rounded-xl text-sm font-bold border border-[#203b14]/30 text-[#203b14] hover:bg-[#203b14]/10 disabled:opacity-40"
+                        >
+                          {visaSaving ? <Loader2 className="w-4 h-4 animate-spin inline" /> : null}
+                          Enregistrer le visa
+                        </button>
+                      </div>
+                    ) : null}
                   </FeatureGate>
 
                   {/* Télécharger FOR.PR6.003 */}
@@ -836,6 +897,33 @@ function TreatmentsContent() {
         open={scheduleOpen}
         onClose={() => setScheduleOpen(false)}
         onSave={() => refetch?.()}
+      />
+      <ClotureTraitementModal
+        open={Boolean(clotureTarget)}
+        treatmentId={clotureTarget?.id ?? ""}
+        parcelleName={clotureTarget?.parcelleName}
+        defaultOperator={clotureTarget?.operatorName}
+        produitsDetail={(clotureTarget as any)?.produitsDetail}
+        onClose={() => setClotureTarget(null)}
+        onSaved={async () => {
+          const id = clotureTarget?.id;
+          setClotureTarget(null);
+          await refetch?.();
+          if (id) {
+            const updated = treatments.find((t) => t.id === id);
+            if (updated) setCompletedBanner(updated);
+          }
+        }}
+      />
+      <EvaluerTraitementModal
+        open={Boolean(evaluateTarget)}
+        treatmentId={evaluateTarget?.id ?? ""}
+        parcelleName={evaluateTarget?.parcelleName}
+        onClose={() => setEvaluateTarget(null)}
+        onSaved={() => {
+          setEvaluateTarget(null);
+          void refetch?.();
+        }}
       />
       <EditTraitementModal
         open={editOpen}

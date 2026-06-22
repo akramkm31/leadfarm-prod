@@ -37,11 +37,16 @@ import {
   Wheat,
   BarChart2,
   Sprout,
+  ChevronDown,
+  Maximize2,
+  Minimize2,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import CommandPalette from "./CommandPalette";
 import { useAlertsPanel } from "@/components/alerts/AlertsProvider";
 
-type NavItem = { href: string; label: string; icon: React.ElementType; badge?: number };
+type NavItem = { href: string; label: string; icon: React.ElementType; badge?: number; section?: string };
 type NavGroup = { id: string; label: string; icon: React.ElementType; items: NavItem[]; badge?: number };
 
 const GROUP_ICONS: Record<string, React.ElementType> = {
@@ -106,6 +111,7 @@ function useNavGroups(lowStock: number, alerts: number): NavGroup[] {
         href: item.href,
         label: item.label,
         icon: ITEM_ICONS[item.href] ?? LayoutDashboard,
+        section: item.section,
         badge:
           item.href === "/stock" && lowStock > 0
             ? lowStock
@@ -123,12 +129,16 @@ interface SidebarProps {
   mobileOpen?: boolean;
   onMobileClose?: () => void;
   onFlyoutOpenChange?: (open: boolean) => void;
+  collapsed?: boolean;
+  onCollapsedChange?: (v: boolean) => void;
 }
 
 export default function Sidebar({
   mobileOpen = false,
   onMobileClose,
   onFlyoutOpenChange,
+  collapsed = false,
+  onCollapsedChange,
 }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -147,6 +157,8 @@ export default function Sidebar({
   const { openAlerts } = useAlertsPanel();
 
   const [hoveredGroupId, setHoveredGroupId] = useState<string | null>(null);
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
+  const [flyoutExpanded, setFlyoutExpanded] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [isMac, setIsMac] = useState(false);
@@ -177,6 +189,8 @@ export default function Sidebar({
 
   const handleMouseLeaveSidebar = () => {
     if (mobileOpen) return;
+    // Desktop: keep flyout open so navigation stays visible (not hover-only).
+    if (typeof window !== "undefined" && window.innerWidth >= 768) return;
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     hoverTimeoutRef.current = setTimeout(() => setHoveredGroupId(null), 200);
   };
@@ -189,11 +203,22 @@ export default function Sidebar({
   }, [hoveredGroupId, mobileOpen, onFlyoutOpenChange]);
 
   useEffect(() => {
-    if (!mobileOpen || navGroups.length === 0) return;
+    if (navGroups.length === 0) return;
     const current =
       navGroups.find((g) => g.items.some((item) => isActiveHref(item.href))) ?? navGroups[0];
-    setHoveredGroupId(current.id);
-  }, [mobileOpen, pathname]);
+    if (mobileOpen) {
+      setHoveredGroupId(current.id);
+      return;
+    }
+    if (typeof window !== "undefined" && window.innerWidth >= 768) {
+      setHoveredGroupId(current.id);
+    }
+  }, [mobileOpen, pathname, navGroups]);
+
+  useEffect(() => {
+    setCollapsedSections(new Set());
+    setFlyoutExpanded(false);
+  }, [hoveredGroupId]);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -251,18 +276,30 @@ export default function Sidebar({
     <>
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/20 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/20 z-30 md:hidden"
           onClick={onMobileClose}
           aria-hidden
         />
+      )}
+
+      {collapsed && (
+        <button
+          type="button"
+          title="Afficher le menu"
+          onClick={() => onCollapsedChange?.(false)}
+          className="fixed left-0 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-5 h-10 rounded-r-lg bg-[var(--surface-pure,#fff)] border border-l-0 border-[var(--surface-recessed,#e5e5ea)] shadow-md hover:w-6 transition-all duration-200 text-[var(--text-secondary,#6e6e73)]"
+        >
+          <PanelLeftOpen className="w-3.5 h-3.5" strokeWidth={1.8} />
+        </button>
       )}
 
       <div
         ref={dockRef}
         className={cn(
           "lf-sidebar-dock fixed left-0 top-0 z-40 flex h-screen transition-transform duration-300",
-          "max-lg:-translate-x-full",
-          mobileOpen && "max-lg:translate-x-0"
+          "max-md:-translate-x-full",
+          mobileOpen && "max-md:translate-x-0",
+          collapsed && "md:-translate-x-[400px]"
         )}
         onMouseLeave={handleMouseLeaveSidebar}
         role={mobileOpen ? "dialog" : undefined}
@@ -312,6 +349,15 @@ export default function Sidebar({
           </nav>
 
           <div className="lf-dock-footer">
+            <button
+              type="button"
+              className="lf-dock-btn"
+              title="Masquer le menu"
+              aria-label="Masquer le menu"
+              onClick={() => onCollapsedChange?.(true)}
+            >
+              <PanelLeftClose strokeWidth={1.6} className="w-5 h-5" />
+            </button>
             <button
               type="button"
               className="lf-dock-btn"
@@ -388,6 +434,7 @@ export default function Sidebar({
         <aside
           id={flyoutId}
           className={cn("lf-flyout", flyoutVisible && "lf-flyout-open")}
+          style={flyoutExpanded ? { width: 360 } : undefined}
           onMouseEnter={() => {
             if (activeGroup) handleMouseEnterGroup(activeGroup.id);
           }}
@@ -400,27 +447,72 @@ export default function Sidebar({
               </div>
 
               <div className="lf-flyout-scroll">
-                {activeGroup.items.map((item) => {
-                  const ItemIcon = item.icon;
-                  const active = isActiveHref(item.href);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={onMobileClose}
-                      className={cn("lf-sb-link", active && "active")}
-                    >
-                      <ItemIcon strokeWidth={1.6} className="w-4 h-4 shrink-0" />
-                      <span className="flex-1">{item.label}</span>
-                      {item.badge != null && item.badge > 0 && (
-                        <span className="badge">{item.badge}</span>
-                      )}
-                      {item.href === "/treatments" && can("treatments.view") && !can("treatments.plan") && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-sky-100 text-sky-700 border border-sky-200 shrink-0">Lecture</span>
-                      )}
-                    </Link>
-                  );
-                })}
+                {(() => {
+                  const sections: { label: string; items: typeof activeGroup.items }[] = [];
+                  const seen = new Map<string, typeof activeGroup.items>();
+                  for (const item of activeGroup.items) {
+                    const key = item.section ?? "";
+                    if (!seen.has(key)) { seen.set(key, []); sections.push({ label: key, items: seen.get(key)! }); }
+                    seen.get(key)!.push(item);
+                  }
+                  return sections.map(({ label, items }, si) => {
+                    const collapsed = label ? collapsedSections.has(label) : false;
+                    return (
+                      <div key={label || si} className={si > 0 ? "mt-2" : undefined}>
+                        {label && (
+                          <button
+                            type="button"
+                            onClick={() => setCollapsedSections(prev => {
+                              const next = new Set(prev);
+                              next.has(label) ? next.delete(label) : next.add(label);
+                              return next;
+                            })}
+                            className="w-full flex items-center justify-between px-3 py-1 group hover:opacity-100 transition-opacity"
+                          >
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--text-secondary,#6e6e73)] opacity-60 group-hover:opacity-90 transition-opacity">
+                              {label}
+                            </span>
+                            <ChevronDown
+                              strokeWidth={2}
+                              className={cn(
+                                "w-3 h-3 text-[var(--text-secondary,#6e6e73)] opacity-40 group-hover:opacity-70 transition-all duration-200",
+                                collapsed && "-rotate-90"
+                              )}
+                            />
+                          </button>
+                        )}
+                        <div className={cn(
+                          "grid transition-all duration-200",
+                          collapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
+                        )}>
+                          <div className="overflow-hidden">
+                            {items.map((item) => {
+                              const ItemIcon = item.icon;
+                              const active = isActiveHref(item.href);
+                              return (
+                                <Link
+                                  key={item.href}
+                                  href={item.href}
+                                  onClick={onMobileClose}
+                                  className={cn("lf-sb-link", active && "active")}
+                                >
+                                  <ItemIcon strokeWidth={1.6} className="w-4 h-4 shrink-0" />
+                                  <span className="flex-1">{item.label}</span>
+                                  {item.badge != null && item.badge > 0 && (
+                                    <span className="badge">{item.badge}</span>
+                                  )}
+                                  {item.href === "/treatments" && can("treatments.view") && !can("treatments.plan") && (
+                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-sky-100 text-sky-700 border border-sky-200 shrink-0">Lecture</span>
+                                  )}
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
               </div>
 
               <div className="lf-flyout-tenant">

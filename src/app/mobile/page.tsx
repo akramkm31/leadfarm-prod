@@ -1,7 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
+import { updateTreatmentStatus } from "@/lib/data-provider";
+import {
+  enqueueSyncJob,
+  flushSyncQueue,
+  getPendingJobs,
+  type SyncJob,
+} from "@/lib/offline/sync-queue";
 import { cn } from "@/lib/utils";
 import {
   ChevronRight, CheckCircle2, AlertTriangle, Droplets,
@@ -44,18 +51,44 @@ export default function MobilePage() {
   const [sessionStart, setSessionStart] = useState<Date | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [completing, setCompleting] = useState(false);
+  const [pendingSync, setPendingSync] = useState(0);
 
   const isRTL = lang === "ar";
 
-  // Online detection
+  const replayQueue = useCallback(async () => {
+    const result = await flushSyncQueue(async (job: SyncJob) => {
+      if (job.action !== "update_status") return false;
+      try {
+        await updateTreatmentStatus(job.treatmentId, job.payload.status as "completed", {
+          executedDate: job.payload.executedDate as string | undefined,
+          notes: job.payload.notes as string | undefined,
+        });
+        return true;
+      } catch {
+        return false;
+      }
+    });
+    setPendingSync(getPendingJobs().length);
+    return result;
+  }, []);
+
+  // Online detection + sync replay
   useEffect(() => {
-    const onOnline  = () => setOnline(true);
+    const onOnline = () => {
+      setOnline(true);
+      void replayQueue();
+    };
     const onOffline = () => setOnline(false);
-    window.addEventListener("online",  onOnline);
+    window.addEventListener("online", onOnline);
     window.addEventListener("offline", onOffline);
     setOnline(navigator.onLine);
-    return () => { window.removeEventListener("online", onOnline); window.removeEventListener("offline", onOffline); };
-  }, []);
+    setPendingSync(getPendingJobs().length);
+    if (navigator.onLine) void replayQueue();
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+    };
+  }, [replayQueue]);
 
   // Timer
   useEffect(() => {
@@ -69,18 +102,25 @@ export default function MobilePage() {
     async function load() {
       setLoading(true);
       const { data } = await supabase
-        .from("traitements")
-        .select("id, cible_maladie, volume_bouillie_l, date_prevue, produits, parcelles(nom, culture_actuelle)")
-        .eq("status", "approved")
-        .order("date_prevue");
-      setOrdres((data || []).map((r: any) => ({
-        id: r.id,
-        parcelle_nom: r.parcelles?.nom || "—",
-        culture: r.parcelles?.culture_actuelle || "—",
-        cible_maladie: r.cible_maladie || "—",
-        date_prevue: r.date_prevue,
-        produits: (r.produits || []).map((p: any) => ({ nom: p.nom || p.produit_id, quantite: p.quantite_prevue, unite: p.unite })),
-        volume_bouillie_l: r.volume_bouillie_l || 0,
+        .from("treatments")
+        .select("id, cible, volume_bouillie, planned_date, site_name, culture, treatment_products(quantity_used, unit, products(trade_name))")
+        .in("status", ["planned", "in_progress"])
+        .order("planned_date");
+      setOrdres((data || []).map((r) => ({
+        id: r.id as string,
+        parcelle_nom: (r.site_name as string) || "—",
+        culture: (r.culture as string) || "—",
+        cible_maladie: (r.cible as string) || "—",
+        date_prevue: (r.planned_date as string) ?? "",
+        produits: ((r.treatment_products as { quantity_used?: number; unit?: string; products?: { trade_name?: string } | { trade_name?: string }[] }[]) || []).map((p) => {
+          const prod = Array.isArray(p.products) ? p.products[0] : p.products;
+          return {
+            nom: prod?.trade_name || "Produit",
+            quantite: p.quantity_used ?? 0,
+            unite: p.unit ?? "L",
+          };
+        }),
+        volume_bouillie_l: (r.volume_bouillie as number) || 0,
       })));
       setLoading(false);
     }
@@ -93,27 +133,53 @@ export default function MobilePage() {
     setScreen("en_cours");
     // Update status to in_progress + persistance EPI immédiate
     if (selectedOrdre) {
-      supabase.from("traitements").update({
-        status: "in_progress",
-        start_time: new Date().toISOString(),
-        epi_confirme: true,
-        epi_checklist: epiChecked,
-      }).eq("id", selectedOrdre.id).then(() => {});
+      const payload = {
+        status: "in_progress" as const,
+        executedDate: new Date().toISOString().slice(0, 10),
+      };
+      if (online) {
+        void updateTreatmentStatus(selectedOrdre.id, "in_progress", {
+          executedDate: payload.executedDate,
+        });
+      } else {
+        enqueueSyncJob({
+          table: "treatments",
+          action: "update_status",
+          treatmentId: selectedOrdre.id,
+          payload,
+        });
+        setPendingSync(getPendingJobs().length);
+      }
     }
   }
 
   async function completeTreatment() {
     if (!selectedOrdre) return;
     setCompleting(true);
-    await supabase.from("traitements").update({
-      status: "completed",
-      end_time: new Date().toISOString(),
-      duration_seconds: elapsed,
-      epi_confirme: true,
-      epi_checklist: epiChecked,
-    }).eq("id", selectedOrdre.id);
-    setCompleting(false);
-    setScreen("cloture");
+    const payload = {
+      status: "completed" as const,
+      executedDate: new Date().toISOString().slice(0, 10),
+      notes: `Mobile · ${elapsed}s · EPI confirmé`,
+    };
+    try {
+      if (online) {
+        await updateTreatmentStatus(selectedOrdre.id, "completed", {
+          executedDate: payload.executedDate,
+          notes: payload.notes,
+        });
+      } else {
+        enqueueSyncJob({
+          table: "treatments",
+          action: "update_status",
+          treatmentId: selectedOrdre.id,
+          payload,
+        });
+        setPendingSync(getPendingJobs().length);
+      }
+      setScreen("cloture");
+    } finally {
+      setCompleting(false);
+    }
   }
 
   const allEpiChecked = EPI_ITEMS.every(i => epiChecked[i.id]);
@@ -130,6 +196,11 @@ export default function MobilePage() {
           <div className={cn("w-2 h-2 rounded-full", online ? "bg-[#203b14]" : "bg-[var(--color-valley-green)]")} />
           <span className="text-xs text-[#31200b]">{online ? "Connecté" : "Hors ligne"}</span>
           {!online && <WifiOff className="w-3.5 h-3.5 text-[var(--color-valley-green)]" />}
+          {pendingSync > 0 && (
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+              {pendingSync} en attente
+            </span>
+          )}
         </div>
         <button
           onClick={() => setLang(l => l === "fr" ? "ar" : "fr")}

@@ -1,24 +1,28 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { supabase } from "@/lib/supabase";
+import { useTreatments, useProducts } from "@/hooks/useData";
+import type { Treatment, PhytoProduct } from "@/lib/mock-data";
+import { genererDossierConformitePDF } from "@/lib/pdf/dossierConformite";
 import { cn } from "@/lib/utils";
 import {
-  ShieldCheck, Globe, CalendarDays, CheckCircle2, XCircle,
-  AlertTriangle, FileDown, QrCode, Loader2, ChevronDown,
+  ShieldCheck, CheckCircle2, XCircle,
+  AlertTriangle, FileDown, QrCode, Loader2,
   FlaskConical, Leaf, ClipboardCheck,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Traitement = {
+type TraitementVM = {
   id: string;
-  start_time: string;
-  surface_traitee_ha: number;
-  volume_total_l: number;
-  produits: { produit_id: string; quantite_prevue: number; unite: string }[];
-  parcelle: { nom: string; culture_actuelle: string };
+  parcelle_nom: string;
+  culture: string;
+  date: string;
+  surface_ha: number;
+  volume_l: number;
+  produits: { productId: string; productName: string; quantite: number; dose: number }[];
 };
 
 type LMRResult = {
@@ -80,8 +84,30 @@ function getStatut(residu: number, lmr: number | null): LMRResult["statut"] {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ConformitePage() {
-  const [traitements, setTraitements] = useState<Traitement[]>([]);
-  const [loadingT, setLoadingT] = useState(true);
+  const { data: treatmentsRaw, loading: loadingT } = useTreatments();
+  const { data: productsRaw } = useProducts();
+  const products = (productsRaw || []) as PhytoProduct[];
+
+  const traitements = useMemo<TraitementVM[]>(() => {
+    const list = (treatmentsRaw || []) as Treatment[];
+    return list
+      .filter((t) => t.status === "completed")
+      .map((t) => ({
+        id: t.id,
+        parcelle_nom: t.sousParcelleName || t.parcelleName,
+        culture: t.type,
+        date: t.executedDate || t.completedDate || t.plannedDate,
+        surface_ha: t.areaTreatedHectares,
+        volume_l: t.volumeBouillie || 0,
+        produits: (t.products || []).map((p) => ({
+          productId: p.productId,
+          productName: p.productName,
+          quantite: p.quantityUsed,
+          dose: p.dosePerHectare,
+        })),
+      }));
+  }, [treatmentsRaw]);
+
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [paysCible, setPaysCible] = useState("EU");
   const [dateRecolte, setDateRecolte] = useState(() => {
@@ -98,27 +124,6 @@ export default function ConformitePage() {
   const [generating, setGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<"lmr" | "inpv" | "export">("lmr");
 
-  // ── Load traitements ────────────────────────────────────────────────────────
-  useEffect(() => {
-    async function load() {
-      setLoadingT(true);
-      const { data } = await supabase
-        .from("traitements")
-        .select(`id, start_time, surface_traitee_ha, volume_total_l, produits,
-                 parcelle:parcelles(nom, culture_actuelle)`)
-        .in("status", ["completed", "terminé"])
-        .order("start_time", { ascending: false })
-        .limit(50);
-      const normalized = (data || []).map((row: Record<string, unknown>) => ({
-        ...row,
-        parcelle: Array.isArray(row.parcelle) ? row.parcelle[0] : row.parcelle,
-      }));
-      setTraitements(normalized as unknown as Traitement[]);
-      setLoadingT(false);
-    }
-    load();
-  }, []);
-
   // ── LMR verification ────────────────────────────────────────────────────────
   async function verifierLMR() {
     if (!selectedIds.length) return;
@@ -129,31 +134,31 @@ export default function ConformitePage() {
     for (const tid of selectedIds) {
       const t = traitements.find(tr => tr.id === tid);
       if (!t || !t.produits?.length) continue;
-      const jours = Math.ceil((new Date(dateRecolte).getTime() - new Date(t.start_time).getTime()) / 86400000);
+      const jours = Math.ceil((new Date(dateRecolte).getTime() - new Date(t.date).getTime()) / 86400000);
 
       for (const pt of t.produits) {
-        const { data: produit } = await supabase
-          .from("produits_ppp")
-          .select("nom_commercial, matiere_active")
-          .eq("id", pt.produit_id)
-          .single();
+        const produit = products.find((p) => p.id === pt.productId);
+        const matiereActive = produit?.activeSubstance || "";
 
-        const { data: lmrRef } = await supabase
-          .from("lmr_references")
-          .select("lmr_mg_kg")
-          .eq("matiere_active", produit?.matiere_active || "")
-          .eq("pays_zone", paysCible)
-          .maybeSingle();
+        let lmr: number | null = null;
+        if (matiereActive) {
+          const { data: lmrRef } = await supabase
+            .from("lmr_references")
+            .select("lmr_mg_kg")
+            .eq("matiere_active", matiereActive)
+            .eq("pays_zone", paysCible)
+            .maybeSingle();
+          lmr = lmrRef?.lmr_mg_kg ?? null;
+        }
 
-        const doseGHa = t.surface_traitee_ha > 0 ? (pt.quantite_prevue * 1000) / t.surface_traitee_ha : 0;
+        const doseGHa = t.surface_ha > 0 ? (pt.quantite * 1000) / t.surface_ha : pt.dose * 1000;
         const residu = estimerResidu(doseGHa, 14, jours); // demi-vie 14j par défaut
-        const lmr = lmrRef?.lmr_mg_kg ?? null;
         const statut = getStatut(residu, lmr);
-        const marge = lmr !== null ? (lmr - residu) / lmr : null;
+        const marge = lmr !== null && lmr > 0 ? (lmr - residu) / lmr : null;
 
         results.push({
-          produit_nom: produit?.nom_commercial || pt.produit_id,
-          matiere_active: produit?.matiere_active || "—",
+          produit_nom: pt.productName,
+          matiere_active: matiereActive || "—",
           dose_g_ha: doseGHa,
           jours_depuis_traitement: jours,
           residu_estime_mg_kg: residu,
@@ -179,14 +184,46 @@ export default function ConformitePage() {
 
   const checklistScore = checklist.filter(c => c.checked).length;
 
-  async function genererPDF() {
-    if (globalStatut === "bloquant") return;
+  const complianceScore = useMemo(() => {
+    if (!lmrResults.length) return null;
+    const SCORE_MAP: Record<string, number> = { conforme: 100, alerte: 60, inconnu: 70, bloquant: 0 };
+    const total = lmrResults.reduce((s, r) => s + (SCORE_MAP[r.statut] ?? 0), 0);
+    return Math.round(total / lmrResults.length);
+  }, [lmrResults]);
+
+  function genererPDF() {
+    if (globalStatut === "bloquant" || !selectedIds.length) return;
     setGenerating(true);
-    // In production: call an Edge Function that renders PDF via puppeteer
-    await new Promise(r => setTimeout(r, 1800));
-    setGenerating(false);
-    // Placeholder: open a print-friendly page
-    window.print();
+    try {
+      const blob = genererDossierConformitePDF({
+        site: "Domaine Khelifa",
+        pays_cible: PAYS_CIBLES.find((p) => p.code === paysCible)?.label || paysCible,
+        date_recolte: new Date(dateRecolte).toLocaleDateString("fr-FR"),
+        statut_global: globalStatut || "non vérifié",
+        lmr_rows: lmrResults.map((r) => ({
+          produit_nom: r.produit_nom,
+          matiere_active: r.matiere_active,
+          residu_estime_mg_kg: r.residu_estime_mg_kg,
+          lmr_mg_kg: r.lmr_mg_kg,
+          marge: r.marge,
+          statut: r.statut,
+        })),
+        checklist: checklist.map((c) => ({ label: c.label, checked: c.checked })),
+        generated_at: new Date().toLocaleString("fr-FR"),
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Dossier_Conformite_${paysCible}_${new Date().toISOString().split("T")[0]}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Erreur génération dossier:", err);
+    } finally {
+      setGenerating(false);
+    }
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -262,11 +299,11 @@ export default function ConformitePage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex gap-3 items-center">
-                            <span className="text-xs font-bold text-[var(--color-adaline-ink)]/80 truncate">{t.parcelle?.nom}</span>
-                            <span className="text-[10px] text-[#31200b]">{t.parcelle?.culture_actuelle}</span>
+                            <span className="text-xs font-bold text-[var(--color-adaline-ink)]/80 truncate">{t.parcelle_nom}</span>
+                            <span className="text-[10px] text-[#31200b]">{t.culture}</span>
                           </div>
                           <div className="text-[10px] text-[#31200b] font-mono mt-0.5">
-                            {new Date(t.start_time).toLocaleDateString("fr-FR")} · {t.surface_traitee_ha?.toFixed(1)} ha · {t.volume_total_l?.toFixed(0)} L
+                            {new Date(t.date).toLocaleDateString("fr-FR")} · {t.surface_ha.toFixed(1)} ha · {t.volume_l.toFixed(0)} L
                           </div>
                         </div>
                       </button>
@@ -310,18 +347,41 @@ export default function ConformitePage() {
                   Sélectionnez des traitements et cliquez sur <strong>Vérifier LMR</strong>.
                 </div>
               ) : (
-                <table className="glass-table">
-                  <thead>
-                    <tr>
-                      <th>Produit</th>
-                      <th>Matière active</th>
-                      <th>Résidu estimé</th>
-                      <th>LMR ({paysCible})</th>
-                      <th>Marge</th>
-                      <th>Statut</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <>
+                  {complianceScore !== null && (
+                    <div className="px-5 py-3 border-b border-[#e0e5d5] flex items-center justify-between bg-[#f5f9f0]">
+                      <span className="text-xs text-[#31200b]">Score de conformité global</span>
+                      <div className="flex items-center gap-3">
+                        <div className="h-1.5 w-32 rounded-full bg-white/60 overflow-hidden">
+                          <div
+                            className={cn("h-full rounded-full transition-all",
+                              complianceScore >= 90 ? "bg-emerald-500" :
+                              complianceScore >= 70 ? "bg-amber-500" : "bg-red-500"
+                            )}
+                            style={{ width: `${complianceScore}%` }}
+                          />
+                        </div>
+                        <span className={cn("text-lg font-black",
+                          complianceScore >= 90 ? "text-emerald-600" :
+                          complianceScore >= 70 ? "text-amber-600" : "text-red-600"
+                        )}>
+                          {complianceScore}<span className="text-xs font-semibold">/100</span>
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  <table className="glass-table">
+                    <thead>
+                      <tr>
+                        <th>Produit</th>
+                        <th>Matière active</th>
+                        <th>Résidu estimé</th>
+                        <th>LMR ({paysCible})</th>
+                        <th>Marge</th>
+                        <th>Statut</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                     {lmrResults.map((r, i) => (
                       <tr key={i}>
                         <td className="font-medium text-[var(--color-adaline-ink)]/80">{r.produit_nom}</td>
@@ -332,7 +392,11 @@ export default function ConformitePage() {
                         </td>
                         <td>
                           {r.marge !== null ? (
-                            <span className={cn("text-xs font-bold", r.marge < 0 ? "text-[var(--color-valley-green)]" : r.marge < 0.2 ? "text-[var(--color-valley-green)]" : "text-[#203b14]")}>
+                            <span className={cn("text-xs font-bold",
+                              r.marge < 0 ? "text-red-600" :
+                              r.marge < 0.2 ? "text-amber-600" :
+                              "text-emerald-600"
+                            )}>
                               {(r.marge * 100).toFixed(1)}%
                             </span>
                           ) : <span className="text-[#31200b]">—</span>}
@@ -340,8 +404,9 @@ export default function ConformitePage() {
                         <td><LMRBadge statut={r.statut} /></td>
                       </tr>
                     ))}
-                  </tbody>
-                </table>
+                    </tbody>
+                  </table>
+                </>
               )}
             </div>
           )}
@@ -393,11 +458,11 @@ export default function ConformitePage() {
           {activeTab === "export" && (
             <div className="space-y-4">
               {globalStatut === "bloquant" && (
-                <div className="flex items-start gap-3 p-4 rounded-xl border border-[var(--color-valley-green)]/30 bg-[var(--color-valley-green)]/[0.06]">
-                  <XCircle className="w-5 h-5 text-[var(--color-valley-green)] flex-shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 p-4 rounded-xl border border-red-300 bg-red-50">
+                  <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-bold text-[var(--color-valley-green)]">Export bloqué</p>
-                    <p className="text-xs text-[#31200b] mt-0.5">Une ou plusieurs LMR sont dépassées. Corrigez les non-conformités avant de générer le dossier.</p>
+                    <p className="text-sm font-bold text-red-700">Export bloqué</p>
+                    <p className="text-xs text-red-600 mt-0.5">Une ou plusieurs LMR sont dépassées. Corrigez les non-conformités avant de générer le dossier.</p>
                   </div>
                 </div>
               )}
@@ -469,19 +534,19 @@ export default function ConformitePage() {
 
 function StatusPill({ statut }: { statut: string }) {
   const styles: Record<string, string> = {
-    conforme: "bg-[#203b14]/15 text-[#203b14] border-[#203b14]/30",
-    alerte: "bg-[var(--color-valley-green)]/15 text-[var(--color-valley-green)] border-[var(--color-valley-green)]/30",
-    bloquant: "bg-[var(--color-valley-green)]/15 text-[var(--color-valley-green)] border-[var(--color-valley-green)]/30",
-    inconnu: "bg-white/[0.06] text-[#31200b] border-[var(--color-stone-moss)]",
+    conforme: "bg-emerald-100 text-emerald-700 border-emerald-200",
+    alerte:   "bg-amber-100 text-amber-700 border-amber-200",
+    bloquant: "bg-red-100 text-red-700 border-red-200",
+    inconnu:  "bg-slate-100 text-slate-600 border-slate-200",
   };
   const icons: Record<string, React.ReactNode> = {
     conforme: <CheckCircle2 className="w-3.5 h-3.5" />,
-    alerte: <AlertTriangle className="w-3.5 h-3.5" />,
+    alerte:   <AlertTriangle className="w-3.5 h-3.5" />,
     bloquant: <XCircle className="w-3.5 h-3.5" />,
-    inconnu: <ShieldCheck className="w-3.5 h-3.5" />,
+    inconnu:  <ShieldCheck className="w-3.5 h-3.5" />,
   };
   return (
-    <span className={cn("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold uppercase tracking-wide", styles[statut])}>
+    <span className={cn("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold uppercase tracking-wide", styles[statut] ?? styles.inconnu)}>
       {icons[statut]}
       {statut}
     </span>

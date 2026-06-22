@@ -1,0 +1,867 @@
+
+==========================================================================================
+FILE: GESTION DU STOCK SBA 2025 (1).xlsx
+==========================================================================================
+Sheets (7): SAISIE | RESTE AUTO | ENTREES | CONSOMMATION | ANALYSE | MOUVEMENT  | PARCELLES
+
+  --- SHEET: SAISIE  (ref B6:D30 -> read B6:D30, rows=11, cols=3) ---
+   r00 | Date |  | 2021-11-22
+   r01 | Catégorie |  | FONGICIDE
+   r02 | Produit (nom commercial) |  | Bouillie bordelaise
+   r03 | Transfert |  | 0
+   r04 | Entrées |  | 0
+   r05 | Retours |  | 0
+   r06 | Sorties |  | 50
+   r07 | ZONE |  | SEFYOUN
+   r08 | SITE |  | SEFYOUN
+   r09 | Fournisseur/ |  | /
+   r10 | Autres observations |  | RS
+
+  --- SHEET: RESTE AUTO  (ref A1:F394 -> read A1:F394, rows=94, cols=6) ---
+   r00 | Catégorie | Produit (nom commercial) | Matière active | RESTE AUTO |  | 
+   r01 | FONGICIDE | Aktuan | Dimethomorphe 150 g/kg, Dithianon 350 g/kg | 49.50 |  | 
+   r02 | FONGICIDE | ALIETTE FLASH | Fosétyl-Aluminium 80 % | 507.70 |  | 
+   r03 | FONGICIDE | Amistar top | Azoxystrobine 200 g/l, Difenoconazole 125  | 26.35 |  | 
+   r04 | FONGICIDE | ANTRACOL | Propineb 70% | 812.50 |  | 
+   r05 | FONGICIDE | BELLIS |  | 415.80 |  | 
+   r06 | FONGICIDE | BOUILLIE BORDELAISE WG | Sulfate de cuivre 80% | 6786.40 |  | 
+   r07 | FONGICIDE | CABRIO DUO | Pyraclotrobine 40 g/l , Dimethomorphe 72 g | 151 |  | 
+   r08 | FONGICIDE | CHORUS | Cyprodinil 50% | 236.70 |  | 
+   r09 | FONGICIDE | Collis | Krésoxim-Methyl 100 g/l, 200 g/l Boscalid | 8.20 |  | 
+   r10 | FONGICIDE | Corail | Tebuconazole 250 g/l | 119.50 |  | 
+   r11 | FONGICIDE | Criptan | Captan 50% WP | 0.30 |  | 
+   r12 | FONGICIDE | Delan | Dithianon 500 g/l | 551.30 |  | 
+   r13 | FONGICIDE | FLINT | Trifloxystrobine | 63.35 |  | 
+   r14 | FONGICIDE | FONGICHEL | / | 12 |  | 
+   r15 | FONGICIDE | Gold Fos | Fosétyl-Aluminium 80 % | 0 |  | 
+   r16 | FONGICIDE | HELIO CUIVRE | / | -760.10 |  | 
+   r17 | FONGICIDE | Inacop | Oxychlorure de Cuivre 678,6 g/l | 300 |  | 
+   r18 | FONGICIDE | LUNA EXPERIENCE | TEBUCONAZOLE, FLUOPYRAM | 510.05 |  | 
+   r19 | FONGICIDE | Malvin | Captan 80% WG | 3277.50 |  | 
+   r20 | FONGICIDE | Merit | Difenoconazole Azoxystrobine 32,50 % | 4 |  | 
+   r21 | FONGICIDE | METHYL THIOPHANATE | THIOPHANATE METHYL | 1974 |  | 
+   r22 | FONGICIDE | Microtheol 80 | Soufre Miconisé Atomisé | 5355.50 |  | 
+   r23 | FONGICIDE | Mikal flash | Fosetyl Aluminium 500 g/kg, Folpel 250 g/k | 0 |  | 
+   ... (70 more rows)
+
+  --- SHEET: ENTREES  (ref A1:G114 -> read A1:G114, rows=55, cols=7) ---
+   r00 | Autres observations | ENTREE |  |  |  |  | 
+   r01 | Date | Catégorie | Produit (nom commercial) | Matière active | Fournisseur/ | Distributeur | Entrées (Kg ou L)
+   r02 | 2021-01-25 | INSECTICIDE | CALYPSO | Thiaclopride 280 g/l | BAYER | CASAP | 192
+   r03 | 2021-01-25 | INSECTICIDE | COMMANDO | IMIDACLOPRID | VAPCO | MAHALIYA TAYEB | 1200
+   r04 | 2021-01-25 | INSECTICIDE | Decis expert | Deltamethrine 25g/l | BAYER | CASAP | 375
+   r05 | 2021-01-25 | INSECTICIDE | EXIREL | CYANTRANILIPROLE | FMC | CASAP | 380
+   r06 | 2021-01-25 | INSECTICIDE | METHOATE | DIMETHOATE | ACI | MAHALIYA TAYEB | 658
+   r07 | 2021-01-25 | INSECTICIDE | Rufast | Acrinathrine 75 g/l | FMC | CASAP | 876
+   r08 | 2021-01-27 | INSECTICIDE | AGROIL BLUE | Huile de paraffine 830g/l | SIPCAM | DEVAGRI | 25600
+   r09 | 2021-01-27 | INSECTICIDE | HEXITHIAZOX | HEXYTHIAZOX | FITOPHARM | FILAHIA | 1620
+   r10 | 2021-01-27 | INSECTICIDE | RIBEN | Pyridabene 20 % | FITOPHARM | FILAHIA | 1150
+   r11 | 2021-01-27 | INSECTICIDE | TEBUMIGHT | Tebufenpyrad | ANGLO GULF | FILAHIA | 826
+   r12 | 2021-01-29 | INSECTICIDE | AGROIL BLUE | Huile de paraffine 830g/l | SIPCAM | DEVAGRI | 34000
+   r13 | 2021-01-29 | INSECTICIDE | CETAN | Acetamepride SP 200 g/l | (vide) | AGRICHEM | 1100
+   r14 | 2021-01-29 | INSECTICIDE | Mitigate | Fenpyroximate 5% | (vide) | AGRICHEM | 900
+   r15 | 2021-01-29 | INSECTICIDE | NUMECTINE | Abamectine | (vide) | AGRICHEM | 1025
+   r16 | 2021-01-29 | INSECTICIDE | TREBON | Etofenprox 287,5 g/l | SIPCAM | DEVAGRI | 1570
+   r17 | 2021-01-29 | INSECTICIDE | KARATE | Lambda cyhalothrine | (vide) | AGRICHEM | 1045
+   r18 | 2021-02-02 | INSECTICIDE | APOLLO | Clofentézine | (vide) | MAHALIYA TAYEB | 500
+   r19 | 2021-02-18 | INSECTICIDE | Movento | Spirotetramat | (vide) | (vide) | 800
+   r20 | 2021-02-18 | INSECTICIDE | TRACER | Spinosad 240 g/l | (vide) | (vide) | 120
+   r21 | 2021-02-19 | INSECTICIDE | Match gold | Lufenuron 50 g/l | (vide) | (vide) | 1500
+   r22 | 2021-02-20 | INSECTICIDE | GENERAL | / | (vide) | (vide) | 500
+   r23 | 2021-02-20 | INSECTICIDE | ABSOLUTE | Emmactin Benzoate | (vide) | (vide) | 1416.75
+   ... (31 more rows)
+
+  --- SHEET: CONSOMMATION  (ref A27:D54 -> read A27:D54, rows=27, cols=4) ---
+   r00 | Autres obs | (vide) |  | 
+   r01 | Site | (Tous) |  | 
+   r02 | Mois (Date) | Catégorie | Produit (nom commercial) | Consommation
+   r03 | févr | FER | FERIK | 60
+   r04 | mars | FER | Sequestrene | 46
+   r05 | mars | FER | Wuxal Fer | 50
+   r06 | mars | FER | FERIK | 5720
+   r07 | avr | FER | Sequestrene | 2595
+   r08 | avr | FER | UltraFerro | 165
+   r09 | avr | FER | EXCELLENT FER+AA | -5
+   r10 | avr | FER | Wuxal Fer | 208
+   r11 | avr | FER | FERIK | 8086
+   r12 | mai | FER | Sequestrene | 2400
+   r13 | mai | FER | Wuxal Fer | 30
+   r14 | mai | FER | FERIK | -90
+   r15 | juin | FER | Sequestrene | 580
+   r16 | juin | FER | Wuxal Fer | -72
+   r17 | juin | FER | FERIK | -80
+   r18 | juil | FER | Sequestrene | 220
+   r19 | juil | FER | Wuxal Fer | 30
+   r20 | juil | FER | FERIK | 60
+   r21 | sept | FER | Wuxal Fer | 173
+   r22 | sept | FER | FERIK | 200
+   r23 | oct | FER | Sequestrene | -55
+   ... (3 more rows)
+
+  --- SHEET: ANALYSE  (ref A24:E5993 -> read A24:E501, rows=10, cols=5) ---
+   r00 | Date | (Tous) |  |  | 
+   r01 | Site | (Tous) |  |  | 
+   r02 | Produit (nom commercial) | Catégorie | Entrées | Retours | Sorties
+   r03 | Delta micro Fer | FER | 0 | 0 | 0
+   r04 | EXCELLENT FER+AA | FER | 776 | 133 | 128
+   r05 | FERIK | FER | 16400 | 513 | 17677.40
+   r06 | Sequestrene | FER | 6700 | 230 | 8257
+   r07 | UltraFerro | FER | 0 | 2 | 167
+   r08 | Wuxal Fer | FER | 2675 | 283 | 2029
+   r09 | Total général |  | 26551 | 1161 | 28258.40
+
+  --- SHEET: MOUVEMENT   (ref A11:XEJ6915 -> read A11:AO501, rows=491, cols=41) ---
+   r00 |  | M 1 | M ENGRAIS |  |  |  |  |  |  |  |  |  | M2 | whatsapp |  |  |  | 
+   r01 | Date | Catégorie | Produit (nom commercial) | Matière active | Teneur en MA | Formulation | Famille chimique | Dose | Cible | Stock Initial 2024 | Transfert | Entrées | Retours | Sorties | Culture | Site | DETAILS SITE | DAR
+   r02 | 2020-12-31 | ACIDE NITRIQUE | ACIDE NITRIQUE | Acide Nitrique | Acide Nitrique | / | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r03 | 2021-01-01 | ACIDE NITRIQUE | ACIDE NITRIQUE | Acide Nitrique | Acide Nitrique | L | / | / | / | 0 | 0 | 0 | 0 | 20 | A PEPINS | TENIRA | Zone Tenira | /
+   r04 | 2021-01-01 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r05 | 2021-01-01 | HERBICIDE | RIVASATE | Glyphosate | Glyphosate 360g/l | L | / | / | / | 0 | 0 | 0 | 0 | 40 | VIGNE | VIGNE | VIGNE | /
+   r06 | 2021-01-03 | ACIDE NITRIQUE | ACIDE NITRIQUE | Acide Nitrique | Acide Nitrique | L | / | / | / | 0 | 0 | 0 | 0 | 15 | A PEPINS | MAGUER | Maguer srira | /
+   r07 | 2021-01-03 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r08 | 2021-01-05 | ACIDE SULFURIQUE | ACIDE SULFURIQUE | Acide sulfurique | Acide sulfurique | L | / | / | / | 0 | 0 | 0 | 0 | 20 | VIGNE | VIGNE | VIGNE | /
+   r09 | 2021-01-05 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r10 | 2021-01-05 | HERBICIDE | RIVASATE | Glyphosate | Glyphosate 360g/l | L | / | / | / | 0 | 0 | 0 | 0 | 20 | VIGNE | VIGNE | VIGNE | /
+   r11 | 2021-01-06 | FONGICIDE | BOUILLIE BORDELAISE WG | Sulfate de cuivre 80% | Sulfate de cuivre 80% | / | Cuivres | / | Tavelure, mildiou | 0 | 0 | 0 | 0 | 30 | A NOYAU | TIRMAN | Tighalimat | /
+   r12 | 2021-01-07 | ACIDE SULFURIQUE | ACIDE SULFURIQUE | Acide sulfurique | Acide sulfurique | L | / | / | / | 0 | 0 | 0 | 0 | 10 | A NOYAU | KOUANKA | Kouanka | /
+   r13 | 2021-01-07 | AUTRE | UREE 46 | N 46% | N 46% | Kg | / | / | / | 0 | 0 | 0 | 150 | 0 | A NOYAU | A NOYAU | A NOYAU | /
+   r14 | 2021-01-07 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r15 | 2021-01-07 | HERBICIDE | RIVASATE | Glyphosate | Glyphosate 360g/l | L | / | / | / | 0 | 0 | 0 | 45 | 0 | A PEPINS | CARRIERE | CARRIERE | /
+   r16 | 2021-01-08 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r17 | 2021-01-10 | ACIDE NITRIQUE | ACIDE NITRIQUE | Acide Nitrique | Acide Nitrique | L | / | / | / | 0 | 0 | 0 | 0 | 5 | A PEPINS | 13HA LA BASE | 13ha la base | /
+   r18 | 2021-01-10 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r19 | 2021-01-11 | ACIDE NITRIQUE | ACIDE NITRIQUE | Acide Nitrique | Acide Nitrique | L | / | / | / | 0 | 0 | 0 | 0 | 20 | A PEPINS | POMMIER SYS V | 13ha système V pom | /
+   r20 | 2021-01-11 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r21 | 2021-01-11 | HERBICIDE | RIVASATE | Glyphosate | Glyphosate 360g/l | L | / | / | / | 0 | 0 | 0 | 0 | 94 | A PEPINS | POMMIER SYS V | 13ha système V pom | /
+   r22 | 2021-01-12 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r23 | 2021-01-13 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 60 | A PEPINS | SEFYOUN | SEFYOUN | /
+   ... (467 more rows)
+
+  --- SHEET: PARCELLES  (ref B4:F82 -> read B4:F82, rows=72, cols=5) ---
+   r00 | N° | CULTURE | REGION | ZONE | SITE
+   r01 | 1 | A PEPINS POMMIER POIRIER | TENIRA | A PEPINS TENIRA | 13HA LA BASE
+   r02 | 2 |  |  |  | LA BASE
+   r03 | 3 |  |  |  | 28HA
+   r04 | 4 |  |  |  | HAJA FATMA GRANDE
+   r05 | 5 |  |  |  | HAJA FATMA PETITE
+   r06 | 6 |  |  |  | HOUARI BOUGARA
+   r07 | 7 |  |  |  | HOUARI HAJA FATMA
+   r08 | 8 |  |  |  | ALIAOUI
+   r09 | 9 |  |  | A PEPINS LYCEE | A PEPINS LYCEE
+   r10 | 10 |  |  | A PEPINS HJIRA | HJIRA GRANDE
+   r11 | 11 |  |  |  | HJIRA PETITE
+   r12 | 12 |  |  | A PEPINS MAGUER | MAGUER GRANDE
+   r13 | 13 |  |  |  | MAGUER PETITE 24Ha
+   r14 | 14 |  | SEFYOUN | A PEPINS SEFYOUN | A PEPINS SEFYOUN
+   r15 | 15 |  | MEZAOUROU | POIRIER MEAOUROU | POIRIER MEAOUROU
+   r16 | 16 | A NOYAU | SIDIHMAD | A NOYAU SIDIHMAD | A NOYAU SIDIHMAD
+   r17 | 17 |  | KOUANKA | A NOYAU KOUANKA | A NOYAU KOUANKA
+   r18 | 18 |  | SYS V | A NOYAU SYS V | A NOYAU SYS V
+   r19 | 19 |  | MAGUER | A NOYAU MAGUER | A NOYAU MAGUER
+   r20 | 20 |  | TIRMANE | A NOYAU TIRMANE | A NOYAU 44HA
+   r21 | 21 |  |  |  | A NOYAU 18HA
+   r22 | 22 |  |  |  | A NOYAU MEZAOUROU
+   r23 | 23 |  |  |  | A NOYAU NV 40HA
+   ... (48 more rows)
+
+==========================================================================================
+FILE: GESTION DU STOCK SBA 2025.xlsx
+==========================================================================================
+Sheets (7): SAISIE | RESTE AUTO | ENTREES | CONSOMMATION | ANALYSE | MOUVEMENT  | PARCELLES
+
+  --- SHEET: SAISIE  (ref B6:D30 -> read B6:D30, rows=11, cols=3) ---
+   r00 | Date |  | 2021-11-22
+   r01 | Catégorie |  | FONGICIDE
+   r02 | Produit (nom commercial) |  | Bouillie bordelaise
+   r03 | Transfert |  | 0
+   r04 | Entrées |  | 0
+   r05 | Retours |  | 0
+   r06 | Sorties |  | 50
+   r07 | ZONE |  | SEFYOUN
+   r08 | SITE |  | SEFYOUN
+   r09 | Fournisseur/ |  | /
+   r10 | Autres observations |  | RS
+
+  --- SHEET: RESTE AUTO  (ref A1:F394 -> read A1:F394, rows=94, cols=6) ---
+   r00 | Catégorie | Produit (nom commercial) | Matière active | RESTE AUTO |  | 
+   r01 | FONGICIDE | Aktuan | Dimethomorphe 150 g/kg, Dithianon 350 g/kg | 49.50 |  | 
+   r02 | FONGICIDE | ALIETTE FLASH | Fosétyl-Aluminium 80 % | 507.70 |  | 
+   r03 | FONGICIDE | Amistar top | Azoxystrobine 200 g/l, Difenoconazole 125  | 26.35 |  | 
+   r04 | FONGICIDE | ANTRACOL | Propineb 70% | 812.50 |  | 
+   r05 | FONGICIDE | BELLIS |  | 415.80 |  | 
+   r06 | FONGICIDE | BOUILLIE BORDELAISE WG | Sulfate de cuivre 80% | 6786.40 |  | 
+   r07 | FONGICIDE | CABRIO DUO | Pyraclotrobine 40 g/l , Dimethomorphe 72 g | 151 |  | 
+   r08 | FONGICIDE | CHORUS | Cyprodinil 50% | 236.70 |  | 
+   r09 | FONGICIDE | Collis | Krésoxim-Methyl 100 g/l, 200 g/l Boscalid | 8.20 |  | 
+   r10 | FONGICIDE | Corail | Tebuconazole 250 g/l | 119.50 |  | 
+   r11 | FONGICIDE | Criptan | Captan 50% WP | 0.30 |  | 
+   r12 | FONGICIDE | Delan | Dithianon 500 g/l | 551.30 |  | 
+   r13 | FONGICIDE | FLINT | Trifloxystrobine | 63.35 |  | 
+   r14 | FONGICIDE | FONGICHEL | / | 12 |  | 
+   r15 | FONGICIDE | Gold Fos | Fosétyl-Aluminium 80 % | 0 |  | 
+   r16 | FONGICIDE | HELIO CUIVRE | / | -760.10 |  | 
+   r17 | FONGICIDE | Inacop | Oxychlorure de Cuivre 678,6 g/l | 300 |  | 
+   r18 | FONGICIDE | LUNA EXPERIENCE | TEBUCONAZOLE, FLUOPYRAM | 510.05 |  | 
+   r19 | FONGICIDE | Malvin | Captan 80% WG | 3277.50 |  | 
+   r20 | FONGICIDE | Merit | Difenoconazole Azoxystrobine 32,50 % | 4 |  | 
+   r21 | FONGICIDE | METHYL THIOPHANATE | THIOPHANATE METHYL | 1974 |  | 
+   r22 | FONGICIDE | Microtheol 80 | Soufre Miconisé Atomisé | 5355.50 |  | 
+   r23 | FONGICIDE | Mikal flash | Fosetyl Aluminium 500 g/kg, Folpel 250 g/k | 0 |  | 
+   ... (70 more rows)
+
+  --- SHEET: ENTREES  (ref A1:G114 -> read A1:G114, rows=55, cols=7) ---
+   r00 | Autres observations | ENTREE |  |  |  |  | 
+   r01 | Date | Catégorie | Produit (nom commercial) | Matière active | Fournisseur/ | Distributeur | Entrées (Kg ou L)
+   r02 | 2021-01-25 | INSECTICIDE | CALYPSO | Thiaclopride 280 g/l | BAYER | CASAP | 192
+   r03 | 2021-01-25 | INSECTICIDE | COMMANDO | IMIDACLOPRID | VAPCO | MAHALIYA TAYEB | 1200
+   r04 | 2021-01-25 | INSECTICIDE | Decis expert | Deltamethrine 25g/l | BAYER | CASAP | 375
+   r05 | 2021-01-25 | INSECTICIDE | EXIREL | CYANTRANILIPROLE | FMC | CASAP | 380
+   r06 | 2021-01-25 | INSECTICIDE | METHOATE | DIMETHOATE | ACI | MAHALIYA TAYEB | 658
+   r07 | 2021-01-25 | INSECTICIDE | Rufast | Acrinathrine 75 g/l | FMC | CASAP | 876
+   r08 | 2021-01-27 | INSECTICIDE | AGROIL BLUE | Huile de paraffine 830g/l | SIPCAM | DEVAGRI | 25600
+   r09 | 2021-01-27 | INSECTICIDE | HEXITHIAZOX | HEXYTHIAZOX | FITOPHARM | FILAHIA | 1620
+   r10 | 2021-01-27 | INSECTICIDE | RIBEN | Pyridabene 20 % | FITOPHARM | FILAHIA | 1150
+   r11 | 2021-01-27 | INSECTICIDE | TEBUMIGHT | Tebufenpyrad | ANGLO GULF | FILAHIA | 826
+   r12 | 2021-01-29 | INSECTICIDE | AGROIL BLUE | Huile de paraffine 830g/l | SIPCAM | DEVAGRI | 34000
+   r13 | 2021-01-29 | INSECTICIDE | CETAN | Acetamepride SP 200 g/l | (vide) | AGRICHEM | 1100
+   r14 | 2021-01-29 | INSECTICIDE | Mitigate | Fenpyroximate 5% | (vide) | AGRICHEM | 900
+   r15 | 2021-01-29 | INSECTICIDE | NUMECTINE | Abamectine | (vide) | AGRICHEM | 1025
+   r16 | 2021-01-29 | INSECTICIDE | TREBON | Etofenprox 287,5 g/l | SIPCAM | DEVAGRI | 1570
+   r17 | 2021-01-29 | INSECTICIDE | KARATE | Lambda cyhalothrine | (vide) | AGRICHEM | 1045
+   r18 | 2021-02-02 | INSECTICIDE | APOLLO | Clofentézine | (vide) | MAHALIYA TAYEB | 500
+   r19 | 2021-02-18 | INSECTICIDE | Movento | Spirotetramat | (vide) | (vide) | 800
+   r20 | 2021-02-18 | INSECTICIDE | TRACER | Spinosad 240 g/l | (vide) | (vide) | 120
+   r21 | 2021-02-19 | INSECTICIDE | Match gold | Lufenuron 50 g/l | (vide) | (vide) | 1500
+   r22 | 2021-02-20 | INSECTICIDE | GENERAL | / | (vide) | (vide) | 500
+   r23 | 2021-02-20 | INSECTICIDE | ABSOLUTE | Emmactin Benzoate | (vide) | (vide) | 1416.75
+   ... (31 more rows)
+
+  --- SHEET: CONSOMMATION  (ref A27:D54 -> read A27:D54, rows=27, cols=4) ---
+   r00 | Autres obs | (vide) |  | 
+   r01 | Site | (Tous) |  | 
+   r02 | Mois (Date) | Catégorie | Produit (nom commercial) | Consommation
+   r03 | févr | FER | FERIK | 60
+   r04 | mars | FER | Sequestrene | 46
+   r05 | mars | FER | Wuxal Fer | 50
+   r06 | mars | FER | FERIK | 5720
+   r07 | avr | FER | Sequestrene | 2595
+   r08 | avr | FER | UltraFerro | 165
+   r09 | avr | FER | EXCELLENT FER+AA | -5
+   r10 | avr | FER | Wuxal Fer | 208
+   r11 | avr | FER | FERIK | 8086
+   r12 | mai | FER | Sequestrene | 2400
+   r13 | mai | FER | Wuxal Fer | 30
+   r14 | mai | FER | FERIK | -90
+   r15 | juin | FER | Sequestrene | 580
+   r16 | juin | FER | Wuxal Fer | -72
+   r17 | juin | FER | FERIK | -80
+   r18 | juil | FER | Sequestrene | 220
+   r19 | juil | FER | Wuxal Fer | 30
+   r20 | juil | FER | FERIK | 60
+   r21 | sept | FER | Wuxal Fer | 173
+   r22 | sept | FER | FERIK | 200
+   r23 | oct | FER | Sequestrene | -55
+   ... (3 more rows)
+
+  --- SHEET: ANALYSE  (ref A24:E5993 -> read A24:E501, rows=10, cols=5) ---
+   r00 | Date | (Tous) |  |  | 
+   r01 | Site | (Tous) |  |  | 
+   r02 | Produit (nom commercial) | Catégorie | Entrées | Retours | Sorties
+   r03 | Delta micro Fer | FER | 0 | 0 | 0
+   r04 | EXCELLENT FER+AA | FER | 776 | 133 | 128
+   r05 | FERIK | FER | 16400 | 513 | 17677.40
+   r06 | Sequestrene | FER | 6700 | 230 | 8257
+   r07 | UltraFerro | FER | 0 | 2 | 167
+   r08 | Wuxal Fer | FER | 2675 | 283 | 2029
+   r09 | Total général |  | 26551 | 1161 | 28258.40
+
+  --- SHEET: MOUVEMENT   (ref A11:XEJ6915 -> read A11:AO501, rows=491, cols=41) ---
+   r00 |  | M 1 | M ENGRAIS |  |  |  |  |  |  |  |  |  | M2 | whatsapp |  |  |  | 
+   r01 | Date | Catégorie | Produit (nom commercial) | Matière active | Teneur en MA | Formulation | Famille chimique | Dose | Cible | Stock Initial 2024 | Transfert | Entrées | Retours | Sorties | Culture | Site | DETAILS SITE | DAR
+   r02 | 2020-12-31 | ACIDE NITRIQUE | ACIDE NITRIQUE | Acide Nitrique | Acide Nitrique | / | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r03 | 2021-01-01 | ACIDE NITRIQUE | ACIDE NITRIQUE | Acide Nitrique | Acide Nitrique | L | / | / | / | 0 | 0 | 0 | 0 | 20 | A PEPINS | TENIRA | Zone Tenira | /
+   r04 | 2021-01-01 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r05 | 2021-01-01 | HERBICIDE | RIVASATE | Glyphosate | Glyphosate 360g/l | L | / | / | / | 0 | 0 | 0 | 0 | 40 | VIGNE | VIGNE | VIGNE | /
+   r06 | 2021-01-03 | ACIDE NITRIQUE | ACIDE NITRIQUE | Acide Nitrique | Acide Nitrique | L | / | / | / | 0 | 0 | 0 | 0 | 15 | A PEPINS | MAGUER | Maguer srira | /
+   r07 | 2021-01-03 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r08 | 2021-01-05 | ACIDE SULFURIQUE | ACIDE SULFURIQUE | Acide sulfurique | Acide sulfurique | L | / | / | / | 0 | 0 | 0 | 0 | 20 | VIGNE | VIGNE | VIGNE | /
+   r09 | 2021-01-05 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r10 | 2021-01-05 | HERBICIDE | RIVASATE | Glyphosate | Glyphosate 360g/l | L | / | / | / | 0 | 0 | 0 | 0 | 20 | VIGNE | VIGNE | VIGNE | /
+   r11 | 2021-01-06 | FONGICIDE | BOUILLIE BORDELAISE WG | Sulfate de cuivre 80% | Sulfate de cuivre 80% | / | Cuivres | / | Tavelure, mildiou | 0 | 0 | 0 | 0 | 30 | A NOYAU | TIRMAN | Tighalimat | /
+   r12 | 2021-01-07 | ACIDE SULFURIQUE | ACIDE SULFURIQUE | Acide sulfurique | Acide sulfurique | L | / | / | / | 0 | 0 | 0 | 0 | 10 | A NOYAU | KOUANKA | Kouanka | /
+   r13 | 2021-01-07 | AUTRE | UREE 46 | N 46% | N 46% | Kg | / | / | / | 0 | 0 | 0 | 150 | 0 | A NOYAU | A NOYAU | A NOYAU | /
+   r14 | 2021-01-07 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r15 | 2021-01-07 | HERBICIDE | RIVASATE | Glyphosate | Glyphosate 360g/l | L | / | / | / | 0 | 0 | 0 | 45 | 0 | A PEPINS | CARRIERE | CARRIERE | /
+   r16 | 2021-01-08 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r17 | 2021-01-10 | ACIDE NITRIQUE | ACIDE NITRIQUE | Acide Nitrique | Acide Nitrique | L | / | / | / | 0 | 0 | 0 | 0 | 5 | A PEPINS | 13HA LA BASE | 13ha la base | /
+   r18 | 2021-01-10 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r19 | 2021-01-11 | ACIDE NITRIQUE | ACIDE NITRIQUE | Acide Nitrique | Acide Nitrique | L | / | / | / | 0 | 0 | 0 | 0 | 20 | A PEPINS | POMMIER SYS V | 13ha système V pom | /
+   r20 | 2021-01-11 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r21 | 2021-01-11 | HERBICIDE | RIVASATE | Glyphosate | Glyphosate 360g/l | L | / | / | / | 0 | 0 | 0 | 0 | 94 | A PEPINS | POMMIER SYS V | 13ha système V pom | /
+   r22 | 2021-01-12 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 40 | A PEPINS | SEFYOUN | SEFYOUN | /
+   r23 | 2021-01-13 | FONGICIDE | HELIO CUIVRE | / | / | L | / | / | / | 0 | 0 | 0 | 0 | 60 | A PEPINS | SEFYOUN | SEFYOUN | /
+   ... (467 more rows)
+
+  --- SHEET: PARCELLES  (ref B4:F82 -> read B4:F82, rows=72, cols=5) ---
+   r00 | N° | CULTURE | REGION | ZONE | SITE
+   r01 | 1 | A PEPINS POMMIER POIRIER | TENIRA | A PEPINS TENIRA | 13HA LA BASE
+   r02 | 2 |  |  |  | LA BASE
+   r03 | 3 |  |  |  | 28HA
+   r04 | 4 |  |  |  | HAJA FATMA GRANDE
+   r05 | 5 |  |  |  | HAJA FATMA PETITE
+   r06 | 6 |  |  |  | HOUARI BOUGARA
+   r07 | 7 |  |  |  | HOUARI HAJA FATMA
+   r08 | 8 |  |  |  | ALIAOUI
+   r09 | 9 |  |  | A PEPINS LYCEE | A PEPINS LYCEE
+   r10 | 10 |  |  | A PEPINS HJIRA | HJIRA GRANDE
+   r11 | 11 |  |  |  | HJIRA PETITE
+   r12 | 12 |  |  | A PEPINS MAGUER | MAGUER GRANDE
+   r13 | 13 |  |  |  | MAGUER PETITE 24Ha
+   r14 | 14 |  | SEFYOUN | A PEPINS SEFYOUN | A PEPINS SEFYOUN
+   r15 | 15 |  | MEZAOUROU | POIRIER MEAOUROU | POIRIER MEAOUROU
+   r16 | 16 | A NOYAU | SIDIHMAD | A NOYAU SIDIHMAD | A NOYAU SIDIHMAD
+   r17 | 17 |  | KOUANKA | A NOYAU KOUANKA | A NOYAU KOUANKA
+   r18 | 18 |  | SYS V | A NOYAU SYS V | A NOYAU SYS V
+   r19 | 19 |  | MAGUER | A NOYAU MAGUER | A NOYAU MAGUER
+   r20 | 20 |  | TIRMANE | A NOYAU TIRMANE | A NOYAU 44HA
+   r21 | 21 |  |  |  | A NOYAU 18HA
+   r22 | 22 |  |  |  | A NOYAU MEZAOUROU
+   r23 | 23 |  |  |  | A NOYAU NV 40HA
+   ... (48 more rows)
+
+==========================================================================================
+FILE: GESTION DU STOCK SBA 2026 (1).xlsx
+==========================================================================================
+Sheets (5): SAISIE | RESTE AUTO | CONSOMMATION | MOUVEMENT  | _LISTES
+
+  --- SHEET: SAISIE  (ref B4:D30 -> read B4:D30, rows=14, cols=3) ---
+   r00 | Remplissez les champs ci-dessous, puis dem |  | 
+   r01 | "Enregistre la saisie" — et j'ajouterai la |  | 
+   r02 | Date |  | 2022-04-12
+   r03 | Catégorie |  | AUTRE
+   r04 | Produit (nom commercial) |  | VITANICA
+   r05 | Transfert |  | 0
+   r06 | Entrées |  | 0
+   r07 | Retours |  | 0
+   r08 | Sorties |  | 0
+   r09 | ZONE |  | SIDIHMAD
+   r10 | SITE |  | SIDIHMAD
+   r11 | Fournisseur/ |  | /
+   r12 | Autres observations |  | RS
+   r13 | ⚠️ Anomalie |  | ✅ Produit connu — 4 ligne(s)
+
+  --- SHEET: RESTE AUTO  (ref A1:F394 -> read A1:F394, rows=173, cols=6) ---
+   r00 | Catégorie | Produit (nom commercial) | Matière active | RESTE AUTO |  | 
+   r01 | AUTRE | ABYSS | (vide) | -438 |  | 
+   r02 | DRMX | LAIT |  | 3995 |  | 
+   r03 | FER | FERIK | (vide) | 4868.50 |  | 
+   r04 | FONGICIDE | Aliette flash | (vide) | -8 |  | 
+   r05 | FONGICIDE | AMISTAR TOP | (vide) | 975 |  | 
+   r06 | FONGICIDE | ANTRACOL | (vide) | -731 |  | 
+   r07 | FONGICIDE | BELLIS |  | 2685.60 |  | 
+   r08 | FONGICIDE | BLACKJAK | (vide) | 1991 |  | 
+   r09 | FONGICIDE | BOUILLIE BORDELAISE | (vide) | -2112 |  | 
+   r10 | FONGICIDE | CABRIO DUO | (vide) | 95 |  | 
+   r11 | FONGICIDE | CERTAKA | (vide) | 5 |  | 
+   r12 | FONGICIDE | Cominal |  | 0 |  | 
+   r13 | FONGICIDE | CURANE | (vide) | 2905 |  | 
+   r14 | FONGICIDE | EXILIS | (vide) | -232.50 |  | 
+   r15 | FONGICIDE | Flint | (vide) | 0.80 |  | 
+   r16 | FONGICIDE | Heliocuivre | (vide) | 2 |  | 
+   r17 | FONGICIDE | KUDOS | (vide) | -45 |  | 
+   r18 | FONGICIDE | LUNA EXPERIENCE | (vide) | -195 |  | 
+   r19 | FONGICIDE | MALVIN | (vide) | -242 |  | 
+   r20 | FONGICIDE | Match Gold | (vide) | -429 |  | 
+   r21 | FONGICIDE | METHYL THIOPHANATE | (vide) | -186 |  | 
+   r22 | FONGICIDE | Pelt | (vide) | 686.20 |  | 
+   r23 | FONGICIDE | PERFECTOS EVO | (vide) | 5 |  | 
+   ... (149 more rows)
+
+  --- SHEET: CONSOMMATION  (ref A53:E62 -> read A53:E62, rows=9, cols=5) ---
+   r00 | Autres obs | (vide) |  |  | 
+   r01 | Site | KOUANKA |  |  | 
+   r02 | Mois (Date) | Jours (Date) | Date | Produit (nom commercial) | Consommation
+   r03 | févr | 17-févr |  |  | -50
+   r04 | févr | 20-févr |  |  | 1275
+   r05 | mars | 05-mars |  |  | 375
+   r06 | mars | 13-mars |  |  | 950
+   r07 | mars | 20-mars |  |  | 850
+   r08 | mars | 29-mars |  |  | 850
+
+  --- SHEET: MOUVEMENT   (ref A11:XEJ4919 -> read A11:AO501, rows=491, cols=41) ---
+   r00 |  | M 1 | M ENGRAIS |  |  |  |  |  |  |  |  |  | M2 | whatsapp |  |  |  | 
+   r01 | Date | Catégorie | Produit (nom commercial) | Matière active | Teneur en MA | Formulation | Famille chimique | Dose | Cible | Stock Initial 2024 | Transfert | Entrées | Retours | Sorties | Culture | Site | DETAILS SITE | DAR
+   r02 | 2021-12-30 | ENGRAIS | BB5 |  |  |  |  |  |  |  |  |  |  | 20 | POMMIER | P SYS V | P SYS V | 
+   r03 | 2021-12-30 | ENGRAIS | GREEN ZINC |  |  |  |  |  |  |  |  |  |  | 900 | POMMIER | SEFYOUN | SEFYOUN | 
+   r04 | 2021-12-30 | ENGRAIS | UREE46% |  |  |  |  |  |  |  |  |  | 50 |  | POMMIER | TENIRA LA BASE | BOUGARA+13HA | 
+   r05 | 2022-01-02 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  |  | 2 |  | LA BASE | LA BASE | 
+   r06 | 2022-01-02 | INSECTICIDE | Decis experience |  |  |  |  |  |  |  |  | 0.25 |  |  |  | SIDIHMAD | SIDIHMAD | 
+   r07 | 2022-01-03 | ENGRAIS | GROUNDUP |  |  |  |  |  |  |  |  |  |  | 100 | POMMIER | POIRIER MEZAOUROU | POIRIER MEZAOUROU | 
+   r08 | 2022-01-03 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  | 0.50 |  |  | LA BASE | LA BASE | 
+   r09 | 2022-01-03 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  |  | 1.50 |  | LYCEE | LYCEE | 
+   r10 | 2022-01-03 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  |  | 10 |  | SIDIHMAD | SIDIHMAD | 
+   r11 | 2022-01-03 | INSECTICIDE | Decis experience |  |  |  |  |  |  |  |  | 0.25 |  |  |  | SIDIHMAD | SIDIHMAD | 
+   r12 | 2022-01-08 | ENGRAIS | N CALCIUM |  |  |  |  |  |  |  |  |  | 325 |  | NOYAU | SIDIHMAD | SIDIHMAD | 
+   r13 | 2022-01-08 | ENGRAIS | N POTASSIUM |  |  |  |  |  |  |  |  |  | 150 |  | NOYAU | SIDIHMAD | SIDIHMAD | 
+   r14 | 2022-01-08 | ENGRAIS | S AMMONIUM |  |  |  |  |  |  |  |  |  | 100 |  | NOYAU | SIDIHMAD | SIDIHMAD | 
+   r15 | 2022-01-08 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  |  | 5 |  | SEFYOUN | SEFYOUN | 
+   r16 | 2022-01-10 | ENGRAIS | AN |  |  |  |  |  |  |  |  |  |  | 20 | NOYAU | SIDIHMAD | SIDIHMAD | 
+   r17 | 2022-01-10 | ENGRAIS | AN |  |  |  |  |  |  |  |  |  |  | 20 | POMMIER | POIRIER MEZAOUROU | POIRIER MEZAOUROU | 
+   r18 | 2022-01-10 | ENGRAIS | AN |  |  |  |  |  |  |  |  |  |  | 20 | POMMIER | MAGUER | MAGUER GRAND | 
+   r19 | 2022-01-10 | INSECTICIDE | Absolute |  |  |  |  |  |  |  |  |  | 6.40 |  |  | SIDIHMAD | SIDIHMAD | 
+   r20 | 2022-01-10 | FONGICIDE | Aliette flash |  |  |  |  |  |  |  |  |  | 16 |  |  | SIDIHMAD | SIDIHMAD | 
+   r21 | 2022-01-10 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  |  | 2 |  | MAGUER | MAGUER GRAND | 
+   r22 | 2022-01-10 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  | 0.70 |  |  | STATION LA BASE | STATION LA BASE | 
+   r23 | 2022-01-10 | ENGRAIS | AUXIM |  |  |  |  |  |  |  |  |  | 1 |  |  | LA BASE | LA BASE | 
+   ... (467 more rows)
+
+  --- SHEET: _LISTES  (ref A1:H101 -> read A1:H101, rows=101, cols=8) ---
+   r00 | Catégorie | Produit | Site | Détails Site | Observations | Culture | Produit | Catégorie
+   r01 | AUTRE | ABYSS | 13HA LA BASE | 13HA LA BASE | RS | NOYAU | ABYSS | AUTRE
+   r02 | INSECTICIDE | AGROUIL BLUE | 18HA TIRMANE | 18HA TIRMANE | ENTREE | POMMIER | AGROUIL BLUE | ENGRAIS
+   r03 | FONGICIDE | ALION | 44HA TIRMAN | 28HA | TRANSFERT |  | ALION | HERBICIDE
+   r04 | HERBICIDE | AMISTAR TOP | BLIDA | 28HA LA BASE |  |  | AMISTAR TOP | FONGICIDE
+   r05 | ENGRAIS | AN | BOUHSSIDA KOUANKA | 40HA TIRMANE |  |  | AN | ENGRAIS
+   r06 | DRMX | ANTRACOL | CARRIERE | 44HA TIRMAN |  |  | ANTRACOL | FONGICIDE
+   r07 | FER | AP | CERISIER MAGUER | ABEILLES SYS V |  |  | AP | ENGRAIS
+   r08 |  | AS | HAJA FATMA | ALIAOUI |  |  | AS | ENGRAIS
+   r09 |  | AUXIM | HILAL | BLAD HOUARI |  |  | AUXIM | ENGRAIS
+   r10 |  | AZOFOL | HJIRA | BLAD HOUARI BOUGARA |  |  | AZOFOL | ENGRAIS
+   r11 |  | Absolute | HJIRA G | BLAD HOUARI+ BOUGARA |  |  | Absolute | INSECTICIDE
+   r12 |  | Aliette flash | HJIRA P | BLIDA |  |  | Aliette flash | FONGICIDE
+   r13 |  | BB5 | HYGINDIST | BOUGARA |  |  | BB5 | ENGRAIS
+   r14 |  | BELLIS | KOUANKA | BOUGARA+13HA |  |  | BELLIS | FONGICIDE
+   r15 |  | BLACKJAK | LA BASE | BOUHSSIDA KOUANKA |  |  | BLACKJAK | FONGICIDE
+   r16 |  | BOROZINC | LYCEE | CARRIERE |  |  | BOROZINC | ENGRAIS
+   r17 |  | BOUILLIE BORDELAISE | MAGUER | CERISIER MAGUER |  |  | BOUILLIE BORDELAISE | FONGICIDE
+   r18 |  | CABRIO DUO | P SYS V | HAJA FATMA |  |  | CABRIO DUO | FONGICIDE
+   r19 |  | CALBORON | POIRIER MEZAOUROU | HILAL |  |  | CALBORON | ENGRAIS
+   r20 |  | CERTAKA | ROUMILIYA | HJIRA |  |  | CERTAKA | FONGICIDE
+   r21 |  | CETAN | SEFYOUN | HJIRA G |  |  | CETAN | ENGRAIS
+   r22 |  | CLERTHIN | SIDIHMAD | HJIRA P |  |  | CLERTHIN | HERBICIDE
+   r23 |  | COREX ZN Mn | STATION LA BASE | HJIRA PORTE GREFFE |  |  | COREX ZN Mn | ENGRAIS
+   ... (77 more rows)
+
+==========================================================================================
+FILE: GESTION DU STOCK SBA 2026.xlsx
+==========================================================================================
+Sheets (5): SAISIE | RESTE AUTO | CONSOMMATION | MOUVEMENT  | _LISTES
+
+  --- SHEET: SAISIE  (ref B4:D30 -> read B4:D30, rows=14, cols=3) ---
+   r00 | Remplissez les champs ci-dessous, puis dem |  | 
+   r01 | "Enregistre la saisie" — et j'ajouterai la |  | 
+   r02 | Date |  | 2022-04-12
+   r03 | Catégorie |  | AUTRE
+   r04 | Produit (nom commercial) |  | VITANICA
+   r05 | Transfert |  | 0
+   r06 | Entrées |  | 0
+   r07 | Retours |  | 0
+   r08 | Sorties |  | 0
+   r09 | ZONE |  | SIDIHMAD
+   r10 | SITE |  | SIDIHMAD
+   r11 | Fournisseur/ |  | /
+   r12 | Autres observations |  | RS
+   r13 | ⚠️ Anomalie |  | ✅ Produit connu — 4 ligne(s)
+
+  --- SHEET: RESTE AUTO  (ref A1:F394 -> read A1:F394, rows=173, cols=6) ---
+   r00 | Catégorie | Produit (nom commercial) | Matière active | RESTE AUTO |  | 
+   r01 | AUTRE | ABYSS | (vide) | -438 |  | 
+   r02 | DRMX | LAIT |  | 3995 |  | 
+   r03 | FER | FERIK | (vide) | 4868.50 |  | 
+   r04 | FONGICIDE | Aliette flash | (vide) | -8 |  | 
+   r05 | FONGICIDE | AMISTAR TOP | (vide) | 975 |  | 
+   r06 | FONGICIDE | ANTRACOL | (vide) | -731 |  | 
+   r07 | FONGICIDE | BELLIS |  | 2685.60 |  | 
+   r08 | FONGICIDE | BLACKJAK | (vide) | 1991 |  | 
+   r09 | FONGICIDE | BOUILLIE BORDELAISE | (vide) | -2112 |  | 
+   r10 | FONGICIDE | CABRIO DUO | (vide) | 95 |  | 
+   r11 | FONGICIDE | CERTAKA | (vide) | 5 |  | 
+   r12 | FONGICIDE | Cominal |  | 0 |  | 
+   r13 | FONGICIDE | CURANE | (vide) | 2905 |  | 
+   r14 | FONGICIDE | EXILIS | (vide) | -232.50 |  | 
+   r15 | FONGICIDE | Flint | (vide) | 0.80 |  | 
+   r16 | FONGICIDE | Heliocuivre | (vide) | 2 |  | 
+   r17 | FONGICIDE | KUDOS | (vide) | -45 |  | 
+   r18 | FONGICIDE | LUNA EXPERIENCE | (vide) | -195 |  | 
+   r19 | FONGICIDE | MALVIN | (vide) | -242 |  | 
+   r20 | FONGICIDE | Match Gold | (vide) | -429 |  | 
+   r21 | FONGICIDE | METHYL THIOPHANATE | (vide) | -186 |  | 
+   r22 | FONGICIDE | Pelt | (vide) | 686.20 |  | 
+   r23 | FONGICIDE | PERFECTOS EVO | (vide) | 5 |  | 
+   ... (149 more rows)
+
+  --- SHEET: CONSOMMATION  (ref A53:E62 -> read A53:E62, rows=9, cols=5) ---
+   r00 | Autres obs | (vide) |  |  | 
+   r01 | Site | KOUANKA |  |  | 
+   r02 | Mois (Date) | Jours (Date) | Date | Produit (nom commercial) | Consommation
+   r03 | févr | 17-févr |  |  | -50
+   r04 | févr | 20-févr |  |  | 1275
+   r05 | mars | 05-mars |  |  | 375
+   r06 | mars | 13-mars |  |  | 950
+   r07 | mars | 20-mars |  |  | 850
+   r08 | mars | 29-mars |  |  | 850
+
+  --- SHEET: MOUVEMENT   (ref A11:XEJ4921 -> read A11:AO501, rows=491, cols=41) ---
+   r00 |  | M 1 | M ENGRAIS |  |  |  |  |  |  |  |  |  | M2 | whatsapp |  |  |  | 
+   r01 | Date | Catégorie | Produit (nom commercial) | Matière active | Teneur en MA | Formulation | Famille chimique | Dose | Cible | Stock Initial 2024 | Transfert | Entrées | Retours | Sorties | Culture | Site | DETAILS SITE | DAR
+   r02 | 2021-12-30 | ENGRAIS | BB5 |  |  |  |  |  |  |  |  |  |  | 20 | POMMIER | P SYS V | P SYS V | 
+   r03 | 2021-12-30 | ENGRAIS | GREEN ZINC |  |  |  |  |  |  |  |  |  |  | 900 | POMMIER | SEFYOUN | SEFYOUN | 
+   r04 | 2021-12-30 | ENGRAIS | UREE46% |  |  |  |  |  |  |  |  |  | 50 |  | POMMIER | TENIRA LA BASE | BOUGARA+13HA | 
+   r05 | 2022-01-02 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  |  | 2 |  | LA BASE | LA BASE | 
+   r06 | 2022-01-02 | INSECTICIDE | Decis experience |  |  |  |  |  |  |  |  | 0.25 |  |  |  | SIDIHMAD | SIDIHMAD | 
+   r07 | 2022-01-03 | ENGRAIS | GROUNDUP |  |  |  |  |  |  |  |  |  |  | 100 | POMMIER | POIRIER MEZAOUROU | POIRIER MEZAOUROU | 
+   r08 | 2022-01-03 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  | 0.50 |  |  | LA BASE | LA BASE | 
+   r09 | 2022-01-03 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  |  | 1.50 |  | LYCEE | LYCEE | 
+   r10 | 2022-01-03 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  |  | 10 |  | SIDIHMAD | SIDIHMAD | 
+   r11 | 2022-01-03 | INSECTICIDE | Decis experience |  |  |  |  |  |  |  |  | 0.25 |  |  |  | SIDIHMAD | SIDIHMAD | 
+   r12 | 2022-01-08 | ENGRAIS | N CALCIUM |  |  |  |  |  |  |  |  |  | 325 |  | NOYAU | SIDIHMAD | SIDIHMAD | 
+   r13 | 2022-01-08 | ENGRAIS | N POTASSIUM |  |  |  |  |  |  |  |  |  | 150 |  | NOYAU | SIDIHMAD | SIDIHMAD | 
+   r14 | 2022-01-08 | ENGRAIS | S AMMONIUM |  |  |  |  |  |  |  |  |  | 100 |  | NOYAU | SIDIHMAD | SIDIHMAD | 
+   r15 | 2022-01-08 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  |  | 5 |  | SEFYOUN | SEFYOUN | 
+   r16 | 2022-01-10 | ENGRAIS | AN |  |  |  |  |  |  |  |  |  |  | 20 | NOYAU | SIDIHMAD | SIDIHMAD | 
+   r17 | 2022-01-10 | ENGRAIS | AN |  |  |  |  |  |  |  |  |  |  | 20 | POMMIER | POIRIER MEZAOUROU | POIRIER MEZAOUROU | 
+   r18 | 2022-01-10 | ENGRAIS | AN |  |  |  |  |  |  |  |  |  |  | 20 | POMMIER | MAGUER | MAGUER GRAND | 
+   r19 | 2022-01-10 | INSECTICIDE | Absolute |  |  |  |  |  |  |  |  |  | 6.40 |  |  | SIDIHMAD | SIDIHMAD | 
+   r20 | 2022-01-10 | FONGICIDE | Aliette flash |  |  |  |  |  |  |  |  |  | 16 |  |  | SIDIHMAD | SIDIHMAD | 
+   r21 | 2022-01-10 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  |  | 2 |  | MAGUER | MAGUER GRAND | 
+   r22 | 2022-01-10 | HERBICIDE | ALION |  |  |  |  |  |  |  |  |  | 0.70 |  |  | STATION LA BASE | STATION LA BASE | 
+   r23 | 2022-01-10 | ENGRAIS | AUXIM |  |  |  |  |  |  |  |  |  | 1 |  |  | LA BASE | LA BASE | 
+   ... (467 more rows)
+
+  --- SHEET: _LISTES  (ref A1:H101 -> read A1:H101, rows=101, cols=8) ---
+   r00 | Catégorie | Produit | Site | Détails Site | Observations | Culture | Produit | Catégorie
+   r01 | AUTRE | ABYSS | 13HA LA BASE | 13HA LA BASE | RS | NOYAU | ABYSS | AUTRE
+   r02 | INSECTICIDE | AGROUIL BLUE | 18HA TIRMANE | 18HA TIRMANE | ENTREE | POMMIER | AGROUIL BLUE | ENGRAIS
+   r03 | FONGICIDE | ALION | 44HA TIRMAN | 28HA | TRANSFERT |  | ALION | HERBICIDE
+   r04 | HERBICIDE | AMISTAR TOP | BLIDA | 28HA LA BASE |  |  | AMISTAR TOP | FONGICIDE
+   r05 | ENGRAIS | AN | BOUHSSIDA KOUANKA | 40HA TIRMANE |  |  | AN | ENGRAIS
+   r06 | DRMX | ANTRACOL | CARRIERE | 44HA TIRMAN |  |  | ANTRACOL | FONGICIDE
+   r07 | FER | AP | CERISIER MAGUER | ABEILLES SYS V |  |  | AP | ENGRAIS
+   r08 |  | AS | HAJA FATMA | ALIAOUI |  |  | AS | ENGRAIS
+   r09 |  | AUXIM | HILAL | BLAD HOUARI |  |  | AUXIM | ENGRAIS
+   r10 |  | AZOFOL | HJIRA | BLAD HOUARI BOUGARA |  |  | AZOFOL | ENGRAIS
+   r11 |  | Absolute | HJIRA G | BLAD HOUARI+ BOUGARA |  |  | Absolute | INSECTICIDE
+   r12 |  | Aliette flash | HJIRA P | BLIDA |  |  | Aliette flash | FONGICIDE
+   r13 |  | BB5 | HYGINDIST | BOUGARA |  |  | BB5 | ENGRAIS
+   r14 |  | BELLIS | KOUANKA | BOUGARA+13HA |  |  | BELLIS | FONGICIDE
+   r15 |  | BLACKJAK | LA BASE | BOUHSSIDA KOUANKA |  |  | BLACKJAK | FONGICIDE
+   r16 |  | BOROZINC | LYCEE | CARRIERE |  |  | BOROZINC | ENGRAIS
+   r17 |  | BOUILLIE BORDELAISE | MAGUER | CERISIER MAGUER |  |  | BOUILLIE BORDELAISE | FONGICIDE
+   r18 |  | CABRIO DUO | P SYS V | HAJA FATMA |  |  | CABRIO DUO | FONGICIDE
+   r19 |  | CALBORON | POIRIER MEZAOUROU | HILAL |  |  | CALBORON | ENGRAIS
+   r20 |  | CERTAKA | ROUMILIYA | HJIRA |  |  | CERTAKA | FONGICIDE
+   r21 |  | CETAN | SEFYOUN | HJIRA G |  |  | CETAN | ENGRAIS
+   r22 |  | CLERTHIN | SIDIHMAD | HJIRA P |  |  | CLERTHIN | HERBICIDE
+   r23 |  | COREX ZN Mn | STATION LA BASE | HJIRA PORTE GREFFE |  |  | COREX ZN Mn | ENGRAIS
+   ... (77 more rows)
+
+==========================================================================================
+FILE: Liste_des_Entrées des_Produits_Phytosanitaires_et_Les_Engrais_SBA_2026 2.5.26.xlsx
+==========================================================================================
+Sheets (2): PRODUITS PHYTOSANITAIRES | ENGRAIS
+
+  --- SHEET: PRODUITS PHYTOSANITAIRES  (ref A1:I106 -> read A1:I106, rows=102, cols=9) ---
+   r00 | L'EXPLOITATION AGRICOLE LES FRERES LACHEB  |  |  |  |  |  |  |  | 
+   r01 | LISTE DES ENTREES DES PRODUITS PHYTOSANITA |  |  |  |  |  |  |  | 
+   r02 | N | Date | Catégorie | Produit | Matière active | Quantité | Unité | Distributeur | Date de péremeption
+   r03 | 1 | 2026-01-18 | Levée de dormance | LAIT | Lait de levée de dormance | 2650 | L | BLIDA | /
+   r04 | 2 | 2026-01-19 | Levée de dormance | LAIT | Lait de levée de dormance | 4260 | L | BLIDA | /
+   r05 | 3 | 2026-01-20 | Levée de dormance | LAIT | Lait de levée de dormance | 3200 | L | BLIDA | /
+   r06 | 4 | 2026-01-24 | Levée de dormance | LAIT | Lait de levée de dormance | 3200 | L | BLIDA | /
+   r07 | 5 | 2026-01-25 | Levée de dormance | LAIT | Lait de levée de dormance | 490 | L | BLIDA | /
+   r08 | 6 | 2026-02-15 | Levée de dormance | LAIT | Lait de levée de dormance | 2600 | L | BLIDA | /
+   r09 | 7 | 2026-02-15 | ACIDE HUMIQUE | BLACK JAK | Acides humiques | 4480 | L | DEVAGRI | 2028-06-09
+   r10 | 8 | 2026-02-15 | FER | FERIK FER | Fer chélaté (EDDHA/EDTA) | 3360 | Kg | DEVAGRI | 2028-03-02
+   r11 | 9 | 2026-02-18 | Insecticide | COLT | Acétamipride | 196.80 | L | DEVAGRI | 2027-05-31
+   r12 | 10 | 2026-02-18 | FER | FERIK FER | Fer chélaté (EDDHA/EDTA) | 2880 | Kg | DEVAGRI | 2028-03-02
+   r13 | 11 | 2026-02-18 | Correcteur de carence | TONOFOL SP | Mn+Zn | 3700 | Kg | DEVAGRI | 2027-06-04
+   r14 | 12 | 2026-02-22 | Insecticide | RIBEN | Pyridabene | 1200 | Kg | FILAHIA | 2026-04-04
+   r15 | 13 | 2026-02-22 | Insecticide | COMINAL | Pyriproxifène 100 g/l | 48 | L | FILAHIA | 2027-08-09
+   r16 | 14 | 2026-02-22 | Correcteur de carence | BOROZINC | Bore + Zinc | 2000 | Kg | TAYEB MAHALIA | 2028-05-12
+   r17 | 15 | 2026-02-23 | Correcteur de carence | GREEN ZINC | Zinc chélaté | 18000 | Kg | DAHRA CHEMICALS | 2027-08-31
+   r18 | 16 | 2026-02-23 | Correcteur de carence | CROX FOLIAIR | NPK + oligo‑éléments | 2000 | L | AGROTECH | 2028-05-31
+   r19 | 17 | 2026-02-23 | FER | CROX FER EDDHA | Fer chélaté EDDHA | 9450 | Kg | AGROTECH | 2027-08-31
+   r20 | 18 | 2026-02-23 | Correcteur de carence | GREEN ZINC | Zinc | 7600 | Kg | DAHRA CHEMICALS | 2027-08-31
+   r21 | 19 | 2026-02-24 | Insecticide | CETAN | Acétamipride | 827 | Kg | AGRICHEM | 2027-03-04
+   r22 | 20 | 2026-02-24 | Correcteur de carence | CURANE | P2O5 60 % /K2O40 % | 2905 | Kg | DEVAGRI | 2028-08-31
+   r23 | 21 | 2026-02-25 | Fongicide | BELLIS | Boscalid + pyraclostrobine | 2820 | Kg | SRID | 2028-07-04
+   ... (78 more rows)
+
+  --- SHEET: ENGRAIS  (ref A1:G23 -> read A1:G23, rows=19, cols=7) ---
+   r00 | L'EXPLOITATION AGRICOLE LES FRERES LACHEB  |  |  |  |  |  | 
+   r01 | LISTE DES ENTREES DES ENGRAIS SIDI BELABBE |  |  |  |  |  | 
+   r02 | N | Date | Produit | Quantité | Unité | Fournisseur | Date de péremeption
+   r03 | 1 | 2026-02-15 | ACIDE PHOSPHORIQUE | 2850 | L | HYGINDUST | 2028-02-27
+   r04 | 2 | 2026-02-15 | ACIDE NITRIQUE | 3000 | L | HYGINDUST | 2028-02-01
+   r05 | 3 | 2026-02-24 | ACIDE PHOSPHORIQUE | 2850 | L | HYGINDUST | 2028-02-27
+   r06 | 4 | 2026-02-24 | ACIDE NITRIQUE | 3000 | L | HYGINDUST | 2028-02-01
+   r07 | 5 | 2026-02-28 | Potassium acide 13,9.0.45 | 468 | Qx | CASAP | 2028-02-29
+   r08 | 6 | 2026-02-28 | Urea phosphaté(N17,5 P44) | 312 | Qx | CASAP | 2028-01-31
+   r09 | 7 | 2026-02-28 | Nitrate calcium | 504 | Qx | CASAP | 2026-07-31
+   r10 | 8 | 2026-02-28 | Nitrate magnésium | 126 | Qx | CASAP | 2028-01-31
+   r11 | 9 | 2026-02-28 | Sulphate ammonium | 300 | Qx | CASAP | 2028-03-31
+   r12 | 10 | 2026-03-04 | Urea phosphaté(N17,5 P44) | 610 | Qx | CASAP | 2028-01-31
+   r13 | 11 | 2026-03-04 | Sulphate ammonium | 370 | Qx | CASAP | 2028-03-31
+   r14 | 12 | 2026-03-23 | Potassium acide 13,9.0.45 | 637 | Qx | CASAP | 2028-02-29
+   r15 | 13 | 2026-03-23 | Nitrate potassium | 11.90 | Qx | CASAP | 2028-02-29
+   r16 | 14 | 2026-04-29 | ACIDE PHOSPHORIQUE | 5700 | L | HYGINDUST | 2028-02-27
+   r17 | 15 | 2026-05-20 | Nitrate calcium | 240 | Qx | AGROTODAY | 2027-12-31
+   r18 | 16 | 2026-05-24 | NITRATE MAGNESIUM | 100 | Qx | MAHALIA | 2028-02-28
+
+==========================================================================================
+FILE: PLANIFICATION ENGRAIS FERTIGATION TENIRA POMMIER.xlsx
+==========================================================================================
+Sheets (2): IMP | PARCELLES 
+
+  --- SHEET: IMP  (ref A1:T337 -> read A1:T337, rows=87, cols=20) ---
+   r00 | STATIONS | STATION LA BASE 1 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+   r01 |  |  | 1 |  |  |  | 2 |  | 3 | 4 |  | 5 |  |  |  | 6 |  | 
+   r02 | STATION | سكتار | DAP 18-44 | سلفات امونيوم | نترات مغنيزيوم | لاسيد نتريك | بلاك جاك | GREEN ZINC | نترات كالسيوم | نترات بوتاسيوم | لاسيد نتريك3 | DAP 18-44_2 | سلفات امونيوم2 | نترات مغنيزيوم2 | لاسيد نتريك2 | نترات بوتاسيوم2 | لاسيد نتريك4 | 
+   r03 | لاباز 1 | S1 | 217 | 65.10 | 65.10 | 0.01 | 32.55 | 54.25 | 368.90 | 271.25 | 0.01 | 217 | 65.10 | 65.10 | 0.01 | 271.25 | 0.01 | 
+   r04 |  | S2 | 160 | 48 | 48 | 0.01 | 24 | 40 | 272 | 200 | 0.01 | 160 | 48 | 48 | 0.01 | 200 | 0.01 | 
+   r05 |  | S3 | 200.30 | 60.09 | 60.09 | 0.01 | 30.05 | 50.08 | 340.51 | 250.38 | 0.01 | 200.30 | 60.09 | 60.09 | 0.01 | 250.38 | 0.01 | 
+   r06 |  | S4 | 205 | 61.50 | 61.50 | 0.01 | 30.75 | 51.25 | 348.50 | 256.25 | 0.01 | 205 | 61.50 | 61.50 | 0.01 | 256.25 | 0.01 | 
+   r07 | STATIONS | STATION LA BASE 2 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+   r08 |  |  | 1 |  |  |  | 2 |  | 3 | 4 |  |  |  | 5 |  |  | 6 | 7
+   r09 | STATION | سكتار | DAP 18-44 | سلفات امونيوم | نترات مغنيزيوم | لاسيد نتريك | بلاك جاك | GREEN ZINC | IRRIGATION الماء | DAP 18-44_2 | سلفات امونيوم2 | نترات مغنيزيوم2 | لاسيد نتريك2 | نترات بوتاسيوم | نترات كالسيوم | لاسيد نتريك3 | IRRIGATION الماء2 | نترات بوتاسيوم2
+   r10 | لاباز 2 | S1 | 100 | 30 | 30 | 0.01 | 15 | 25 |  | 100 | 30 | 30 | 0.01 | 125 | 170 | 0.01 |  | 125
+   r11 |  | S2 | 191 | 57.30 | 57.30 | 0.01 | 28.65 | 47.75 |  | 191 | 57.30 | 57.30 | 0.01 | 238.75 | 324.70 | 0.01 |  | 238.75
+   r12 |  | S3 | 116 | 34.80 | 34.80 | 0.01 | 17.40 | 29 |  | 116 | 34.80 | 34.80 | 0.01 | 145 | 197.20 | 0.01 |  | 145
+   r13 |  |  |  | مع بعض |  |  |  |  |  |  | مع بعض |  |  |  |  |  |  | 
+   r14 | STATIONS | STATION LA BASE 3 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+   r15 |  |  | 1 |  |  |  | 2 |  | 3 | 4 |  |  |  | 5 |  |  | 6 | 7
+   r16 | STATION | سكتار | DAP 18-44 | سلفات امونيوم | نترات مغنيزيوم | لاسيد نتريك | بلاك جاك | GREEN ZINC | IRRIGATION الماء | DAP 18-44_2 | سلفات امونيوم2 | نترات مغنيزيوم2 | لاسيد نتريك2 | نترات بوتاسيوم | نترات كالسيوم | لاسيد نتريك3 | IRRIGATION الماء2 | نترات بوتاسيوم2
+   r17 | 13هكتار لاباز | S1 | 35 | 10.50 | 10.50 | 0.01 | 5.25 | 8.75 |  | 35 | 10.50 | 10.50 | 0.01 | 43.75 | 59.50 | 0.01 |  | 43.75
+   r18 |  | S2 | 35 | 10.50 | 10.50 | 0.01 | 5.25 | 8.75 |  | 35 | 10.50 | 10.50 | 0.01 | 43.75 | 59.50 | 0.01 |  | 43.75
+   r19 |  | S3 | 35 | 10.50 | 10.50 | 0.01 | 5.25 | 8.75 |  | 35 | 10.50 | 10.50 | 0.01 | 43.75 | 59.50 | 0.01 |  | 43.75
+   r20 |  | S4 | 35 | 10.50 | 10.50 | 0.01 | 5.25 | 8.75 |  | 35 | 10.50 | 10.50 | 0.01 | 43.75 | 59.50 | 0.01 |  | 43.75
+   r21 |  |  |  | مع بعض |  |  |  |  |  |  | مع بعض |  |  |  |  |  |  | 
+   r22 | STATIONS | STATION LYCEE |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+   r23 |  |  | 1 |  |  |  | 2 |  | 3 | 4 |  |  |  | 5 |  |  | 6 | 7
+   ... (63 more rows)
+
+  --- SHEET: PARCELLES   (ref B2:Q53 -> read B2:Q53, rows=50, cols=16) ---
+   r00 |  | STATION | سكتار |  |  |  |  |  |  |  |  |  |  |  |  | 
+   r01 | STATIONS | STATION | SECTEURS | سكتار | SUP | لاسيد نتريك | لاسيد فوسفوريك | DAP 18-44 | بلاك جاك | الحديد FER | GREEN ZINC | نترات كالسيوم | نترات بوتاسيوم | نترات مغنيزيوم | سلفات امونيوم | IRRIGATION الماء
+   r02 | STATION CARRIERE | كاريار | CARRIERE | S1 | 6.79 | 0.01 | 13.58 | 67.90 | 10.19 | 33.95 | 16.98 | 115.43 | 84.88 | 20.37 | 20.37 | 
+   r03 | STATION CARRIERE | كاريار | CARRIERE | S2 | 7.30 | 0.01 | 14.60 | 73 | 10.95 | 36.50 | 18.25 | 124.10 | 91.25 | 21.90 | 21.90 | 
+   r04 | STATION CARRIERE | كاريار | CARRIERE | S3 | 8.90 | 0.01 | 17.80 | 89 | 13.35 | 44.50 | 22.25 | 151.30 | 111.25 | 26.70 | 26.70 | 
+   r05 | STATION CARRIERE | كاريار | CARRIERE | S4 | 6.46 | 0.01 | 12.92 | 64.60 | 9.69 | 32.30 | 16.15 | 109.82 | 80.75 | 19.38 | 19.38 | 
+   r06 | STATION 25Ha | 25 هكتار | 25Ha | S1 | 5.33 | 0.01 | 10.66 | 53.30 | 8.00 | 26.65 | 13.32 | 90.61 | 66.63 | 15.99 | 15.99 | 
+   r07 | STATION 25Ha | 25 هكتار | 25Ha | S2 | 5.82 | 0.01 | 11.64 | 58.20 | 8.73 | 29.10 | 14.55 | 98.94 | 72.75 | 17.46 | 17.46 | 
+   r08 | STATION 25Ha | 25 هكتار | 25Ha | S3 | 4.96 | 0.01 | 9.92 | 49.60 | 7.44 | 24.80 | 12.40 | 84.32 | 62 | 14.88 | 14.88 | 
+   r09 | STATION 25Ha | 25 هكتار | 25Ha | S4 | 4.50 | 0.01 | 9 | 45 | 6.75 | 22.50 | 11.25 | 76.50 | 56.25 | 13.50 | 13.50 | 
+   r10 | STATION 13Ha devil gala | 13هكتار تفاح | 13Ha devil gala | S1 | 6.50 | 0.01 | 13 | 65 | 9.75 | 32.50 | 16.25 | 110.50 | 81.25 | 19.50 | 19.50 | 
+   r11 | STATION 13Ha devil gala | 13هكتار تفاح | 13Ha devil gala | S2 | 6.50 | 0.01 | 13 | 65 | 9.75 | 32.50 | 16.25 | 110.50 | 81.25 | 19.50 | 19.50 | 
+   r12 | STATION 2Ha SYS V | 2هكتار V سيستام | 2Ha SYS V | S1 | 4 | 0.01 | 8 | 40 | 6 | 20 | 10 | 68 | 50 | 12 | 12 | 
+   r13 | STATION Maguer Grande | ماقر كبيرة | Maguer Grande | S1 | 13 | 0.01 | 26 | 130 | 19.50 | 65 | 32.50 | 221 | 162.50 | 39 | 39 | 
+   r14 | STATION Maguer Grande | ماقر كبيرة | Maguer Grande | S2 | 9.50 | 0.01 | 19 | 95 | 14.25 | 47.50 | 23.75 | 161.50 | 118.75 | 28.50 | 28.50 | 
+   r15 | STATION Maguer Grande | ماقر كبيرة | Maguer Grande | S3 | 11.50 | 0.01 | 23 | 115 | 17.25 | 57.50 | 28.75 | 195.50 | 143.75 | 34.50 | 34.50 | 
+   r16 | STATION Maguer Grande | ماقر كبيرة | Maguer Grande | S4 | 3 | 0.01 | 6 | 30 | 4.50 | 15 | 7.50 | 51 | 37.50 | 9 | 9 | 
+   r17 | STATION Maguer Petite | ماقر صغيرة | Maguer Petite | S1 | 7 | 0.01 | 14 | 70 | 10.50 | 35 | 17.50 | 119 | 87.50 | 21 | 21 | 
+   r18 | STATION Maguer Petite | ماقر صغيرة | Maguer Petite | S2 | 7 | 0.01 | 14 | 70 | 10.50 | 35 | 17.50 | 119 | 87.50 | 21 | 21 | 
+   r19 | STATION Maguer Petite | ماقر صغيرة | Maguer Petite | S3 | 7 | 0.01 | 14 | 70 | 10.50 | 35 | 17.50 | 119 | 87.50 | 21 | 21 | 
+   r20 | STATION LYCEE | ليسي | LYCEE | S1 | 5 | 0.01 | 10 | 50 | 7.50 | 25 | 12.50 | 85 | 62.50 | 15 | 15 | 
+   r21 | STATION LYCEE | ليسي | LYCEE | S2 | 5 | 0.01 | 10 | 50 | 7.50 | 25 | 12.50 | 85 | 62.50 | 15 | 15 | 
+   r22 | STATION LYCEE | ليسي | LYCEE | S3 | 5 | 0.01 | 10 | 50 | 7.50 | 25 | 12.50 | 85 | 62.50 | 15 | 15 | 
+   r23 | STATION LYCEE | ليسي | LYCEE | S4 | 5 | 0.01 | 10 | 50 | 7.50 | 25 | 12.50 | 85 | 62.50 | 15 | 15 | 
+   ... (26 more rows)
+
+==========================================================================================
+FILE: RESTE DES BESOINS 2026 SBA.xlsx
+==========================================================================================
+Sheets (4): FONG | INSECT | AUTRE | ENGRAIS
+
+  --- SHEET: FONG  (ref A1:G981 -> read A1:G501, rows=10, cols=7) ---
+   r00 | L'EXPLOITATION AGRICOLE LES FRERES LACHEB |  |  |  |  |  | 
+   r01 | BESOIN TOTAL DES FONGICIDES 2026 |  |  |  |  |  | 
+   r02 |  |  | 2026-05-29 |  |  |  | 
+   r03 |  | N° | MATIERE ACTIVE | PRODUIT | UNITE | RESTE DES BESOINS | 
+   r04 |  | 1 | Cyprodinil 37,5 %, Fludioxonil 25 % | Switch/ Valtera | Kg | 1584 | 
+   r05 |  | 2 | Tebuconazole 200 g/l, Fluopyram 200 g/l | LUNA | L | 580 | 
+   r06 |  | 3 | Cuivre 4,5% | FUNGICHELL | L | 4000 | 
+   r07 |  | 4 | Difénoconazole 250 g/l | SCORE | L | 150 | 
+   r08 |  | 5 | Dithianon 500 g/l | DELAN | L | 800 | 
+   r09 |  | 6 | Fosétyl-Aluminium 80 % | ALIETTE FLASH | Kg | 400 | 
+
+  --- SHEET: INSECT  (ref A1:G980 -> read A1:G501, rows=21, cols=7) ---
+   r00 | L'EXPLOITATION AGRICOLE LES FRERES LACHEB |  |  |  |  |  | 
+   r01 | BESOIN TOTAL DES INSECTICIDES 2026 |  |  |  |  |  | 
+   r02 |  | 2026-05-29 |  |  |  |  | 
+   r03 |  | N° | MATIERE ACTIVE | PRODUIT | UNITE | RESTE DES BESOINS | 
+   r04 |  | 1 | Bifénazate 240 g/l | Floramite/ ACARIPRO 43 SC | L | 420.30 | 
+   r05 |  | 2 | Dimétoate 400g/l | Metheoate | L | 1735.25 | 
+   r06 |  | 3 | Emamectin Benzoate 50 g/l | ProCLAIM WG / ABSOLUTE/ PROACT | Kg | 720 | 
+   r07 |  | 4 | Etofenprox 287,5 g/l | Trebon | L | 770 | 
+   r08 |  | 5 | Hexythiazox | Hexithiazox | Kg | 686 | 
+   r09 |  | 6 | Lambda cyhalothrine 5% | DEKAPLUS/ Karaté | L | 123 | 
+   r10 |  | 7 | Lufenuron 50 g/l | Match Gold/ ELECTRA | L | 1043 | 
+   r11 |  | 8 | Spinetoram 120 g/l | Radiant | L | 800 | 
+   r12 |  | 9 | Spinosad 240g/l | Tracer | L | 1000 | 
+   r13 |  | 10 | Spirodiclofen 240 g/l | Envidor/ BYMITE 24 SC | L | 714 | 
+   r14 |  | 11 | Spirotetramat 240g/l | Movento/ ALEMBRA | L | 950 | 
+   r15 |  | 12 | Bifenthrine 10% | TELSTAR/ TRESTAR | / | 2000 | 
+   r16 |  | 13 | Cypermethrine (10/20g/l) | Cythrine 10 EC | L | 510 | CHOISIR UN PRODUIT
+   r17 |  | 14 |  | Cythrine 25 EC | L | 306 | 
+   r18 |  | 15 | Thiaclopride 280 g/l | CALYPSO | L | 426 | 
+   r19 |  | 16 | Fenoxycarbe 25 % | INSEGAR | L | 400 | 
+   r20 |  | 17 | Deltamethrine 25g/l | DECIS EXPERT | L | 1000 | 
+
+  --- SHEET: AUTRE  (ref A1:E974 -> read A1:E501, rows=13, cols=5) ---
+   r00 | L'EXPLOITATION AGRICOLE LES FRERES LACHEB |  |  |  | 
+   r01 | BESOIN TOTAL DES AUTRES PRODUITS 2026 |  |  |  | 
+   r02 |  |  | 2026-05-29 |  | 
+   r03 | N° | CATEGORIE | PRODUIT | UNITE | RESTE DES BESOINS
+   r04 | 1 | AH | Blackjak | L | 6272
+   r05 | 2 | ACIDIFIANT | LI700 | L | 1200
+   r06 | 3 |  | BB5 | L | 3362
+   r07 | 4 | ANTI SALINITE | CORSAL/ ANTISAL | L | 3160
+   r08 | 5 | FER | Sequestrene | Kg | 2011
+   r09 | 6 | OE | Citoquin Mix | L | 2000
+   r10 | 7 | Zn+Mn | Corex Zn Mn | L | 4339.50
+   r11 | 8 | / | ATLANTIS | L | 1300
+   r12 | 9 |  | Deccoshield | Kg | 10000
+
+  --- SHEET: ENGRAIS  (ref A1:E997 -> read A1:E501, rows=15, cols=5) ---
+   r00 | L'EXPLOITATION AGRICOLE LES FRERES LACHEB |  |  |  | 
+   r01 | BESOIN TOTAL DES ENGRAIS 2026 |  |  |  | 
+   r02 |  |  | 2026-05-29 |  | 
+   r03 | N° | CATEGORIE | PRODUIT | UNITE | RESTE BESOIN TOTAL
+   r04 | 1 | ACIDES | Agrizote | L | 8230
+   r05 | 2 |  | Agriphos | L | 42840
+   r06 | 3 |  | Agrisulf | L | 10420
+   r07 | 4 | Ca | Nitrate de Calcium | Qx | 1293
+   r08 | 5 | K | Nitrate de Potassium | Qx | 3000
+   r09 | 6 | Mg | Nitrate de Magnésium | Qx | 629.90
+   r10 | 7 | N | UAN 32% | Qx | 2917.59
+   r11 | 8 | MPK | PHOSPHATE MONO POTASSIQUE | Qx | 533.80
+   r12 | 9 | DAP | DAP 18.44 | Qx | 181.75
+   r13 | 10 | SA | S AMMONIUM | QX | 670
+   r14 | 11 | ACIDE CITRIQUE | CITRIC | QX | 10
+
+==========================================================================================
+FILE: RESTE_EN_STOCK 11.06.2026.xlsx
+==========================================================================================
+Sheets (5): FONG | HERB | INSECT | AUTRE | ENGRAIS
+
+  --- SHEET: FONG  (ref A1:G55 -> read A1:G55, rows=50, cols=7) ---
+   r00 | L'EXPLOITATION AGRICOLE LES FRERES LACHEB |  |  |  |  |  | 
+   r01 | FONGICIDE |  |  |  |  |  | 
+   r02 |  | N° | MATIERE ACTIVE | PRODUIT | UNITE | QUANTITE | 
+   r03 |  | 1 | Boscalid 200 g/l, Krésoxim-Methyl 100 g/l | Collis | L | 8.20 | 
+   r04 |  | 2 | Boscalid 252 g/kg, Pyraclostrobine 128 g/k | Bellis | Kg | 960.20 | 
+   r05 |  | 3 | Captan 50% WP | Criptan | Kg | 0 | 
+   r06 |  | 4 | Captan 80% WG | Malvin | Kg | 4480 | 
+   r07 |  | 5 | Cuivre 4,5% | Fongichell | L | 0 | 
+   r08 |  | 6 | Cyprodinil 37,5 %, Fludioxonil 25 % | Switch | Kg | 0 | 
+   r09 |  | 7 |  | Valtera | Kg | 259.50 | 
+   r10 |  | 8 | Cyprodinil 50% | Chorus | Kg | 236.70 | 
+   r11 |  | 9 | Difenoconazole 125 g/l, Azoxystrobine 200  | Amistar top | L | 749 | 
+   r12 |  | 10 | Difénoconazole 250 g/l | Score | L | 44.20 | 
+   r13 |  | 11 | Difenoconazole, Azoxystrobine | Merit | L | 4 | 
+   r14 |  | 12 | Dimethomorphe 150 g/kg, Dithianon 350 g/kg | Aktuan | Kg | 49.50 | 
+   r15 |  | 13 | Dimethomorphe 60 g/kg, cuivre 400 g/kg | Volar cu | Kg | 12 | 
+   r16 |  | 14 | Dimethomorphe 72 g/l, Pyraclotrobine 40 g/ | Cabrio | L | 68.10 | 
+   r17 |  | 15 | Dithianon 500 g/l | Delan | L | 1190.20 | 
+   r18 |  | 16 | Dithianon 70% | Click | Kg | 52 | 
+   r19 |  | 17 | Dodine 400 g/l | Syllit | L | 626.30 | 
+   r20 |  | 18 | Fenhexamid 500 g/kg | Teldor | Kg | 1.70 | 
+   r21 |  | 19 | Fluazinam 500g/l | Nando | L | 27 | 
+   r22 |  | 20 |  | Tizca | L | 269.50 | 
+   r23 |  | 21 | Fo Métalaxyl-M 5%, Folpel 40 % | Ridomil | Kg | 1.30 | 
+   ... (26 more rows)
+
+  --- SHEET: HERB  (ref B1:H18 -> read B1:H18, rows=12, cols=7) ---
+   r00 | L'EXPLOITATION AGRICOLE LES FRERES LACHEB |  |  |  |  |  | 
+   r01 | HERBICIDE |  |  |  |  |  | 
+   r02 |  | N° | MATIERE ACTIVE | PRODUIT | UNITE | QUANTITE | 
+   r03 |  | 1 | Glufosinate Ammonium 15 g/l | Basta | L | 225 | 
+   r04 |  | 2 | Glyphosate | Rivasate | L | 0 | 
+   r05 |  | 3 |  | Ground UP | L | 645 | 
+   r06 |  | 4 | Indaziflam 500 g/L | Alion | L | 89.50 | 
+   r07 |  | 5 | Oxyfluorfen 240 g/l | HADDAF | L | 490 | 
+   r08 |  | 6 | FLUAZIFOP-P-BUTYL | FUSILAD | L | 150 | 
+   r09 |  |  |  | TOPPER | L | 100 | 
+   r10 |  | 7 |  | FLUENT | L | 80 | 
+   r11 |  | 8 | Cycloxydine | Focus | L | 0 | 
+
+  --- SHEET: INSECT  (ref B1:H64 -> read B1:H64, rows=59, cols=7) ---
+   r00 | L'EXPLOITATION AGRICOLE LES FRERES LACHEB |  |  |  |  |  | 
+   r01 | INSECTICIDE |  |  |  |  |  | 
+   r02 |  | N° | MATIERE ACTIVE | PRODUIT | UNITE | QUANTITE | 
+   r03 |  | 1 | Abamectine 18 g/l | Bactimec | L | 1500 | 
+   r04 |  | 2 |  | NUMECTINE | L | 342.50 | 
+   r05 |  | 3 | Acétamepride SL 200 g/l | Picador | L | 0.80 | 
+   r06 |  | 4 |  | Cetan | Kg | 955.50 | 
+   r07 |  | 5 | Acrinathrine 75 g/l | Rufast | L | 402 | 
+   r08 |  | 6 | Alpha-Cyperméthrine 100 g/l | Fastac | L | 178.13 | 
+   r09 |  | 7 | Bifénazate 240 g/l | Floramite | L | 145.60 | 
+   r10 |  | 8 | Chlorpyriphos 2% | Fourmicide | Kg | 472 | 
+   r11 |  | 9 |  | KAOROFOURMI | Kg | 0 | 
+   r12 |  | 10 | Chlorpyriphos 480g/l | Pyrical | L | 0 | 
+   r13 |  | 11 | CLOFENTEZINE+ BIFENTHRINE | APOLLO | L | 500 | 
+   r14 |  | 12 | Cyantraniliprole | Exirel | L | 1973.70 | 
+   r15 |  | 13 | Deltamethrine 25g/l | Decis expert | L | 0.25 | 
+   r16 |  | 14 | Dimétoate | Metheoate | L | 447.50 | 
+   r17 |  | 15 |  | DIMETHOATE | L | 0 | 
+   r18 |  | 16 | Emamectin Benzoate 50 g/l | ProAct | L | 0 | 
+   r19 |  | 17 |  | Absolute | Kg | 1200.20 | 
+   r20 |  | 18 | Etofenprox 287,5 g/l | Trebon | L | 1962 | 
+   r21 |  | 19 | Fenoxycarbe 25 % | Insegar | Kg | 374.30 | 
+   r22 |  | 20 | Fenpyroximate 5% | Mitigate | L | 1490.70 | 
+   r23 |  | 21 | Flupyradifurone 200 g/l | Sivanto | L | 511.60 | 
+   ... (35 more rows)
+
+  --- SHEET: AUTRE  (ref B1:G109 -> read B1:G109, rows=104, cols=6) ---
+   r00 | L'EXPLOITATION AGRICOLE LES FRERES LACHEB |  |  |  |  | 
+   r01 | AUTRE |  |  |  |  | 
+   r02 | N° | CATEGORIE | PRODUIT | COMPOSITION | UNITE | QUANTITE
+   r03 | 1 | AA | Specialcare amino acide | Amino acide 43% , Organic matier 20% Nitro | Kg | 2
+   r04 | 2 |  | Plyaminol | AA | L | 240
+   r05 | 3 |  | Trainer | Mo, N organique | L | 3305
+   r06 | 4 |  | Stilo racinaire | AA 10.5% N 2.7% Fer 4.5% Mn 1% | L | 464.50
+   r07 | 5 |  | Prefectos | Acides Aminées | L | 5330
+   r08 | 6 | AH | Terracan | Extrait Humique total + Oxyde de Potassium | L | 80
+   r09 | 7 |  | Humistar/Humagreen | ACIDE HUMIQUE | L | 20
+   r10 | 8 |  | Blackjak | ACIDE HUMIQUE | L | 2990
+   r11 | 9 |  | HUMIK | ACIDE HUMIQUE | L | 0
+   r12 | 10 |  | FULVISTAR | ACIDE HUMIQUE | L | 0
+   r13 | 11 | ACIDIFIANT | BB5 | N 3% + P2O5 18,1% | L | 5.50
+   r14 | 12 |  | LI700 STAR | 488 g/L lécithine | L | 111
+   r15 | 13 | ALGUES | Abyss | Mannto 1%, AA 0.3% | L | 0
+   r16 | 14 |  | Phylgreen Alya | Extrait D'algues 13,5% P/P, Bore 9,2% P/P | L | 158
+   r17 | 15 |  | CroxX kelp | Les algues 30%, oxyde de potassium 3,4 %,  | L | 2990
+   r18 | 16 |  | Fruka | K2O, Mo, Algues | L | 465.40
+   r19 | 17 |  | Vitanica | Algues | L | 4870
+   r20 | 18 | ANTI SALINITE | Saltrad Ca | CaO 7,5% | L | 14
+   r21 | 19 |  | ANTISAL | / | L | 720
+   r22 | 20 |  | C0RSAL | Oxyde ca 9%+ Oxyde Mg 1% | L | 1920
+   r23 | 21 | B | Boraminal | Azote total 4,1 % , Bore 4,6 % , Acides am | L | 51.30
+   ... (80 more rows)
+
+  --- SHEET: ENGRAIS  (ref B1:G31 -> read B1:G31, rows=26, cols=6) ---
+   r00 | L'EXPLOITATION AGRICOLE LES FRERES LACHEB |  |  |  |  | 
+   r01 | ENGRAIS |  |  |  |  | 
+   r02 | N° | CATEGORIE | PRODUIT | COMPOSITION | UNITE | QUANTITE
+   r03 | 1 | AN | Agrizote | Acide Nitrique | L | 2900
+   r04 | 2 | AP | Agriphos | Acide Phosphorique | L | 4260
+   r05 | 3 | AS | Agrisulf | Acide sulfurique | L | 1000
+   r06 | 4 | AC | Acide citrique | Acide citrique | Kg | 851.50
+   r07 | 5 | Ca | Nitrate de Calcium | N 15% - Cao 26,5% | Kg | 0
+   r08 | 6 | K | Nitrate de Potassium | N13- P 0 - K 46 | Kg | 0
+   r09 | 7 |  | Sulfate de Potassium | K2o 51%+So3 45% | Kg | 0
+   r10 | 8 |  | POTASSIUM ACID | ACIDE + N13- P 0 - K 46 | Kg | 0
+   r11 | 9 | Mg | Nitrate de Magnésium | N 10,5%, Mgo 16% | Kg | 26275
+   r12 | 10 |  | Rombiquel Magnesio | Oxyde De Magnésium 8,5 % | L | 280
+   r13 | 11 |  | Sulfate de Mg | Mgo 16%+So3 32% | Kg | 10900
+   r14 | 12 | Mo | Matière organique | Matiere organique liquide | L | 2380
+   r15 | 13 |  | Matière organique | Matiere organique solide | Kg | 0
+   r16 | 14 | N | Urée 46 | N 46% | Kg | 550
+   r17 | 15 |  | Hydro speed | Sulfate D'ammoniaque | Kg | 250
+   r18 | 16 |  | Sulfate d’ammonium | N21 | Kg | 100150
+   r19 | 17 |  | UAN 32% | N 32% | L | 1500
+   r20 | 18 | GEL | FERTIGEL | / | L | 22704
+   r21 | 19 | P | KSC1 | 14 % N, 40% P2o5, 5 % K2o, 13 % So3, 0,1 % | Kg | 0
+   r22 | 20 |  | MAP 12-61-00 | Np 12-61 | Kg | 8835
+   r23 | 21 |  | NPK SOP | Npk 12.12.17+2+Te | Kg | 400
+   ... (2 more rows)

@@ -10,6 +10,7 @@ import {
   Target, ChevronDown, ChevronUp, Satellite, Apple, Zap,
 } from "lucide-react";
 import { useState, useMemo } from "react";
+import { cn } from "@/lib/utils";
 import ModalPortal from "@/components/ui/ModalPortal";
 import type { Parcelle } from "@/lib/mock-data";
 import type { ParcelleHistoryBundle, HistoryEventKind } from "@/lib/parcelle-history";
@@ -74,9 +75,17 @@ type Props = {
   history: ParcelleHistoryBundle | null;
   loading?: boolean;
   onClose: () => void;
+  variant?: "modal" | "drawer";
 };
 
-export default function DashboardParcelleHistoryPanel({ parcelle, history, loading, onClose }: Props) {
+export default function DashboardParcelleHistoryPanel({
+  parcelle,
+  history,
+  loading,
+  onClose,
+  variant = "modal",
+}: Props) {
+  const isDrawer = variant === "drawer";
   const [tab, setTab] = useState<Tab>("chronologie");
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -145,25 +154,31 @@ export default function DashboardParcelleHistoryPanel({ parcelle, history, loadi
     { id: "satellite",    label: "Satellite",      icon: <Satellite size={11}/>, count: byKind.satellite?.length ?? 0 },
   ];
 
-  return (
-    <ModalPortal>
-      <div className="lf-overlay-root flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div className="absolute inset-0 cursor-pointer"
-           style={{ background: "rgba(8,12,8,0.65)", backdropFilter: "blur(6px)" }}
-           onClick={onClose} />
-
-      {/* Panel */}
+  const panel = (
       <div
-        className="relative w-full flex flex-col rounded-2xl overflow-hidden shadow-2xl"
-        style={{
-          maxWidth: 1120, width: "100%",
-          height: "calc(100vh - 48px)", maxHeight: 900,
-          background: "#fff",
-          border: `1.5px solid ${parcelle.color}30`,
-          animation: "ph-in 0.22s cubic-bezier(0.16,1,0.3,1) forwards",
-        }}
-        onClick={e => e.stopPropagation()}
+        className={cn(
+          "relative w-full flex flex-col overflow-hidden",
+          isDrawer ? "h-full min-h-0 rounded-none shadow-none" : "rounded-2xl shadow-2xl"
+        )}
+        style={
+          isDrawer
+            ? {
+                height: "100%",
+                maxHeight: "none",
+                background: "#fff",
+                borderLeft: `3px solid ${parcelle.color}`,
+              }
+            : {
+                maxWidth: 1120,
+                width: "100%",
+                height: "calc(100vh - 48px)",
+                maxHeight: 900,
+                background: "#fff",
+                border: `1.5px solid ${parcelle.color}30`,
+                animation: "ph-in 0.22s cubic-bezier(0.16,1,0.3,1) forwards",
+              }
+        }
+        onClick={(e) => e.stopPropagation()}
       >
         <style>{`
           @keyframes ph-in { from{opacity:0;transform:scale(0.96) translateY(12px)} to{opacity:1;transform:scale(1) translateY(0)} }
@@ -583,7 +598,26 @@ export default function DashboardParcelleHistoryPanel({ parcelle, history, loadi
           </div>
         )}
       </div>
-    </div>
+  );
+
+  if (isDrawer) {
+    return (
+      <div className="flex flex-col h-full min-h-0 overflow-hidden bg-[#fcfdfa]">
+        {panel}
+      </div>
+    );
+  }
+
+  return (
+    <ModalPortal>
+      <div className="lf-overlay-root flex items-center justify-center p-4">
+        <div
+          className="absolute inset-0 cursor-pointer"
+          style={{ background: "rgba(8,12,8,0.65)", backdropFilter: "blur(6px)" }}
+          onClick={onClose}
+        />
+        {panel}
+      </div>
     </ModalPortal>
   );
 }

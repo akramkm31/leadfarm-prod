@@ -3,6 +3,7 @@ import type { UserRole } from "./types";
 export const ROLE_LABELS: Record<UserRole, string> = {
   directeur: "Directeur d'exploitation",
   responsable_technique: "Responsable technique",
+  agronome: "Agronome",
   magasinier: "Magasinier phyto",
   operateur: "Opérateur terrain",
   auditeur: "Auditeur",
@@ -13,6 +14,9 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 export const ROLE_ALIASES: Record<string, UserRole> = {
   directeur: "directeur",
   responsable_technique: "responsable_technique",
+  agronome: "agronome",
+  ingenieur: "agronome",
+  agri: "agronome",
   magasinier: "magasinier",
   operateur: "operateur",
   auditeur: "auditeur",

@@ -5,6 +5,7 @@
 import { supabase } from "./supabase";
 import { SUPABASE_CONFIGURED } from "./data-provider-config";
 import { deductStockForTreatment } from "./treatments/stock-deduction";
+import { canTransition } from "./treatments/workflow";
 
 export { SUPABASE_CONFIGURED };
 export {
@@ -309,6 +310,8 @@ function mapTreatment(row: any): any {
     culture: pick("culture", "culture"),
     variete: pick("variete", "variete"),
     cible: pick("cible", "cible"),
+    eppo_crop_code: row.eppo_crop_code ?? null,
+    bbch_stage: row.bbch_stage ?? null,
     mode_application: pick("mode_application", "mode_application"),
     materiel: pick("materiel", "materiel"),
     vitesse_kmh: pick("vitesse_kmh", "vitesse_kmh", null),
@@ -322,6 +325,7 @@ function mapTreatment(row: any): any {
         dose_hl: p.dose_hl || "",
         quantite_sortir: p.quantite_sortir || "",
         dar_jours: p.dar_jours || 21,
+        product_auth_number: p.product_auth_number || "",
       }));
       if (fromDetailTable.length > 0) return fromDetailTable;
       return ((forData as any).produitsDetail || []).map((p: any) => ({
@@ -331,6 +335,7 @@ function mapTreatment(row: any): any {
         dose_hl: p.dose_hl || "",
         quantite_sortir: p.quantite_sortir || "",
         dar_jours: p.dar_jours || 21,
+        product_auth_number: p.product_auth_number || "",
       }));
     })(),
     date_reelle: pick("date_reelle", "date_reelle", null),
@@ -588,6 +593,7 @@ export async function insertTreatment(data: {
     dose_hl: string;
     quantite_sortir: string;
     dar_jours: number;
+    product_auth_number?: string;
   }[];
   dateReelle?: string;
   heureDebut?: string;
@@ -599,6 +605,8 @@ export async function insertTreatment(data: {
   darJours?: number;
   efficacite?: string;
   visaRT?: string;
+  eppoCropCode?: string;
+  bbchStage?: string;
 }) {
   if (!SUPABASE_CONFIGURED) {
     throw new Error("Supabase non configuré");
@@ -947,16 +955,7 @@ export async function fetchTreatmentWithPoints(id: string) {
 // Treatment Workflow (State Machine)
 // ============================================================
 
-const STATUS_TRANSITIONS: Record<string, string[]> = {
-  planned:          ["in_progress"],
-  in_progress:      ["completed"],
-  completed:        ["cancelled"],
-  cancelled:        [],
-};
-
-export function canTransition(current: string, next: string): boolean {
-  return STATUS_TRANSITIONS[current]?.includes(next) ?? false;
-}
+export { canTransition } from "./treatments/workflow";
 
 /** Transition a treatment through the status state machine */
 export async function transitionTreatmentStatus(
@@ -966,14 +965,19 @@ export async function transitionTreatmentStatus(
 ): Promise<void> {
   if (!SUPABASE_CONFIGURED) return;
 
-  const payload: Record<string, unknown> = { status: newStatus };
-  if (meta?.notes) payload.notes = meta.notes;
-
   const { data: treatment } = await supabase
     .from("treatments")
     .select("*, treatment_products(*)")
     .eq("id", id)
     .single();
+
+  const currentStatus = treatment?.status as string | undefined;
+  if (currentStatus && !canTransition(currentStatus, newStatus)) {
+    throw new Error(`Transition ${currentStatus} → ${newStatus} non autorisée`);
+  }
+
+  const payload: Record<string, unknown> = { status: newStatus };
+  if (meta?.notes) payload.notes = meta.notes;
 
   const { error } = await supabase
     .from("treatments")
@@ -998,6 +1002,85 @@ export async function transitionTreatmentStatus(
       });
     }
   }
+}
+
+/** Opérateur : saisie terrain puis clôture (stock + traçabilité). */
+export async function completeTreatmentExecution(
+  id: string,
+  data: {
+    operatorName?: string;
+    dateReelle: string;
+    heureDebut?: string;
+    heureFin?: string;
+    areaTreatedHectares?: number;
+    produitsReels?: {
+      productId: string;
+      quantiteReelle: number;
+      volumeBouilliePasse?: number;
+      unit: string;
+    }[];
+  }
+): Promise<void> {
+  if (!canTransition("in_progress", "completed")) {
+    throw new Error("Transition invalide");
+  }
+
+  const { data: current } = await supabase
+    .from("treatments")
+    .select("status")
+    .eq("id", id)
+    .single();
+
+  if (current?.status !== "in_progress") {
+    throw new Error("Seul un traitement en cours peut être clôturé depuis ce formulaire");
+  }
+
+  const totalUsed = data.produitsReels?.length
+    ? data.produitsReels.reduce((s, p) => s + p.quantiteReelle, 0).toFixed(2)
+    : undefined;
+
+  await updateTreatment(id, {
+    operatorName: data.operatorName,
+    dateReelle: data.dateReelle,
+    heureDebut: data.heureDebut,
+    heureFin: data.heureFin,
+    qteProduitUtilise: totalUsed,
+    areaTreatedHectares: data.areaTreatedHectares,
+  });
+
+  if (data.produitsReels?.length) {
+    const rows = data.produitsReels
+      .filter(p => p.productId && p.quantiteReelle >= 0)
+      .map(p => ({
+        treatment_id: id,
+        product_id: p.productId,
+        quantity_used: p.quantiteReelle,
+        unit: p.unit || "L",
+        ...(p.volumeBouilliePasse !== undefined && { volume_bouillie_passe: p.volumeBouilliePasse }),
+      }));
+    if (rows.length) {
+      await supabase
+        .from("treatment_products")
+        .upsert(rows, { onConflict: "treatment_id,product_id" });
+    }
+  }
+
+  await transitionTreatmentStatus(id, "completed");
+}
+
+/** RT : visa après exécution constatée. */
+export async function signTreatmentVisa(id: string, visaRT: string): Promise<void> {
+  if (!visaRT.trim()) throw new Error("Visa requis");
+  await updateTreatment(id, { visaRT: visaRT.trim() });
+}
+
+/** RT / agronome : efficacité J+7. */
+export async function evaluateTreatment(id: string, efficacite: string): Promise<void> {
+  if (!canTransition("completed", "evaluated")) {
+    throw new Error("Transition invalide");
+  }
+  await updateTreatment(id, { efficacite });
+  await transitionTreatmentStatus(id, "evaluated");
 }
 
 /** Finalize treatment with DAR + stock deductions */

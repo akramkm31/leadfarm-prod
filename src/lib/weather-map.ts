@@ -10,13 +10,27 @@ export type RainCell = {
   precipMm: number;
 };
 
+export type WeatherDayForecast = {
+  dateIso: string;
+  dateLabel: string;
+  dayShort: string;
+  tempMin: number;
+  tempMax: number;
+  humidityAvg: number;
+  precipProb: number;
+  precipMm: number;
+  weathercode: number;
+};
+
 export type WeatherMapData = {
   temperature: number;
+  humidity: number;
   windspeed: number;
   winddirection: number;
   precipitationProb: number;
   weathercode: number;
   rainCells: RainCell[];
+  weekly: WeatherDayForecast[];
 };
 
 type PointWeather = {
@@ -27,12 +41,14 @@ type PointWeather = {
   weathercode?: number;
 };
 
+const DAY_NAMES = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+
 async function fetchPointWeather(lat: number, lng: number): Promise<PointWeather | null> {
   try {
     const url =
       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}` +
       `&current_weather=true&hourly=precipitation_probability,precipitation&forecast_days=1&timezone=auto`;
-    const res = await fetch(url);
+    const res = await fetch(url, { signal: AbortSignal.timeout(8_000) });
     if (!res.ok) return null;
     const json = await res.json();
     const hour = new Date().getHours();
@@ -48,6 +64,107 @@ async function fetchPointWeather(lat: number, lng: number): Promise<PointWeather
       temperature: json.current_weather?.temperature,
       weathercode: json.current_weather?.weathercode,
     };
+  } catch {
+    return null;
+  }
+}
+
+async function fetchDomainForecastDirect(
+  lat: number,
+  lng: number
+): Promise<{
+  current: Omit<WeatherMapData, "rainCells" | "weekly">;
+  weekly: WeatherDayForecast[];
+} | null> {
+  const url =
+    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}` +
+    `&current_weather=true` +
+    `&hourly=relative_humidity_2m,precipitation_probability,precipitation` +
+    `&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max` +
+    `&forecast_days=7&timezone=auto`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(12_000) });
+  if (!res.ok) return null;
+  const json = await res.json();
+  const daily = json.daily;
+  const hourly = json.hourly;
+  const cw = json.current_weather;
+  if (!daily?.time?.length || !cw) return null;
+
+  const hour = new Date().getHours();
+  const weekly: WeatherDayForecast[] = [];
+  const count = Math.min(7, daily.time.length);
+
+  for (let i = 0; i < count; i++) {
+    const dateIso = daily.time[i] as string;
+    const dateObj = new Date(dateIso);
+    const humiditySlice = (hourly?.relative_humidity_2m ?? []).slice(i * 24, (i + 1) * 24);
+    const humidityAvg =
+      humiditySlice.length > 0
+        ? Math.round(humiditySlice.reduce((a: number, b: number) => a + b, 0) / humiditySlice.length)
+        : 55;
+
+    weekly.push({
+      dateIso,
+      dateLabel: dateObj.toLocaleDateString("fr-FR", { day: "numeric", month: "short" }),
+      dayShort: DAY_NAMES[dateObj.getDay()],
+      tempMin: Math.round(daily.temperature_2m_min[i] ?? 0),
+      tempMax: Math.round(daily.temperature_2m_max[i] ?? 0),
+      humidityAvg,
+      precipProb: Math.round(daily.precipitation_probability_max[i] ?? 0),
+      precipMm: Math.round((daily.precipitation_sum[i] ?? 0) * 10) / 10,
+      weathercode: daily.weathercode[i] ?? 0,
+    });
+  }
+
+  return {
+    current: {
+      temperature: Math.round(cw.temperature ?? 0),
+      humidity: Math.round(hourly?.relative_humidity_2m?.[hour] ?? 55),
+      windspeed: cw.windspeed ?? 0,
+      winddirection: cw.winddirection ?? 0,
+      precipitationProb: Math.round(
+        hourly?.precipitation_probability?.[hour] ?? daily.precipitation_probability_max?.[0] ?? 0
+      ),
+      weathercode: cw.weathercode ?? 0,
+    },
+    weekly,
+  };
+}
+
+export async function fetchDomainForecast(
+  lat: number,
+  lng: number
+): Promise<{
+  current: Omit<WeatherMapData, "rainCells" | "weekly">;
+  weekly: WeatherDayForecast[];
+} | null> {
+  try {
+    const res = await fetch(
+      `/api/weather/forecast?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`,
+      { signal: AbortSignal.timeout(16_000) }
+    );
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.data) {
+        const d = json.data;
+        return {
+          current: {
+            temperature: d.temperature,
+            humidity: d.humidity,
+            windspeed: d.windspeed,
+            winddirection: d.winddirection,
+            precipitationProb: d.precipitationProb,
+            weathercode: d.weathercode,
+          },
+          weekly: d.weekly as WeatherDayForecast[],
+        };
+      }
+    }
+  } catch {
+    /* fallback direct */
+  }
+  try {
+    return await fetchDomainForecastDirect(lat, lng);
   } catch {
     return null;
   }
@@ -87,38 +204,31 @@ export function buildRainGridBounds(points: [number, number][]): {
   };
 }
 
-export async function fetchWeatherMapData(
+async function fetchRainGrid(
   bounds: { south: number; north: number; west: number; east: number }
-): Promise<WeatherMapData | null> {
-  const rows = 5;
-  const cols = 5;
+): Promise<RainCell[]> {
+  const rows = 3;
+  const cols = 3;
   const latStep = (bounds.north - bounds.south) / rows;
   const lngStep = (bounds.east - bounds.west) / cols;
   const halfLat = latStep / 2;
   const halfLng = lngStep / 2;
 
-  const tasks: { lat: number; lng: number; row: number; col: number }[] = [];
+  const tasks: { lat: number; lng: number }[] = [];
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       tasks.push({
         lat: bounds.south + latStep * (r + 0.5),
         lng: bounds.west + lngStep * (c + 0.5),
-        row: r,
-        col: c,
       });
     }
   }
 
-  const results = await Promise.all(
+  const gridResults = await Promise.all(
     tasks.map(async (t) => ({ ...t, data: await fetchPointWeather(t.lat, t.lng) }))
   );
 
-  const center = results.find((r) => r.row === 2 && r.col === 2)?.data;
-  const fallback = results.find((r) => r.data)?.data;
-  const windSource = center ?? fallback;
-  if (!windSource?.wind) return null;
-
-  const rainCells: RainCell[] = results
+  return gridResults
     .filter((r) => r.data && (r.data.precipProb > 5 || r.data.precipMm > 0))
     .map((r) => ({
       lat: r.lat,
@@ -128,17 +238,33 @@ export async function fetchWeatherMapData(
       precipProb: r.data!.precipProb,
       precipMm: r.data!.precipMm,
     }));
+}
 
-  const avgProb =
-    results.reduce((s, r) => s + (r.data?.precipProb ?? 0), 0) / results.length;
+export async function fetchWeatherMapData(
+  bounds: { south: number; north: number; west: number; east: number }
+): Promise<WeatherMapData | null> {
+  const centerLat = (bounds.south + bounds.north) / 2;
+  const centerLng = (bounds.west + bounds.east) / 2;
+
+  const domain = await fetchDomainForecast(centerLat, centerLng);
+  if (!domain) return null;
+
+  let rainCells: RainCell[] = [];
+  try {
+    rainCells = await Promise.race([
+      fetchRainGrid(bounds),
+      new Promise<RainCell[]>((_, reject) =>
+        setTimeout(() => reject(new Error("grid timeout")), 6_000)
+      ),
+    ]);
+  } catch {
+    rainCells = [];
+  }
 
   return {
-    temperature: windSource.temperature ?? 0,
-    windspeed: windSource.wind.speed,
-    winddirection: windSource.wind.direction,
-    precipitationProb: Math.round(avgProb),
-    weathercode: windSource.weathercode ?? 0,
+    ...domain.current,
     rainCells,
+    weekly: domain.weekly,
   };
 }
 

@@ -77,6 +77,14 @@ export default function TrajectoryReplayModal({
     [rawPoints, simIndex]
   );
 
+  const heatmapStats = useMemo(() => {
+    if (!rawPoints.length) return null;
+    const flows = rawPoints.map(p => ((p.debit1_lpm ?? 0) + (p.debit2_lpm ?? 0)) / 2);
+    const avg = flows.reduce((a, b) => a + b, 0) / flows.length;
+    const zeroPct = Math.round((flows.filter(f => f <= 0.05).length / flows.length) * 100);
+    return { avg, zeroPct, count: rawPoints.length };
+  }, [rawPoints]);
+
   if (!isOpen) return null;
 
   return (
@@ -114,7 +122,11 @@ export default function TrajectoryReplayModal({
               <TractorLiveMap
                 points={[]}
                 trajectory={trajectory}
-                livePosition={currentPoint ? { lat: currentPoint[0], lon: currentPoint[1], speed: currentPoint[2] } : null}
+                livePosition={currentPoint ? {
+                  lat: currentPoint.lat,
+                  lon: currentPoint.lng,
+                  speed: currentPoint.speed_kmh ?? 0,
+                } : null}
                 realTrail={currentTrail}
                 className="w-full h-full"
               />
@@ -186,7 +198,7 @@ export default function TrajectoryReplayModal({
                     <span className="text-[10px] font-bold text-[var(--color-adaline-ink)]/60 uppercase">Vitesse</span>
                   </div>
                   <div className="text-2xl font-bold text-[var(--color-adaline-ink)]/90 font-mono">
-                    {currentPoint ? currentPoint[2].toFixed(1) : "0.0"} <span className="text-xs text-[var(--color-adaline-ink)]/30">km/h</span>
+                    {currentPoint ? (currentPoint.speed_kmh ?? 0).toFixed(1) : "0.0"} <span className="text-xs text-[var(--color-adaline-ink)]/30">km/h</span>
                   </div>
                 </div>
 
@@ -196,7 +208,9 @@ export default function TrajectoryReplayModal({
                     <span className="text-[10px] font-bold text-[var(--color-adaline-ink)]/60 uppercase">Heure</span>
                   </div>
                   <div className="text-sm font-bold text-[var(--color-adaline-ink)]/80 font-mono">
-                    {currentPoint ? new Date(currentPoint[3]).toLocaleTimeString("fr-FR") : "--:--:--"}
+                    {currentPoint?.timestamp
+                      ? new Date(currentPoint.timestamp).toLocaleTimeString("fr-FR")
+                      : "--:--:--"}
                   </div>
                 </div>
 
@@ -209,6 +223,19 @@ export default function TrajectoryReplayModal({
                     {simIndex + 1} / {rawPoints.length}
                   </div>
                 </div>
+
+                {heatmapStats && (
+                  <div className="hud-panel p-3 bg-white/[0.03] border-white/[0.06]">
+                    <div className="text-[10px] font-bold text-[var(--color-adaline-ink)]/60 uppercase mb-2">
+                      Carte dose (heatmap)
+                    </div>
+                    <div className="text-xs text-[var(--color-adaline-ink)]/70 space-y-1">
+                      <p>Débit moyen : {heatmapStats.avg.toFixed(2)} L/min</p>
+                      <p>Zones à 0 : {heatmapStats.zeroPct}%</p>
+                      <p>{heatmapStats.count} points GPS</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

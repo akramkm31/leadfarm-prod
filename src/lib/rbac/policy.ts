@@ -29,6 +29,11 @@ export function canAny(profile: Pick<UserAccessProfile, "features">, features: F
   return features.some((f) => can(profile, f));
 }
 
+/** Returns true only when the profile has ALL listed features. */
+export function canAll(profile: Pick<UserAccessProfile, "features">, features: Feature[]): boolean {
+  return features.every((f) => can(profile, f));
+}
+
 export function canPath(profile: Pick<UserAccessProfile, "features">, pathname: string): boolean {
   const required = featureForPath(pathname);
   if (!required) return true;
@@ -42,9 +47,6 @@ export function requiredFeatureForApi(method: string, pathname: string): Feature
       return rule.feature;
     }
   }
-  if (pathname.startsWith("/api/v1/") && upper !== "GET" && upper !== "HEAD" && upper !== "OPTIONS") {
-    return null;
-  }
   return null;
 }
 
@@ -54,8 +56,10 @@ export function canApi(
   pathname: string
 ): boolean {
   const required = requiredFeatureForApi(method, pathname);
-  if (!required) return true;
-  return can(profile, required);
+  if (required) return can(profile, required);
+  // No explicit rule: allow read-only methods, deny writes (fail-safe for unregistered routes)
+  const upper = method.toUpperCase();
+  return upper === "GET" || upper === "HEAD" || upper === "OPTIONS";
 }
 
 /** Première route autorisée (fallback après refus). */

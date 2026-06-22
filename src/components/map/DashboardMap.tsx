@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { useParcelles, useTreatments } from "@/hooks/useData";
-import type { Parcelle } from "@/lib/mock-data";
+import { useParcelles, useTreatments, useStockLevels } from "@/hooks/useData";
+import type { Parcelle, StockLevel } from "@/lib/mock-data";
+import { summarizeParcelleStock } from "@/lib/parcelle-stock";
 import { Layers, Target } from "lucide-react";
 import {
   getProp,
@@ -12,8 +13,34 @@ import {
   treatmentsForParcelle,
   sortTreatmentsByDate,
   collectParcelleBounds,
+  collectParcelleBoundsFiltered,
 } from "./dashboard-map-utils";
-import { parcelleLabelHtml, parcelleLabelIconAnchor } from "@/lib/map-labels";
+import {
+  attachParcelleMapLabel,
+  bindPolygonClipToImageOverlay,
+  parcelleLabelHtml,
+  parcelleLabelIconAnchor,
+  parcelleLabelIconSize,
+  parcelleLabelPosition,
+  parcelleSatellitePopupHtml,
+  polygonCentroid,
+  polygonLatLngBounds,
+  shouldShowParcelleMapLabel,
+  shouldUseCompactSatelliteLabels,
+} from "@/lib/map-labels";
+import {
+  getIndexValue,
+  getIndexLevel,
+  buildSatelliteLookup,
+  buildDirectSatelliteLookup,
+  hasSatelliteIndexValue,
+  getNdwiMapColor,
+  getSatelliteMapColor,
+  NDVI_MAP_LEGEND,
+  ndviLegendColor,
+  type SatelliteIndexKey,
+} from "@/lib/agronome/satellite-utils";
+import type { DonneesSatellite } from "@/lib/mcd/types";
 import ParcelleOverlay from "./ParcelleOverlay";
 import ParcelleQuickNav from "./ParcelleQuickNav";
 import DashboardParcelleHistoryPanel from "./DashboardParcelleHistoryPanel";
@@ -34,37 +61,90 @@ interface DashboardMapProps {
   onSelectTreatment?: (id: string | null) => void;
   /** Parcelle à centrer (ex. clic ligne tableau) — prioritaire sur la résolution interne */
   focusParcelleId?: string | null;
+  selectedParcelleId?: string | null;
+  onSelectedParcelleIdChange?: (id: string | null) => void;
+  historyPanelExternal?: boolean;
+  detailPanelOpen?: boolean;
+  detailPanelWidth?: number;
   embedded?: boolean;
   weatherMode?: boolean;
   weatherLayers?: WeatherLayerState;
   weatherOpacity?: number;
   onWeatherData?: (data: WeatherMapData | null, loading: boolean) => void;
+  /** Affiche stock + produits sous le nom de chaque parcelle (vue magasinier) */
+  stockLabels?: boolean;
+  /** Colore les parcelles selon NDVI/NDWI (vue agronome) */
+  satelliteMode?: boolean;
+  satelliteData?: DonneesSatellite[];
+  satelliteIndex?: SatelliteIndexKey;
+  /** N'affiche et ne colore que les parcelles ayant un indice synchronisé */
+  satelliteIndexedOnly?: boolean;
+  /** Vue /satellite : popup riche, légende, badges alerte, couleurs fines */
+  satelliteEnhanced?: boolean;
+  /** Indices strictement par parcelle_id depuis l’API (pas d’alignement catalogue) */
+  satelliteDirectApi?: boolean;
+  /** Aperçu NDVI Sentinel par parcelle id */
+  satellitePreviewByParcelleId?: Record<string, string>;
+  /** Opacité overlay NDVI (0–1) */
+  satellitePreviewOpacity?: number;
+  hideQuickNav?: boolean;
 }
 
 export default function DashboardMap({
   activeTreatmentId,
   onSelectTreatment,
   focusParcelleId = null,
+  selectedParcelleId: selectedParcelleIdProp,
+  onSelectedParcelleIdChange,
+  historyPanelExternal = false,
+  detailPanelOpen = false,
+  detailPanelWidth = 400,
   embedded = false,
   weatherMode = false,
   weatherLayers = DEFAULT_WEATHER_LAYERS,
   weatherOpacity = 0.65,
   onWeatherData,
+  stockLabels = false,
+  satelliteMode = false,
+  satelliteData = [],
+  satelliteIndex = "ndvi",
+  satelliteIndexedOnly = false,
+  satelliteEnhanced = false,
+  satelliteDirectApi = false,
+  satellitePreviewByParcelleId = {},
+  satellitePreviewOpacity = 0.72,
+  hideQuickNav = false,
 }: DashboardMapProps) {
   const { data: parcellesRaw } = useParcelles();
   const { data: treatmentsRaw } = useTreatments();
+  const { data: stockRaw } = useStockLevels();
   const parcelles = (parcellesRaw || []) as Parcelle[];
   const treatments = (treatmentsRaw || []) as unknown as Record<string, unknown>[];
+  const stockLevels = (stockRaw || []) as StockLevel[];
 
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const LRef = useRef<any>(null);
   const layersRef = useRef<L.Layer[]>([]);
+  const overlayClipCleanupsRef = useRef<(() => void)[]>([]);
   const detailLayersRef = useRef<L.Layer[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sentinelTileLayerRef = useRef<any>(null);
   const [loaded, setLoaded] = useState(false);
   const [leafletMap, setLeafletMap] = useState<L.Map | null>(null);
-  const [selectedParcelleId, setSelectedParcelleId] = useState<string | null>(null);
+  const [selectedParcelleIdInternal, setSelectedParcelleIdInternal] = useState<string | null>(null);
+  const selectedParcelleIdControlled = selectedParcelleIdProp !== undefined;
+  const selectedParcelleId = selectedParcelleIdControlled
+    ? selectedParcelleIdProp ?? null
+    : selectedParcelleIdInternal;
+  const setSelectedParcelleId = useCallback(
+    (id: string | null) => {
+      if (onSelectedParcelleIdChange) onSelectedParcelleIdChange(id);
+      if (!selectedParcelleIdControlled) setSelectedParcelleIdInternal(id);
+    },
+    [onSelectedParcelleIdChange, selectedParcelleIdControlled]
+  );
   const [historyBundle, setHistoryBundle] = useState<ParcelleHistoryBundle | null>(null);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [weatherData, setWeatherData] = useState<WeatherMapData | null>(null);
@@ -76,25 +156,28 @@ export default function DashboardMap({
 
   const closeParcellePanel = useCallback(() => {
     setSelectedParcelleId(null);
-    setHistoryBundle(null);
+    if (!historyPanelExternal) setHistoryBundle(null);
     onSelectTreatmentRef.current?.(null);
-  }, []);
+  }, [historyPanelExternal, setSelectedParcelleId]);
 
   const handleMapBackgroundClickRef = useRef<() => void>(() => {});
   handleMapBackgroundClickRef.current = () => {
     closeParcellePanel();
   };
 
-  const focusParcelleById = useCallback((parcelleId: string) => {
-    skipClearParcelleRef.current = true;
-    onSelectTreatmentRef.current?.(null);
-    setSelectedParcelleId(parcelleId);
-  }, []);
+  const focusParcelleById = useCallback(
+    (parcelleId: string) => {
+      skipClearParcelleRef.current = true;
+      onSelectTreatmentRef.current?.(null);
+      setSelectedParcelleId(parcelleId);
+    },
+    [setSelectedParcelleId]
+  );
 
   const clearParcelleFocus = useCallback(() => {
     setSelectedParcelleId(null);
     onSelectTreatmentRef.current?.(null);
-  }, []);
+  }, [setSelectedParcelleId]);
 
   const handleParcelleClick = useCallback(
     (parcelleId: string) => {
@@ -102,16 +185,14 @@ export default function DashboardMap({
         focusParcelleById(parcelleId);
         return;
       }
-      setSelectedParcelleId((prev) => {
-        const next = prev === parcelleId ? null : parcelleId;
-        if (next) {
-          skipClearParcelleRef.current = true;
-          onSelectTreatmentRef.current?.(null);
-        }
-        return next;
-      });
+      const next = selectedParcelleId === parcelleId ? null : parcelleId;
+      if (next) {
+        skipClearParcelleRef.current = true;
+        onSelectTreatmentRef.current?.(null);
+      }
+      setSelectedParcelleId(next);
     },
-    [embedded, focusParcelleById]
+    [embedded, focusParcelleById, selectedParcelleId, setSelectedParcelleId]
   );
 
   // Désélection traitement (liste) → fermer aussi la parcelle sur la carte
@@ -122,7 +203,7 @@ export default function DashboardMap({
       return;
     }
     setSelectedParcelleId(null);
-  }, [activeTreatmentId]);
+  }, [activeTreatmentId, setSelectedParcelleId]);
 
   const handleParcelleClickRef = useRef(handleParcelleClick);
   handleParcelleClickRef.current = handleParcelleClick;
@@ -143,7 +224,20 @@ export default function DashboardMap({
       if (!loaded || !mapInstance.current || !LRef.current) return;
       if (resolvedFocusIdRef.current) return;
 
-      const points = collectParcelleBounds(parcelles);
+      let points: [number, number][];
+      if (satelliteMode && satelliteIndexedOnly) {
+        const lookup =
+          satelliteDirectApi || satelliteEnhanced
+            ? buildDirectSatelliteLookup(satelliteData)
+            : buildSatelliteLookup(parcelles, satelliteData);
+        points = collectParcelleBoundsFiltered(parcelles, (id) =>
+          satelliteDirectApi || satelliteEnhanced
+            ? lookup.has(id)
+            : hasSatelliteIndexValue(lookup.get(id), satelliteIndex)
+        );
+      } else {
+        points = collectParcelleBounds(parcelles);
+      }
       if (points.length === 0) return;
 
       const L = LRef.current;
@@ -154,7 +248,17 @@ export default function DashboardMap({
         animate,
       });
     },
-    [loaded, parcelles, embedded]
+    [
+      loaded,
+      parcelles,
+      embedded,
+      satelliteMode,
+      satelliteIndexedOnly,
+      satelliteEnhanced,
+      satelliteDirectApi,
+      satelliteData,
+      satelliteIndex,
+    ]
   );
 
   const fitAllParcellesRef = useRef(fitAllParcelles);
@@ -240,8 +344,19 @@ export default function DashboardMap({
     const map = mapInstance.current;
     if (!L || !map) return;
 
+    overlayClipCleanupsRef.current.forEach((fn) => fn());
+    overlayClipCleanupsRef.current = [];
     layersRef.current.forEach((layer) => map.removeLayer(layer));
     layersRef.current = [];
+
+    const useDirectApi = satelliteDirectApi || satelliteEnhanced;
+    const satelliteMap = satelliteMode
+      ? useDirectApi
+        ? buildDirectSatelliteLookup(satelliteData)
+        : buildSatelliteLookup(parcelles, satelliteData)
+      : new Map();
+    const compactSatelliteLabels =
+      satelliteMode && shouldUseCompactSatelliteLabels(satelliteMap.size || parcelles.filter((p) => !p.parentId).length);
 
     const isSelected = (id: string) =>
       resolvedFocusId === id ||
@@ -259,17 +374,49 @@ export default function DashboardMap({
       });
     };
 
-    const addLabel = (center: L.LatLngExpression, name: string, color: string) => {
+    const addMarkerLabel = (center: L.LatLngExpression, name: string, color: string) => {
       const icon = L.divIcon({
-        className: "",
+        className: "parc-map-label-wrap",
         html: parcelleLabelHtml(String(name), color),
         iconAnchor: parcelleLabelIconAnchor(),
+        iconSize: parcelleLabelIconSize(),
       });
       const m = L.marker(center, { icon, interactive: false }).addTo(map);
       layersRef.current.push(m);
     };
 
     const drawParcelle = (p: Parcelle, isChild = false) => {
+      const sat = satelliteMode ? satelliteMap.get(p.id) : undefined;
+      const hasIndex = useDirectApi
+        ? !!sat
+        : !!sat &&
+          (hasSatelliteIndexValue(sat, satelliteIndex) ||
+            hasSatelliteIndexValue(sat, "ndvi") ||
+            hasSatelliteIndexValue(sat, "ndwi"));
+
+      if (satelliteMode && satelliteIndexedOnly && !hasIndex) {
+        if (satelliteEnhanced && !isChild && p.boundary && p.boundary.length > 0) {
+          const missing = L.polygon(p.boundary as L.LatLngExpression[], {
+            color: "#94a3b8",
+            weight: 2,
+            dashArray: "8,6",
+            fillColor: "#e2e8f0",
+            fillOpacity: 0.45,
+          }).addTo(map);
+          missing.bindPopup(
+            `<div class="lf-sat-popup"><b>${p.name}</b><br><span style="color:#64748b">Non indexé — Sync Sentinel-2</span></div>`,
+            { maxWidth: 240, className: "lf-sat-popup-leaflet" }
+          );
+          missing.on("click", (e: L.LeafletMouseEvent) => {
+            L.DomEvent.stopPropagation(e);
+            handleParcelleClickRef.current(p.id);
+          });
+          layersRef.current.push(missing);
+        }
+        p.children?.forEach((child) => drawParcelle(child, true));
+        return;
+      }
+
       const selected = isSelected(p.id);
       const hasTreatment = treatments.some(
         (t) =>
@@ -278,16 +425,116 @@ export default function DashboardMap({
           getProp(t, "status", "status") === "in_progress"
       );
 
+      let strokeColor = selected ? "#f59e0b" : p.color;
+      let fillColor = p.color;
+      let fillOpacity = selected ? 0.38 : isChild ? 0.28 : hasTreatment ? 0.25 : 0.15;
+
+      const applySatelliteStyle = satelliteMode && hasIndex && (satelliteIndexedOnly || !isChild);
+      const parcellePreviewUrl = satellitePreviewByParcelleId[p.id];
+      const hasPreviewAsset = !!parcellePreviewUrl && !!sat?.date_acquisition;
+      const showPreviewOverlay =
+        satelliteEnhanced && applySatelliteStyle && hasPreviewAsset;
+
+      if (stockLabels && !isChild) {
+        const s = summarizeParcelleStock(p, treatments as never[], stockLevels);
+        const state = s.productCount === 0 ? "empty" : s.alertCount > 0 ? "warn" : "ok";
+        strokeColor = selected ? "#f59e0b" : state === "empty" ? "#64748B" : state === "warn" ? "#F59E0B" : "#22C55E";
+        fillColor = strokeColor;
+        fillOpacity = selected ? 0.38 : 0.22;
+      } else if (applySatelliteStyle && sat) {
+        if (satelliteEnhanced) {
+          const ndvi = getIndexValue(sat, "ndvi");
+          fillColor = ndviLegendColor(ndvi);
+          fillOpacity = hasPreviewAsset ? 0.28 : selected ? 0.58 : 0.44;
+          strokeColor = selected ? "#f59e0b" : "#ffffff";
+        } else {
+          const mapColorIndex = satelliteIndex;
+          const idxVal = hasSatelliteIndexValue(sat, mapColorIndex)
+            ? getIndexValue(sat, mapColorIndex)
+            : null;
+          const color =
+            idxVal != null ? getIndexLevel(idxVal, satelliteIndex).bar : p.color;
+          strokeColor = selected ? "#f59e0b" : color;
+          fillColor = color;
+          fillOpacity = selected ? 0.48 : 0.35;
+        }
+      }
+
       if (p.boundary && p.boundary.length > 0) {
+        let haloLayer: L.Polygon | null = null;
+        if (satelliteEnhanced && applySatelliteStyle) {
+          haloLayer = L.polygon(p.boundary as L.LatLngExpression[], {
+            color: selected ? "#f59e0b" : "#0f172a",
+            weight: selected ? 5 : 4,
+            fillOpacity: 0,
+            interactive: false,
+          }).addTo(map);
+          if (haloLayer) layersRef.current.push(haloLayer);
+        }
+
         const poly = L.polygon(p.boundary as L.LatLngExpression[], {
-          color: selected ? "#f59e0b" : p.color,
-          fillColor: p.color,
-          fillOpacity: selected ? 0.38 : isChild ? 0.28 : hasTreatment ? 0.25 : 0.15,
-          weight: selected ? 3.5 : isChild ? 2 : hasTreatment ? 3 : 2,
-          dashArray: isChild ? "6,4" : p.lastTreatmentDate ? undefined : "5,5",
+          color: strokeColor,
+          fillColor,
+          fillOpacity,
+          weight: selected ? 3.5 : satelliteEnhanced && applySatelliteStyle ? 2.5 : isChild ? 2 : hasTreatment ? 3 : 2.5,
+          dashArray: isChild ? "6,4" : stockLabels || applySatelliteStyle ? undefined : p.lastTreatmentDate ? undefined : "5,5",
         }).addTo(map);
-        addClickable(poly, p.id);
+        if (satelliteEnhanced && applySatelliteStyle) {
+          poly.on("click", (e: L.LeafletMouseEvent) => {
+            L.DomEvent.stopPropagation(e);
+            poly.openPopup(e.latlng);
+            handleParcelleClickRef.current(p.id);
+          });
+        } else {
+          addClickable(poly, p.id);
+        }
         layersRef.current.push(poly);
+
+        if (showPreviewOverlay && p.boundary?.length) {
+          const bounds = polygonLatLngBounds(p.boundary as [number, number][]);
+          if (bounds) {
+            const imgOverlay = L.imageOverlay(parcellePreviewUrl, bounds, {
+              opacity: satellitePreviewOpacity,
+              interactive: false,
+              className: "lf-sat-ndvi-overlay",
+            }).addTo(map);
+            const bindClip = () => {
+              const el = imgOverlay.getElement() as HTMLImageElement | undefined;
+              if (!el || el.naturalWidth === 0) return;
+              const cleanup = bindPolygonClipToImageOverlay(
+                map,
+                p.boundary as [number, number][],
+                bounds,
+                el
+              );
+              overlayClipCleanupsRef.current.push(cleanup);
+            };
+            imgOverlay.on("load", bindClip);
+            const imgEl = imgOverlay.getElement() as HTMLImageElement | undefined;
+            if (imgEl?.complete) bindClip();
+            layersRef.current.push(imgOverlay);
+            poly.bringToFront();
+            haloLayer?.bringToFront();
+            poly.bringToFront();
+          }
+        }
+
+        if (satelliteEnhanced && applySatelliteStyle && sat) {
+          poly.bindPopup(parcelleSatellitePopupHtml(p, sat), {
+            maxWidth: 280,
+            className: "lf-sat-popup-leaflet",
+          });
+        } else if (stockLabels) {
+          // Magasinier: label only top-level parcelles, stock aggregated over sub-parcelles
+          if (!isChild) {
+            const s = summarizeParcelleStock(p, treatments as never[], stockLevels);
+            attachParcelleMapLabel(poly, p, isChild, { productCount: s.productCount, alertCount: s.alertCount }, true);
+          }
+        } else if (applySatelliteStyle && sat && !satelliteEnhanced) {
+          attachParcelleMapLabel(poly, p, isChild, undefined, true, { row: sat, index: satelliteIndex }, compactSatelliteLabels);
+        } else if (!satelliteIndexedOnly && !satelliteEnhanced) {
+          attachParcelleMapLabel(poly, p, isChild);
+        }
         if (isChild) poly.bringToFront();
       } else if (p.center) {
         // No boundary → draw a clickable circle marker so it's still reachable
@@ -317,7 +564,10 @@ export default function DashboardMap({
         layersRef.current.push(L.marker(p.center as L.LatLngExpression, { icon: pulseIcon, interactive: false }).addTo(map));
       }
 
-      if (p.center) addLabel(p.center as L.LatLngExpression, p.name, p.color);
+      if (shouldShowParcelleMapLabel(p, isChild) && !p.boundary?.length) {
+        const labelPos = parcelleLabelPosition(p);
+        if (labelPos) addMarkerLabel(labelPos as L.LatLngExpression, p.name, p.color);
+      }
 
       p.children?.forEach((child) => drawParcelle(child, true));
     };
@@ -327,7 +577,89 @@ export default function DashboardMap({
     if (!resolvedFocusId) {
       fitAllParcellesRef.current(false);
     }
-  }, [parcelles, treatments, loaded, selectedParcelleId, activeTreatmentId, focusParcelleId, resolvedFocusId]);
+  }, [
+    parcelles,
+    treatments,
+    loaded,
+    selectedParcelleId,
+    activeTreatmentId,
+    focusParcelleId,
+    resolvedFocusId,
+    stockLabels,
+    stockLevels,
+    satelliteMode,
+    satelliteData,
+    satelliteIndex,
+    satelliteIndexedOnly,
+    satelliteEnhanced,
+    satelliteDirectApi,
+    satellitePreviewByParcelleId,
+    satellitePreviewOpacity,
+  ]);
+
+  useEffect(() => {
+    if (!loaded || !satelliteEnhanced || !satelliteMode) return;
+    const L = LRef.current;
+    const map = mapInstance.current;
+    if (!L || !map) return;
+
+    const legend = L.control({ position: "bottomleft" });
+    legend.onAdd = () => {
+      const div = L.DomUtil.create("div", "lf-sat-ndvi-legend-control");
+      L.DomEvent.disableClickPropagation(div);
+      const rows = NDVI_MAP_LEGEND.map(
+        (item) =>
+          `<div class="lf-sat-ndvi-legend-row">
+            <span class="lf-sat-ndvi-legend-swatch" style="background:${item.color}"></span>
+            <span>${item.label}</span>
+            <span class="lf-sat-ndvi-legend-range">${item.range}</span>
+          </div>`
+      ).join("");
+      div.innerHTML = `<b class="lf-sat-ndvi-legend-heading">NDVI</b>${rows}`;
+      return div;
+    };
+    legend.addTo(map);
+    return () => {
+      legend.remove();
+    };
+  }, [loaded, satelliteEnhanced, satelliteMode]);
+
+  // Sentinel Hub WMS tile layer (NDVI / NDWI raster overlay via Process API)
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapInstance.current;
+    if (!L || !map || !loaded) return;
+
+    if (sentinelTileLayerRef.current) {
+      map.removeLayer(sentinelTileLayerRef.current);
+      sentinelTileLayerRef.current = null;
+    }
+    if (!satelliteMode) return;
+
+    const tileUrl = `/api/v1/satellite-data/tile/{z}/{x}/{y}?index=${satelliteIndex}&days=30`;
+    const layer = L.tileLayer(tileUrl, {
+      opacity: satellitePreviewOpacity,
+      minZoom: 10,
+      maxNativeZoom: 15,
+      maxZoom: 18,
+      tileSize: 256,
+      attribution: "Sentinel-2 L2A · ESA Copernicus",
+    });
+    layer.addTo(map);
+    sentinelTileLayerRef.current = layer;
+
+    return () => {
+      if (sentinelTileLayerRef.current) {
+        map.removeLayer(sentinelTileLayerRef.current);
+        sentinelTileLayerRef.current = null;
+      }
+    };
+  }, [loaded, satelliteMode, satelliteIndex]);
+
+  // Update tile opacity without re-fetching tiles
+  useEffect(() => {
+    sentinelTileLayerRef.current?.setOpacity(satellitePreviewOpacity);
+  }, [satellitePreviewOpacity]);
 
   // Sync parcelle selection when a treatment is picked from the list
   useEffect(() => {
@@ -361,6 +693,20 @@ export default function DashboardMap({
 
     if (!focusParcelle) return;
 
+    if (satelliteEnhanced) {
+      if (focusParcelle.boundary?.length) {
+        const highlight = L.polygon(focusParcelle.boundary as L.LatLngExpression[], {
+          color: "#f59e0b",
+          fillOpacity: 0,
+          weight: 3,
+          dashArray: "6,4",
+          interactive: false,
+        }).addTo(map);
+        detailLayersRef.current.push(highlight);
+      }
+      return;
+    }
+
     if (focusParcelle.boundary?.length) {
       const highlight = L.polygon(focusParcelle.boundary as L.LatLngExpression[], {
         color: "#f59e0b",
@@ -368,6 +714,7 @@ export default function DashboardMap({
         fillOpacity: 0.28,
         weight: 4,
         dashArray: "4,4",
+        interactive: false,
       }).addTo(map);
       detailLayersRef.current.push(highlight);
       map.fitBounds(L.latLngBounds(focusParcelle.boundary).pad(0.25), { animate: true, duration: 0.5 });
@@ -379,6 +726,7 @@ export default function DashboardMap({
         fillColor: focusParcelle.color,
         fillOpacity: 0.35,
         weight: 3,
+        interactive: false,
       }).addTo(map);
       detailLayersRef.current.push(ring);
       map.setView(center, Math.max(map.getZoom(), 16), { animate: true, duration: 0.5 });
@@ -399,7 +747,7 @@ export default function DashboardMap({
       detailLayersRef.current.forEach((layer) => map.removeLayer(layer));
       detailLayersRef.current = [];
     };
-  }, [activeTreatmentId, focusParcelle, treatments, loaded]);
+  }, [activeTreatmentId, focusParcelle, treatments, loaded, satelliteEnhanced]);
 
   // Computed data for React overlay
   const overlayParcelle = focusParcelle;
@@ -409,8 +757,31 @@ export default function DashboardMap({
     [overlayParcelle, treatments]
   );
 
-  // Historique complet (dashboard)
   useEffect(() => {
+    if (!embedded || !detailPanelOpen || !loaded || !mapInstance.current) return;
+    const map = mapInstance.current;
+    const t = window.setTimeout(() => map.invalidateSize(), 380);
+    return () => window.clearTimeout(t);
+  }, [embedded, detailPanelOpen, loaded]);
+
+  const detailPanelOpenRef = useRef(detailPanelOpen);
+  useEffect(() => {
+    if (!embedded || !loaded || !mapInstance.current) return;
+    const map = mapInstance.current;
+    const wasOpen = detailPanelOpenRef.current;
+    detailPanelOpenRef.current = detailPanelOpen;
+    const t = window.setTimeout(() => {
+      map.invalidateSize();
+      if (detailPanelOpen && !wasOpen) {
+        map.panBy([-Math.round(detailPanelWidth * 0.22), 0], { animate: true, duration: 0.38 });
+      }
+    }, 380);
+    return () => window.clearTimeout(t);
+  }, [embedded, detailPanelOpen, detailPanelWidth, loaded]);
+
+  // Historique complet (dashboard modal — drawer géré par la page)
+  useEffect(() => {
+    if (historyPanelExternal) return;
     if (!resolvedFocusId) {
       setHistoryBundle(null);
       return;
@@ -445,29 +816,48 @@ export default function DashboardMap({
     return () => {
       cancelled = true;
     };
-  }, [resolvedFocusId, overlayParcelle, treatments]);
+  }, [historyPanelExternal, resolvedFocusId, overlayParcelle, treatments]);
+
+  const onWeatherDataRef = useRef(onWeatherData);
+  onWeatherDataRef.current = onWeatherData;
+  const parcellesRef = useRef(parcelles);
+  parcellesRef.current = parcelles;
 
   useEffect(() => {
     if (!weatherMode) {
       setWeatherData(null);
       setWeatherLoading(false);
-      onWeatherData?.(null, false);
+      onWeatherDataRef.current?.(null, false);
       return;
     }
+
     let cancelled = false;
-    setWeatherLoading(true);
-    onWeatherData?.(null, true);
-    const bounds = buildRainGridBounds(collectParcelleBounds(parcelles));
-    fetchWeatherMapData(bounds).then((data) => {
-      if (cancelled) return;
-      setWeatherData(data);
-      setWeatherLoading(false);
-      onWeatherData?.(data, false);
-    });
+
+    const load = async () => {
+      setWeatherLoading(true);
+      onWeatherDataRef.current?.(null, true);
+      try {
+        const bounds = buildRainGridBounds(collectParcelleBounds(parcellesRef.current));
+        const data = await fetchWeatherMapData(bounds);
+        if (cancelled) return;
+        setWeatherData(data);
+        onWeatherDataRef.current?.(data, false);
+      } catch {
+        if (cancelled) return;
+        setWeatherData(null);
+        onWeatherDataRef.current?.(null, false);
+      } finally {
+        if (!cancelled) setWeatherLoading(false);
+      }
+    };
+
+    void load();
     return () => {
       cancelled = true;
+      setWeatherLoading(false);
+      onWeatherDataRef.current?.(null, false);
     };
-  }, [weatherMode, parcelles, onWeatherData]);
+  }, [weatherMode]);
 
   // GIS HUD Actions
   const handleCenterMap = () => {
@@ -514,14 +904,14 @@ export default function DashboardMap({
         </div>
       )}
 
-      {parcelles.length > 0 && !embedded && (
+      {parcelles.length > 0 && !hideQuickNav && (
         <ParcelleQuickNav
           parcelles={parcelles}
           selectedId={chipSelectedId}
           onSelect={focusParcelleById}
           onClear={clearParcelleFocus}
           variant="light"
-          hint="Clic parcelle → historique complet"
+          hint={embedded ? "Sélection → panneau latéral" : "Clic parcelle → historique complet"}
         />
       )}
 
@@ -568,7 +958,7 @@ export default function DashboardMap({
         />
       )}
 
-      {overlayParcelle && embedded && !weatherMode && (
+      {overlayParcelle && embedded && !weatherMode && !historyPanelExternal && !satelliteEnhanced && (
         <DashboardParcelleHistoryPanel
           parcelle={overlayParcelle}
           history={historyBundle}

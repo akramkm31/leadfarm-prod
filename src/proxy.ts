@@ -2,8 +2,16 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { canPath, defaultLandingPath } from "@/lib/rbac/policy";
 import { loadUserAccessProfile } from "@/lib/rbac/server";
+import { MOCK_PARCELLES } from "@/lib/data-provider-config";
 
-const PUBLIC_ROUTES = ["/login", "/auth/callback", "/api/readings"];
+const PUBLIC_ROUTES = [
+  "/login",
+  "/auth/callback",
+  "/api/auth/login",
+  "/api/readings",
+  "/verify",
+  "/api/v1/verify",
+];
 
 /** Marketing home + static media must stay reachable without a session. */
 function isPublicRoute(pathname: string): boolean {
@@ -12,10 +20,18 @@ function isPublicRoute(pathname: string): boolean {
   return PUBLIC_ROUTES.some((r) => pathname.startsWith(r));
 }
 
+function isLocalMockDev(): boolean {
+  return process.env.NODE_ENV === "development" && MOCK_PARCELLES;
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (isPublicRoute(pathname)) {
+  if (process.env.APP_SITE === "app" && pathname === "/") {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (isPublicRoute(pathname) || isLocalMockDev()) {
     return NextResponse.next();
   }
 
@@ -49,6 +65,9 @@ export async function proxy(request: NextRequest) {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+      }
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);

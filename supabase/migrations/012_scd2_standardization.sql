@@ -89,9 +89,9 @@ BEGIN
         EXECUTE format('ALTER TABLE %I ADD COLUMN IF NOT EXISTS identifiant_modifie_par INT', table_name);
         EXECUTE format('ALTER TABLE %I ADD COLUMN IF NOT EXISTS motif_modification TEXT', table_name);
         
-        -- Create Unique Index for Current Version per Business ID
+        -- CREATE UNIQUE INDEX IF NOT EXISTS for Current Version per Business ID
         EXECUTE format('DROP INDEX IF EXISTS idx_%I_metier_actuel', table_name);
-        EXECUTE format('CREATE UNIQUE INDEX idx_%I_metier_actuel ON %I(identifiant_metier) WHERE est_version_actuelle = TRUE', table_name, table_name);
+        EXECUTE format('CREATE UNIQUE INDEX IF NOT EXISTS idx_%I_metier_actuel ON %I(identifiant_metier) WHERE est_version_actuelle = TRUE', table_name, table_name);
         
         -- Attach Trigger
         EXECUTE format('DROP TRIGGER IF EXISTS trg_scd2_%I ON %I', table_name, table_name);

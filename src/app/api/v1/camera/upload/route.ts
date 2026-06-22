@@ -1,18 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
+import { verifyServiceToken } from "@/lib/auth/service-token";
 import { createServiceClient } from "@/lib/supabase/service";
 import { classifyDisease } from "@/lib/services/disease-detection";
 import { fireAlert } from "@/lib/services/notifications";
 
-const CONFIDENCE_THRESHOLD_AUTO  = 85;  // auto-alert, no confirmation needed
-const CONFIDENCE_THRESHOLD_HUMAN = 60;  // below this → request human confirmation
+const CONFIDENCE_THRESHOLD_AUTO  = 85;
+const CONFIDENCE_THRESHOLD_HUMAN = 60;
+
+function authorizeDevice(req: NextRequest): boolean {
+  const deviceKey = req.headers.get("x-device-key");
+  const configured = process.env.DEVICE_API_KEY;
+  if (deviceKey && configured && deviceKey === configured) return true;
+
+  const authHeader = req.headers.get("authorization");
+  if (authHeader?.startsWith("Bearer ")) {
+    return verifyServiceToken(authHeader.slice(7));
+  }
+  return false;
+}
 
 export async function POST(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
+  if (!authorizeDevice(req)) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
+
   const capteurId  = req.headers.get("x-capteur-id");
   const parcellId  = req.headers.get("x-parcelle-id");
   const tenantId   = req.headers.get("x-tenant-id");
 
-  if (!authHeader || !capteurId || !parcellId || !tenantId) {
+  if (!capteurId || !parcellId || !tenantId) {
     return NextResponse.json({ error: "Missing headers" }, { status: 400 });
   }
 

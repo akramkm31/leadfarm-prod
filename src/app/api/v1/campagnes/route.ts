@@ -1,99 +1,90 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { createRouteHandlerClient } from "@/lib/supabase-server";
-import { requireAuth, json, parsePagination, validateBody } from "@/lib/api-helpers";
+import { withAuth, requireFeature, json, parsePagination, validateBody } from "@/lib/api-helpers";
 
-const insertSchema = z.object({
-  exploitation_id: z.string().uuid(),
-  nom: z.string().min(1).max(255),
-  date_debut: z.string().optional().nullable(),
-  date_fin: z.string().optional().nullable(),
-  statut: z.string().max(50).optional().default("en_cours"),
-});
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const HEX_RE  = /^#[0-9A-Fa-f]{6}$/;
+
+const insertSchema = z
+  .object({
+    nom:         z.string().min(1).max(100).trim(),
+    date_debut:  z.string().regex(DATE_RE, "Format AAAA-MM-JJ requis"),
+    date_fin:    z.string().regex(DATE_RE, "Format AAAA-MM-JJ requis"),
+    statut:      z.enum(["planifie", "en_cours", "termine", "suspendu"]).default("planifie"),
+    description: z.string().max(500).optional().nullable(),
+    couleur:     z.string().regex(HEX_RE, "Code hex invalide (ex: #00D4AA)").optional().nullable(),
+  })
+  .refine(
+    (d) => d.date_debut < d.date_fin,
+    { message: "La date de fin doit être strictement après la date de début", path: ["date_fin"] }
+  );
 
 export async function GET(req: NextRequest) {
-  const { error: authErr } = await requireAuth(req);
-  if (authErr) return authErr;
+  const auth = await withAuth(req);
+  if (auth.error) return auth.error;
+  const denied = requireFeature(auth, "campagnes");
+  if (denied) return denied;
 
   const sp = req.nextUrl.searchParams;
   const { limit, offset } = parsePagination(sp, 200);
-  const exploitationId = sp.get("exploitation_id");
 
-  const supabase = createRouteHandlerClient(req);
-  let q = supabase
+  const STATUT_VALUES = ["planifie", "en_cours", "termine", "suspendu"] as const;
+  const rawStatut = sp.get("statut");
+  const statut    = STATUT_VALUES.includes(rawStatut as typeof STATUT_VALUES[number]) ? rawStatut : null;
+  const annee     = sp.get("annee") ? parseInt(sp.get("annee")!) : null;
+
+  let query = auth.supabase
     .from("campagnes")
     .select("*", { count: "exact" })
     .order("date_debut", { ascending: false, nullsFirst: false })
     .range(offset, offset + limit - 1);
 
-  if (exploitationId) q = q.eq("exploitation_id", exploitationId);
-
-  const { data, error, count } = await q;
-  if (error) {
-    console.warn("Campagnes API query failed, falling back to mock data:", error.message);
-    const mockCampagnes = [
-      {
-        id: "camp-2026",
-        exploitation_id: "exp-001",
-        nom: "Campagne 2025-2026",
-        date_debut: "2025-09-01",
-        date_fin: "2026-08-31",
-        statut: "en_cours"
-      },
-      {
-        id: "camp-2025",
-        exploitation_id: "exp-001",
-        nom: "Campagne 2024-2025",
-        date_debut: "2024-09-01",
-        date_fin: "2025-08-31",
-        statut: "termine"
-      },
-      {
-        id: "camp-2024",
-        exploitation_id: "exp-001",
-        nom: "Campagne 2023-2024",
-        date_debut: "2023-09-01",
-        date_fin: "2024-08-31",
-        statut: "termine"
-      }
-    ];
-    return json({ success: true, data: mockCampagnes, total: mockCampagnes.length, limit, offset });
+  if (auth.access.exploitationId) query = query.eq("exploitation_id", auth.access.exploitationId);
+  if (statut) query = query.eq("statut", statut);
+  if (annee) {
+    query = query
+      .lte("date_debut", `${annee}-12-31`)
+      .gte("date_fin",   `${annee}-01-01`);
   }
+
+  const { data, error, count } = await query;
+  if (error) return json({ success: false, error: error.message }, 500);
   return json({ success: true, data, total: count ?? data?.length ?? 0, limit, offset });
 }
 
 export async function POST(req: NextRequest) {
-  const { error: authErr } = await requireAuth(req);
-  if (authErr) return authErr;
+  const auth = await withAuth(req);
+  if (auth.error) return auth.error;
+  const denied = requireFeature(auth, "campagnes");
+  if (denied) return denied;
 
-  const body = await req.json();
+  const exploitationId = auth.access.exploitationId;
+  if (!exploitationId)
+    return json({ success: false, error: "Exploitation non configurée pour cet utilisateur" }, 422);
+
+  const body   = await req.json().catch(() => ({}));
   const parsed = validateBody(body, insertSchema);
   if (parsed.error) return parsed.error;
 
-  const supabase = createRouteHandlerClient(req);
-  const { data, error } = await supabase
+  const { data, error } = await auth.supabase
     .from("campagnes")
     .insert({
-      exploitation_id: parsed.data.exploitation_id,
-      nom: parsed.data.nom,
-      date_debut: parsed.data.date_debut || null,
-      date_fin: parsed.data.date_fin || null,
-      statut: parsed.data.statut,
+      exploitation_id: exploitationId,
+      nom:         parsed.data.nom,
+      date_debut:  parsed.data.date_debut,
+      date_fin:    parsed.data.date_fin,
+      statut:      parsed.data.statut,
+      description: parsed.data.description ?? null,
+      couleur:     parsed.data.couleur ?? "#00D4AA",
     })
     .select()
     .single();
 
   if (error) {
-    console.warn("Campagnes API insert failed, simulating mock creation:", error.message);
-    const mockNew = {
-      id: "camp-" + Math.random().toString(36).substring(2, 9),
-      exploitation_id: parsed.data.exploitation_id,
-      nom: parsed.data.nom,
-      date_debut: parsed.data.date_debut || null,
-      date_fin: parsed.data.date_fin || null,
-      statut: parsed.data.statut,
-    };
-    return json({ success: true, data: mockNew }, 201);
+    // Overlap exclusion constraint violation
+    if (error.code === "23P01" || error.message.includes("campagnes_no_overlap"))
+      return json({ success: false, error: "CAMPAIGN_OVERLAP", message: "Cette période chevauche une campagne existante pour cette exploitation." }, 409);
+    return json({ success: false, error: error.message }, 500);
   }
   return json({ success: true, data }, 201);
 }

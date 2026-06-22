@@ -25,4 +25,4 @@ export const TREATMENT_STATUS_SHORT: Record<string, string> = {
 };
 
 export const FARM_DISPLAY_NAME =
-  process.env.NEXT_PUBLIC_FARM_NAME ?? "Domaine Khelifa";
+  process.env.NEXT_PUBLIC_FARM_NAME ?? "Groupe Lechehab";

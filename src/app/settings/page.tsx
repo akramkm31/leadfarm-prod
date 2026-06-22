@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
+import { useAccessContext } from "@/components/auth/AccessProvider";
+import { MagasinierPage } from "@/components/magasinier/MagasinierBranch";
+import MagSettingsPage from "@/components/magasinier/pages/MagSettingsPage";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import {
@@ -58,6 +61,14 @@ const colorStyles: Record<string, string> = {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
+  const { profile } = useAccessContext();
+  if (profile?.role === "magasinier") {
+    return <MagasinierPage mag={MagSettingsPage} />;
+  }
+  return <SettingsContent />;
+}
+
+function SettingsContent() {
   const [user, setUser] = useState<any>(null);
   const [exploitation, setExploitation] = useState<ExploitationData>({
     nom: "Domaine Khelifa",
@@ -185,7 +196,7 @@ export default function SettingsPage() {
         </div>
       )}
 
-      <div className="mb-8 bg-black/30  rounded-2xl p-5 border border-[var(--color-stone-moss)]">
+      <div className="lf-page-header mb-8">
         <h1 className="text-2xl font-bold text-[var(--color-adaline-ink)] tracking-tight">Param�tres</h1>
         <p className="text-sm text-[var(--color-adaline-ink)]/60 mt-1">
           Configuration de l&apos;exploitation — {exploitation.nom}

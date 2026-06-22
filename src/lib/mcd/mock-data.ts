@@ -33,10 +33,7 @@ export const MOCK_METEO: DonneesMeteo[] = [
   { id: "m2", exploitation_id: "exp-001", zone_label: "Tlemcen", date_mesure: "2026-05-21", temperature_min_c: 13, temperature_max_c: 26, humidite_pourcentage: 58, pluviometrie_mm: 3.2, vitesse_vent_kmh: 8 },
 ];
 
-export const MOCK_SATELLITE: DonneesSatellite[] = [
-  { id: "s1", parcelle_id: "p-001", date_acquisition: "2026-05-20", indice_ndvi: 0.72, indice_ndwi: 0.45, parcelle_name: "Parcelle Nord — Pommiers" },
-  { id: "s2", parcelle_id: "p-003", date_acquisition: "2026-05-20", indice_ndvi: 0.58, indice_ndwi: 0.38, parcelle_name: "Parcelle Sud — Vigne" },
-];
+export { MOCK_SATELLITE } from "./mock-satellite";
 
 export const MOCK_MALADIES: Maladie[] = [
   { id: "mal-1", nom: "Tavelure", type_pathogene: "fongique", cultures_cibles: ["pomme", "poire"] },

@@ -13,7 +13,6 @@ const LABELS: Record<string, string> = {
   audit: "Journal SCD2",
   trace: "Traçabilité",
   campagnes: "Campagnes",
-  simulation: "Simulation démo",
   operators: "Opérateurs",
   alerts: "Alertes",
   settings: "Paramètres",

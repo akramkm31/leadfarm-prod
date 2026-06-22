@@ -41,6 +41,12 @@ export type DonneesSatellite = {
   date_acquisition: string;
   indice_ndvi?: number | null;
   indice_ndwi?: number | null;
+  indice_evi?: number | null;
+  indice_savi?: number | null;
+  indice_ndre?: number | null;
+  ndvi_min?: number | null;
+  ndvi_max?: number | null;
+  cloud_cover_pct?: number | null;
   source_satellite?: string;
   parcelle_name?: string;
 };

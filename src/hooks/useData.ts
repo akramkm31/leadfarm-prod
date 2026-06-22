@@ -89,8 +89,7 @@ export function useTreatments(status?: string) {
     }
     try {
       const rows = await getTreatments(status ? { status: status as any } : {});
-      if (rows.length > 0) return rows;
-      return fetchTreatments(status);
+      return rows;
     } catch {
       return fetchTreatments(status);
     }

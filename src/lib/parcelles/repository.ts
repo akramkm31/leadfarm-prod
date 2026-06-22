@@ -2,10 +2,38 @@ import { supabase } from "@/lib/supabase";
 import { SUPABASE_CONFIGURED } from "@/lib/data-provider-config";
 import type { RegionRow } from "@/lib/database.types";
 import { CANONICAL_PARCELLE_TABLE } from "./constants";
+import { insertRegionRow } from "./insert-region";
 import { mapRegionToParcelle, type ParcelleUI } from "./mappers";
+import { removeRegionParcelle } from "./remove-region";
 import { syncParcelleMirror } from "./sync-mirror";
+import { isUuid } from "@/lib/ids";
 
 export type { ParcelleUI };
+
+async function loadMockParcelles(): Promise<ParcelleUI[]> {
+  const { parcelles } = await import("@/lib/mock-data");
+  return parcelles as ParcelleUI[];
+}
+
+function formatFetchError(err: unknown): string {
+  if (err instanceof Error && err.message) return err.message;
+  if (err && typeof err === "object") {
+    const row = err as Record<string, unknown>;
+    const parts = [row.code, row.message, row.details, row.hint].filter(
+      (v): v is string => typeof v === "string" && v.length > 0
+    );
+    if (parts.length) return parts.join(" — ");
+  }
+  return "Erreur Supabase inconnue";
+}
+
+let parcellesFallbackWarned = false;
+
+function warnParcellesFallback(reason: string): void {
+  if (parcellesFallbackWarned || process.env.NODE_ENV !== "development") return;
+  parcellesFallbackWarned = true;
+  console.warn(`[fetchParcelles] ${reason} Données mock utilisées.`);
+}
 
 function buildTreatmentStats(treatments: { site_name?: string | null; planned_date?: string | null }[]) {
   const treatmentMap = new Map<string, { count: number; lastDate: string | null }>();
@@ -26,8 +54,7 @@ function buildTreatmentStats(treatments: { site_name?: string | null; planned_da
 
 export async function fetchParcelles(): Promise<ParcelleUI[]> {
   if (!SUPABASE_CONFIGURED) {
-    const { parcelles } = await import("@/lib/mock-data");
-    return parcelles as ParcelleUI[];
+    return loadMockParcelles();
   }
 
   try {
@@ -56,9 +83,8 @@ export async function fetchParcelles(): Promise<ParcelleUI[]> {
         return mapRegionToParcelle(r, childrenByParent.get(r.id) || [], stats);
       });
   } catch (err) {
-    console.error("[fetchParcelles]", err);
-    const { parcelles } = await import("@/lib/mock-data");
-    return parcelles as ParcelleUI[];
+    warnParcellesFallback(formatFetchError(err));
+    return loadMockParcelles();
   }
 }
 
@@ -100,35 +126,35 @@ export async function insertParcelle(data: {
     return newParcelle;
   }
 
-  const { data: region, error } = await supabase
-    .from(CANONICAL_PARCELLE_TABLE)
-    .insert({
-      name: data.name,
-      boundary: data.boundary,
-      color: data.color,
-      area_hectares: data.areaHectares,
-      crop_type: data.cropType,
-      variete: data.variete,
-      site: data.site,
-      center: data.center,
-      culture_type: "arboriculture",
-      parent_id: data.parentId ?? null,
-    })
-    .select()
-    .single();
+  const { data: region, error } = await insertRegionRow(supabase, {
+    name: data.name,
+    boundary: data.boundary,
+    color: data.color,
+    area_hectares: data.areaHectares,
+    crop_type: data.cropType,
+    variete: data.variete,
+    site: data.site,
+    center: data.center,
+    culture_type: "arboriculture",
+    parent_id: data.parentId ?? null,
+  });
 
   if (error) throw new Error(error.message || "Erreur lors de l'enregistrement");
 
   const regionRow = region as RegionRow;
-  await syncParcelleMirror(supabase, regionRow);
-  return mapRegionToParcelle(regionRow);
+  void syncParcelleMirror(supabase, regionRow);
+  return mapRegionToParcelle({
+    ...regionRow,
+    site: regionRow.site ?? data.site,
+    variete: regionRow.variete ?? data.variete,
+  });
 }
 
 export async function updateParcelle(
   id: string,
   data: { name?: string; cropType?: string; color?: string; areaHectares?: number }
 ): Promise<ParcelleUI | null> {
-  if (!SUPABASE_CONFIGURED) return null;
+  if (!SUPABASE_CONFIGURED || !isUuid(id)) return null;
 
   const updates: Record<string, unknown> = {};
   if (data.name !== undefined) updates.name = data.name;
@@ -150,12 +176,20 @@ export async function updateParcelle(
 }
 
 export async function deleteParcelle(id: string): Promise<boolean> {
-  if (!SUPABASE_CONFIGURED) return true;
+  if (!SUPABASE_CONFIGURED || !isUuid(id)) return true;
 
-  await supabase.from(CANONICAL_PARCELLE_TABLE).delete().eq("parent_id", id);
-  const { error } = await supabase.from(CANONICAL_PARCELLE_TABLE).delete().eq("id", id);
-  if (error) throw new Error(error.message);
+  if (typeof window !== "undefined") {
+    const res = await fetch(`/api/v1/parcelles/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    const payload = (await res.json().catch(() => ({}))) as { error?: string };
+    if (!res.ok) {
+      throw new Error(payload.error ?? "Erreur lors de la suppression");
+    }
+    return true;
+  }
 
-  await supabase.from("parcelles").delete().eq("id", id);
+  await removeRegionParcelle(supabase, id);
   return true;
 }
