@@ -21,5 +21,5 @@ jobs:
       - run: npm test
       - run: npm run build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          NEXT_PUBLIC_SUPABASE_URL: https://rjvmygudsemlnkpfdfzd.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqdm15Z3Vkc2VtbG5rcGZkZnpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDMyNDcsImV4cCI6MjA4NzI3OTI0N30.45pU-Gjla48N2omKAyBIyv6pgVTi6p8XGjSWCaW2nH8

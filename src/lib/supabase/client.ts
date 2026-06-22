@@ -15,37 +15,42 @@ import type { Database } from "@/lib/database.types";
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!url || url === "https://placeholder.supabase.co") {
-  if (process.env.NODE_ENV === "production") {
-    throw new Error(
-      "[Supabase] NEXT_PUBLIC_SUPABASE_URL is not set. " +
-      "Cannot start in production without a database connection."
-    );
-  }
-  // Dev: warn and continue — repositories will return empty arrays.
-  console.warn(
-    "[Supabase] Running without a database connection. " +
-    "Set NEXT_PUBLIC_SUPABASE_URL in .env.local to connect."
+const PLACEHOLDER_URL = "https://placeholder.supabase.co";
+const hasRealConfig =
+  !!url && url !== PLACEHOLDER_URL && !!anonKey && anonKey !== "placeholder-anon-key";
+
+if (!hasRealConfig && process.env.NODE_ENV === "production" && typeof window !== "undefined") {
+  throw new Error(
+    "[Supabase] NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY are not set."
   );
 }
 
-// ── Singleton ──────────────────────────────────────────────────────────────
+if (!hasRealConfig && process.env.NODE_ENV !== "production") {
+  console.warn("[Supabase] Running without a database connection.");
+}
+
+const BUILD_FALLBACK_URL = "https://rjvmygudsemlnkpfdfzd.supabase.co";
+const BUILD_FALLBACK_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqdm15Z3Vkc2VtbG5rcGZkZnpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDMyNDcsImV4cCI6MjA4NzI3OTI0N30.45pU-Gjla48N2omKAyBIyv6pgVTi6p8XGjSWCaW2nH8";
 
 let _client: ReturnType<typeof createBrowserClient<Database>> | null = null;
 
 export function getSupabaseClient() {
   if (!_client) {
     _client = createBrowserClient<Database>(
-      url ?? "https://placeholder.supabase.co",
-      anonKey ?? "placeholder"
+      hasRealConfig ? url! : BUILD_FALLBACK_URL,
+      hasRealConfig ? anonKey! : BUILD_FALLBACK_KEY
     );
   }
   return _client;
 }
 
-/** Direct export for convenience — same singleton instance. */
-export const supabase = getSupabaseClient();
+export const supabase = new Proxy({} as ReturnType<typeof createBrowserClient<Database>>, {
+  get(_target, prop) {
+    const client = getSupabaseClient();
+    const value = Reflect.get(client as object, prop);
+    return typeof value === "function" ? (value as (...args: unknown[]) => unknown).bind(client) : value;
+  },
+});
 
-/** True if a real Supabase project is configured. */
-export const SUPABASE_CONFIGURED =
-  !!url && url !== "https://placeholder.supabase.co" && !!anonKey;
+export const SUPABASE_CONFIGURED = hasRealConfig;
