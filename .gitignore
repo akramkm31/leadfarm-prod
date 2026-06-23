@@ -65,3 +65,6 @@ playwright-report/
 # ML models (large binaries — store outside repo)
 models/*.onnx
 models/*.pt
+
+# Local Netlify folder
+.netlify

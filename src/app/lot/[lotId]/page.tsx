@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 import { useParams } from "next/navigation";
+import { resolveLotDemoProfile, NORD_A_GOLDEN_LOT_ID, lotTraceUrl } from "@/lib/lot/demo-profiles";
 
 /* ════════════════════════════════════════════════════════════════════════
    PUBLIC LOT TRACEABILITY — accessible via QR code, no auth required.
@@ -30,11 +31,11 @@ const MONO = "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace";
 
 /* ── Demo data ────────────────────────────────────────────────────────── */
 const LOT = {
-  id: "DK-2026-P7A-20260614",
+  id: NORD_A_GOLDEN_LOT_ID,
   ggn: "4049928123456",
-  exploitation: "Domaine Khelifa",
-  localisation: "Sidi Bel Abbès, Algérie (wilaya 22)",
-  generatedAt: "", // filled client-side
+  exploitation: "Domaine Khelifa — Groupe Lechehab",
+  localisation: "Tenira, Sidi Bel Abbès, Algérie (wilaya 22)",
+  generatedAt: "",
   closedAt: "14/06/2026",
 };
 
@@ -49,11 +50,12 @@ const TIMELINE = [
 ];
 
 const PRODUIT: [string, string][] = [
-  ["Variété", "Golden Delicious"],
+  ["Variété", "Golden Delicious (pomme jaune)"],
   ["Porte-greffe", "M9 (demi-nain)"],
   ["Culture", "Malus domestica"],
-  ["Parcelle", "P7-A"],
-  ["Surface parcelle", "4.2 ha"],
+  ["Bloc", "Nord-A — Golden Delicious"],
+  ["Parcelle mère", "Parcelle Nord — Pommiers"],
+  ["Surface bloc", "4.2 ha"],
   ["Altitude", "820 m"],
   ["GPS centroïde", "35.1234°N, 0.5678°W"],
   ["Saison", "Campagne 2025-2026"],
@@ -72,7 +74,7 @@ const QUALITE_PC: [string, string, boolean?][] = [
   ["Firmété", "7.1 kg/cm² (pénétromètre)"],
   ["Acidité titrable", "5.8 g/L ac. malique"],
   ["Poids moyen fruit", "198 g"],
-  ["Couleur", "Rougissage > 50 % surface", true],
+  ["Couleur", "Jaune doré uniforme (> 85 % surface)", true],
 ];
 
 const PHENO = [
@@ -86,7 +88,7 @@ const PHENO = [
 
 const RONDES = [
   {
-    num: 12, date: "08/06/2026", zone: "P7-A intégralité",
+    num: 12, date: "08/06/2026", zone: "Nord-A — Golden Delicious",
     obs: [
       { l: "Tavelure", v: "1.2 %", seuil: "seuil 5 %", ok: true },
       { l: "Oïdium", v: "0.3 %", seuil: "seuil 5 %", ok: true },
@@ -96,12 +98,12 @@ const RONDES = [
     decision: "Pas d'intervention nécessaire ✅", alert: false,
   },
   {
-    num: 10, date: "20/05/2026", zone: "P7-A intégralité",
+    num: 10, date: "20/05/2026", zone: "Nord-A — Golden Delicious",
     obs: [{ l: "Tavelure", v: "6.8 %", seuil: "seuil 5 %", ok: false }],
     decision: "TRAITEMENT DÉCLENCHÉ → voir Traitement #5", alert: true,
   },
   {
-    num: 8, date: "28/04/2026", zone: "P7-A intégralité",
+    num: 8, date: "28/04/2026", zone: "Nord-A — Golden Delicious",
     obs: [{ l: "Oïdium", v: "5.2 %", seuil: "seuil 5 %", ok: false }],
     decision: "TRAITEMENT DÉCLENCHÉ → voir Traitement #4", alert: true,
   },
@@ -374,13 +376,16 @@ export default function PublicLotPage() {
   const [live, setLive] = useState<LiveData | null>(null);
   const t = I18N[lang];
 
+  const demo = useMemo(() => resolveLotDemoProfile(routeLotId || LOT.id), [routeLotId]);
+  const demoProduit = demo.produit;
+  const demoQualitePc = demo.qualitePc;
+
   useEffect(() => {
-    const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || window.location.origin;
-    const url = `${base}/lot/${encodeURIComponent(routeLotId)}`;
+    const url = lotTraceUrl(routeLotId || demo.lotId);
     setPageUrl(url);
     setNow(new Date().toLocaleString("fr-FR"));
     QRCode.toDataURL(url, { width: 160, margin: 1 }).then(setQrDataUrl).catch(() => {});
-  }, []);
+  }, [routeLotId, demo.lotId]);
 
   useEffect(() => {
     if (!routeLotId) return;
@@ -394,7 +399,7 @@ export default function PublicLotPage() {
 
   /* ── Live overlay (real LeadFarm data) on top of demo fallback ── */
   const isLive = live?.source === "live";
-  const lotId = live?.lot?.id || routeLotId || LOT.id;
+  const lotId = live?.lot?.id || routeLotId || demo.lotId;
   const p = (live?.parcelle ?? {}) as Record<string, any>;
   const cmp = (live?.campagne ?? {}) as Record<string, any>;
 
@@ -410,7 +415,7 @@ export default function PublicLotPage() {
         ["Saison", cmp.nom ?? "—"],
         ["Date récolte", fmtFr(live?.lot?.date_recolte) ?? "—"],
       ] as [string, string][])
-    : PRODUIT;
+    : demoProduit;
 
   const objectifs = isLive
     ? {
@@ -456,7 +461,7 @@ export default function PublicLotPage() {
               {lotId}
             </div>
             <div style={{ fontSize: 10, color: C.sub, display: "flex", alignItems: "center", gap: 5 }}>
-              {LOT.exploitation}
+              {demo.exploitation}
               <span style={{ display: "inline-flex", alignItems: "center", gap: 3, color: isLive ? C.greenLt : C.sub, fontWeight: 700 }}>
                 <span style={{ width: 5, height: 5, borderRadius: 999, background: isLive ? C.greenLt : "#cbd5e1", display: "inline-block" }} />
                 {isLive ? "données LeadFarm en direct" : "données de démonstration"}
@@ -492,8 +497,8 @@ export default function PublicLotPage() {
                 <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: C.ink, wordBreak: "break-all", lineHeight: 1.2, margin: "2px 0 12px" }}>
                   {lotId}
                 </div>
-                <KV k="Exploitation" v={LOT.exploitation} />
-                <KV k="Localisation" v={LOT.localisation} />
+                <KV k="Exploitation" v={demo.exploitation} />
+                <KV k="Localisation" v={demo.localisation} />
                 {isLive && cmp.nom && <KV k="Campagne" v={cmp.nom} />}
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "6px 0" }}>
                   <span style={{ fontSize: 13, color: C.sub }}>GGN</span>
@@ -535,10 +540,10 @@ export default function PublicLotPage() {
         <Section n={3} title="🍎 Produit">
           <Card>
             {produitRows.map(([k, v]) => <KV key={k} k={k} v={v} mono={k.startsWith("GPS")} />)}
-            <a href="https://maps.google.com/?q=35.1234,-0.5678" target="_blank" rel="noopener noreferrer" style={{ display: "block", marginTop: 12 }}>
+            <a href={`https://maps.google.com/?q=${demo.mapCoords.lat},${demo.mapCoords.lng}`} target="_blank" rel="noopener noreferrer" style={{ display: "block", marginTop: 12 }}>
               <img
-                src="https://staticmap.openstreetmap.de/staticmap.php?center=35.1234,-0.5678&zoom=13&size=620x140&markers=35.1234,-0.5678,red-pushpin"
-                alt="Localisation parcelle P7-A" width="100%" style={{ borderRadius: 8, border: `1px solid ${C.border}`, display: "block" }}
+                src={`https://staticmap.openstreetmap.de/staticmap.php?center=${demo.mapCoords.lat},${demo.mapCoords.lng}&zoom=13&size=620x140&markers=${demo.mapCoords.lat},${demo.mapCoords.lng},red-pushpin`}
+                alt={`Localisation ${demo.mapLabel}`} width="100%" style={{ borderRadius: 8, border: `1px solid ${C.border}`, display: "block" }}
                 onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
               />
             </a>
@@ -560,7 +565,7 @@ export default function PublicLotPage() {
             <div style={{ fontSize: 12, fontWeight: 800, color: C.green, textTransform: "uppercase", letterSpacing: 0.5, margin: "14px 0 4px" }}>
               Paramètres physico-chimiques
             </div>
-            {QUALITE_PC.map(([k, v, ok]) => <KV key={k} k={k} v={v} ok={ok} mono />)}
+            {demoQualitePc.map(([k, v, ok]) => <KV key={k} k={k} v={v} ok={ok} mono />)}
             <div style={{ marginTop: 12, fontSize: 12, color: C.sub }}>
               Défauts observés : <Check>aucun défaut disqualifiant</Check>
             </div>
