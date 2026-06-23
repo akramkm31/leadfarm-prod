@@ -1,0 +1,31 @@
+[     173ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    6442ms] [LOG] [Fast Refresh] done in 6381ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    7377ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    7451ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /admin. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    7508ms] [LOG] [HMR] connected @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    8061ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   10025ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/icon-192.png:0
+[   10066ms] [LOG] [Fast Refresh] done in 2184ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   10089ms] [WARNING] Error while trying to use the following icon from the Manifest: http://localhost:3001/icon-192.png (Download error or resource isn't a valid image) @ http://localhost:3001/admin:0
+[   10666ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   19091ms] [LOG] [Fast Refresh] done in 8590ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   19609ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/api/v1/admin/parcelles:0
+[  190501ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  191133ms] [LOG] [Fast Refresh] done in 750ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  214024ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  214511ms] [LOG] [Fast Refresh] done in 597ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  218569ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  219141ms] [LOG] [Fast Refresh] done in 677ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  316031ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  316650ms] [LOG] [Fast Refresh] done in 731ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  325041ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  325639ms] [LOG] [Fast Refresh] done in 596ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  325828ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  326180ms] [LOG] [Fast Refresh] done in 464ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  331505ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  331546ms] [LOG] [Fast Refresh] done in 186ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  331653ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  332077ms] [LOG] [Fast Refresh] done in 443ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  337686ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  338166ms] [LOG] [Fast Refresh] done in 486ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297

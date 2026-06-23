@@ -139,15 +139,22 @@ export function useAssistant() {
           });
           const data = await res.json();
           if (!res.ok) {
-            const detail = data?.details ? ` (${JSON.stringify(data.details)})` : "";
-            return { result: `Échec : ${data?.error || res.status}${detail}`, chip: { text: "Échec création traitement", tone: "warn" } };
+            const detail = data?.details ? ` — ${JSON.stringify(data.details)}` : "";
+            const msg = data?.error || `erreur ${res.status}`;
+            return {
+              result: `La création a échoué : ${msg}${detail}. Demande à l'utilisateur de vérifier les champs (parcelle, date) et de réessayer, ou de créer le traitement manuellement depuis la page Traitements.`,
+              chip: { text: "Échec création traitement", tone: "warn" },
+            };
           }
           return {
-            result: `Traitement créé pour « ${body.site_name} » le ${body.planned_date}.`,
+            result: `Traitement créé avec succès pour « ${body.site_name} » le ${body.planned_date}. L'utilisateur peut le retrouver dans la page Traitements.`,
             chip: { text: `Traitement créé · ${body.site_name}`, tone: "ok" },
           };
         } catch {
-          return { result: "Erreur réseau lors de la création.", chip: { text: "Échec création traitement", tone: "warn" } };
+          return {
+            result: "Impossible de joindre le serveur (erreur réseau). Demande à l'utilisateur de vérifier sa connexion et de réessayer.",
+            chip: { text: "Échec création traitement", tone: "warn" },
+          };
         }
       }
 

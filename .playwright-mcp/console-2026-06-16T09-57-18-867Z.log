@@ -1,0 +1,20 @@
+[    1026ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    1315ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /login. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    1422ms] [LOG] [HMR] connected @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    2546ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/icon-192.png:0
+[    2582ms] [WARNING] Error while trying to use the following icon from the Manifest: http://localhost:3001/icon-192.png (Download error or resource isn't a valid image) @ http://localhost:3001/login:0
+[   11710ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   11854ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   12653ms] [LOG] [Fast Refresh] done in 917ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   12676ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   13858ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   13917ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[   13943ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[   14099ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/icon-192.png:0
+[   14109ms] [LOG] [Fast Refresh] done in 362ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   14133ms] [WARNING] Error while trying to use the following icon from the Manifest: http://localhost:3001/icon-192.png (Download error or resource isn't a valid image) @ http://localhost:3001/dashboard:0
+[   22967ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   23505ms] [LOG] [Fast Refresh] done in 641ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297

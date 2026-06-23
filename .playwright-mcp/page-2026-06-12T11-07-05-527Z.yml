@@ -1,0 +1,197 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e33] [cursor=pointer]:
+    - img [ref=e34]
+  - alert [ref=e37]
+  - generic [ref=e38]:
+    - generic [ref=e39]:
+      - complementary "Navigation principale" [ref=e40]:
+        - link "LeadFarm" [ref=e41] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e42]
+        - navigation [ref=e46]:
+          - button "Pilotage" [ref=e47]:
+            - img [ref=e49]
+          - button "Opérations" [ref=e54]:
+            - img [ref=e55]
+          - button "Audit" [ref=e59]:
+            - img [ref=e60]
+        - generic [ref=e63]:
+          - button "Rechercher (Ctrl+K)" [ref=e64]:
+            - img [ref=e65]
+          - button "Alertes" [ref=e68]:
+            - img [ref=e69]
+          - button "Menu compte" [ref=e73] [cursor=pointer]: AK
+      - complementary
+    - generic [ref=e74]:
+      - banner [ref=e75]:
+        - button "Actualiser" [ref=e77] [cursor=pointer]:
+          - img [ref=e78]
+      - generic [ref=e84]:
+        - generic [ref=e85]:
+          - complementary "Inventaire compact" [ref=e86]:
+            - generic [ref=e87]:
+              - generic [ref=e88]:
+                - img [ref=e89]
+                - generic [ref=e99]: Inventaire
+              - link "Stock" [ref=e100] [cursor=pointer]:
+                - /url: /stock
+                - text: Stock
+                - img [ref=e101]
+            - generic [ref=e104]:
+              - generic [ref=e105]:
+                - strong [ref=e106]: "2"
+                - text: produits
+              - generic [ref=e107]:
+                - strong [ref=e108]: "0"
+                - text: alertes
+              - generic [ref=e109]:
+                - strong [ref=e110]: "0"
+                - text: DZD
+            - generic [ref=e111]:
+              - button "Tous" [ref=e112]
+              - button "Alertes" [ref=e113]
+            - generic [ref=e114]:
+              - button "OK Fongicide Cuivre 100.0 kg" [ref=e116]:
+                - generic [ref=e117]: OK
+                - generic [ref=e118]: Fongicide Cuivre
+                - generic [ref=e119]: 100.0 kg
+                - img [ref=e120]
+              - button "OK Insecticide Chlorpyrifos 100.0 L" [ref=e123]:
+                - generic [ref=e124]: OK
+                - generic [ref=e125]: Insecticide Chlorpyrifos
+                - generic [ref=e126]: 100.0 L
+                - img [ref=e127]
+          - generic [ref=e129]:
+            - generic [ref=e130]:
+              - generic [ref=e133]:
+                - button "Recadrer sur les parcelles" [ref=e135]:
+                  - img [ref=e136]
+                - generic [ref=e140]:
+                  - generic [ref=e141]:
+                    - generic [ref=e142]:
+                      - img [ref=e143]
+                      - text: Parcelles
+                    - generic [ref=e146]: Sélection → panneau latéral
+                  - tablist "Sélection rapide des parcelles" [ref=e147]:
+                    - tab "Parcelle Nord — Pommiers" [ref=e148]:
+                      - generic [ref=e150]: Parcelle Nord — Pommiers
+                    - tab "Nord-A — Golden Delicious Parcelle Nord — Pommiers" [ref=e151]:
+                      - generic [ref=e153]: Nord-A — Golden Delicious
+                      - generic [ref=e154]: Parcelle Nord — Pommiers
+                    - tab "Nord-B — Starkrimson Parcelle Nord — Pommiers" [ref=e155]:
+                      - generic [ref=e157]: Nord-B — Starkrimson
+                      - generic [ref=e158]: Parcelle Nord — Pommiers
+                    - tab "Parcelle Est — Oliviers" [ref=e159]:
+                      - generic [ref=e161]: Parcelle Est — Oliviers
+                    - tab "Est-A — Sigoise Parcelle Est — Oliviers" [ref=e162]:
+                      - generic [ref=e164]: Est-A — Sigoise
+                      - generic [ref=e165]: Parcelle Est — Oliviers
+                    - tab "Est-B — Chemlal Parcelle Est — Oliviers" [ref=e166]:
+                      - generic [ref=e168]: Est-B — Chemlal
+                      - generic [ref=e169]: Parcelle Est — Oliviers
+                    - tab "Parcelle Sud — Vigne" [ref=e170]:
+                      - generic [ref=e172]: Parcelle Sud — Vigne
+                    - tab "Sud-A — Cinsault Parcelle Sud — Vigne" [ref=e173]:
+                      - generic [ref=e175]: Sud-A — Cinsault
+                      - generic [ref=e176]: Parcelle Sud — Vigne
+                    - tab "Sud-B — Carignan Parcelle Sud — Vigne" [ref=e177]:
+                      - generic [ref=e179]: Sud-B — Carignan
+                      - generic [ref=e180]: Parcelle Sud — Vigne
+                    - tab "Parcelle Ouest — Maraîchage" [ref=e181]:
+                      - generic [ref=e183]: Parcelle Ouest — Maraîchage
+                    - tab "Parcelle Centre — Agrumes" [ref=e184]:
+                      - generic [ref=e186]: Parcelle Centre — Agrumes
+                - generic [ref=e187]:
+                  - generic:
+                    - generic:
+                      - img
+                    - generic:
+                      - tooltip "Nord-A":
+                        - generic: Nord-A
+                      - tooltip "Nord-B":
+                        - generic: Nord-B
+                      - tooltip "Est-A":
+                        - generic: Est-A
+                      - tooltip "Est-B":
+                        - generic: Est-B
+                      - tooltip "Sud-A":
+                        - generic: Sud-A
+                      - tooltip "Sud-B":
+                        - generic: Sud-B
+                      - tooltip "Maraîchage":
+                        - generic: Maraîchage
+                      - tooltip "Agrumes":
+                        - generic: Agrumes
+                  - generic [ref=e199]:
+                    - button "Zoom in" [ref=e200] [cursor=pointer]: +
+                    - button "Zoom out" [ref=e201] [cursor=pointer]: −
+              - generic [ref=e202]:
+                - button "Derniers traitements" [ref=e203] [cursor=pointer]:
+                  - img [ref=e204]
+                  - generic [ref=e207]: Derniers traitements
+                - button "Météo" [ref=e208] [cursor=pointer]:
+                  - img [ref=e209]
+                  - generic [ref=e214]: Météo
+            - complementary [ref=e215]
+        - generic [ref=e217]:
+          - generic [ref=e218]:
+            - generic [ref=e220]:
+              - img [ref=e222]
+              - heading "Péremptions à venir" [level=3] [ref=e225]
+              - generic [ref=e226]: "0"
+            - generic [ref=e228]:
+              - img [ref=e230]
+              - paragraph [ref=e233]: Aucun lot ne périme sous 30 jours
+          - generic [ref=e234]:
+            - generic [ref=e235]:
+              - generic [ref=e236]:
+                - img [ref=e238]
+                - heading "À réapprovisionner" [level=3] [ref=e242]
+                - generic [ref=e243]: "0"
+              - link "Fournisseurs" [ref=e244] [cursor=pointer]:
+                - /url: /suppliers
+                - text: Fournisseurs
+                - img [ref=e245]
+            - generic [ref=e249]:
+              - img [ref=e251]
+              - paragraph [ref=e256]: Tous les stocks au-dessus du seuil
+          - generic [ref=e257]:
+            - generic [ref=e259]:
+              - img [ref=e261]
+              - heading "Produits à préparer" [level=3] [ref=e265]
+              - generic [ref=e266]: "2"
+            - list [ref=e268]:
+              - listitem [ref=e269]:
+                - generic [ref=e270]:
+                  - generic [ref=e271]:
+                    - img [ref=e272]
+                    - generic [ref=e275]: Parcelle Nord — Pommiers
+                  - generic [ref=e276]:
+                    - img [ref=e277]
+                    - text: 08 juin
+                - generic [ref=e282]:
+                  - text: Insecticide Chlorpyrifos
+                  - generic [ref=e283]: · 12 L
+              - listitem [ref=e284]:
+                - generic [ref=e285]:
+                  - generic [ref=e286]:
+                    - img [ref=e287]
+                    - generic [ref=e290]: Parcelle Est — Oliviers
+                  - generic [ref=e291]:
+                    - img [ref=e292]
+                    - text: 10 juin
+                - generic [ref=e297]:
+                  - text: Fongicide Cuivre
+                  - generic [ref=e298]: · 22 kg
+          - generic [ref=e299]:
+            - generic [ref=e300]:
+              - generic [ref=e301]:
+                - img [ref=e303]
+                - heading "Mouvements récents" [level=3] [ref=e308]
+              - link "Tout voir" [ref=e309] [cursor=pointer]:
+                - /url: /stock
+                - text: Tout voir
+                - img [ref=e310]
+            - generic [ref=e315]:
+              - img [ref=e317]
+              - paragraph [ref=e322]: Aucun mouvement récent

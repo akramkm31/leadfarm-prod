@@ -1,0 +1,133 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e33] [cursor=pointer]:
+    - img [ref=e34]
+  - alert [ref=e37]
+  - generic [ref=e38]:
+    - generic [ref=e39]:
+      - complementary "Navigation principale" [ref=e40]:
+        - link "LeadFarm" [ref=e41] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e42]
+        - navigation [ref=e46]:
+          - button "Pilotage" [ref=e120]:
+            - img [ref=e122]
+          - button "Opérations" [ref=e127]:
+            - img [ref=e128]
+          - button "Audit" [ref=e132]:
+            - img [ref=e133]
+        - generic [ref=e47]:
+          - button "Rechercher (Ctrl+K)" [ref=e48]:
+            - img [ref=e49]
+          - button "Alertes" [ref=e136]:
+            - img [ref=e137]
+          - button "Menu compte" [ref=e53] [cursor=pointer]: AK
+      - complementary
+    - generic [ref=e54]:
+      - banner [ref=e55]:
+        - generic [ref=e140]:
+          - link "Planifier un traitement" [ref=e141] [cursor=pointer]:
+            - /url: /treatments
+            - img [ref=e142]
+            - text: Planifier un traitement
+          - button "Actualiser" [ref=e143] [cursor=pointer]:
+            - img [ref=e144]
+      - generic [ref=e151]:
+        - generic [ref=e152]:
+          - generic [ref=e155]:
+            - button "Recadrer sur les parcelles" [ref=e157]:
+              - img [ref=e158]
+            - generic [ref=e162]:
+              - generic [ref=e163]:
+                - generic [ref=e164]:
+                  - img [ref=e165]
+                  - text: Parcelles
+                - generic [ref=e168]: Sélection → panneau latéral
+              - tablist "Sélection rapide des parcelles" [ref=e169]:
+                - tab "Parcelle Nord — Pommiers" [ref=e170]:
+                  - generic [ref=e172]: Parcelle Nord — Pommiers
+                - tab "Nord-A — Golden Delicious Parcelle Nord — Pommiers" [ref=e173]:
+                  - generic [ref=e175]: Nord-A — Golden Delicious
+                  - generic [ref=e176]: Parcelle Nord — Pommiers
+                - tab "Nord-B — Starkrimson Parcelle Nord — Pommiers" [ref=e177]:
+                  - generic [ref=e179]: Nord-B — Starkrimson
+                  - generic [ref=e180]: Parcelle Nord — Pommiers
+                - tab "Parcelle Est — Oliviers" [ref=e181]:
+                  - generic [ref=e183]: Parcelle Est — Oliviers
+                - tab "Est-A — Sigoise Parcelle Est — Oliviers" [ref=e184]:
+                  - generic [ref=e186]: Est-A — Sigoise
+                  - generic [ref=e187]: Parcelle Est — Oliviers
+                - tab "Est-B — Chemlal Parcelle Est — Oliviers" [ref=e188]:
+                  - generic [ref=e190]: Est-B — Chemlal
+                  - generic [ref=e191]: Parcelle Est — Oliviers
+                - tab "Parcelle Sud — Vigne" [ref=e192]:
+                  - generic [ref=e194]: Parcelle Sud — Vigne
+                - tab "Sud-A — Cinsault Parcelle Sud — Vigne" [ref=e195]:
+                  - generic [ref=e197]: Sud-A — Cinsault
+                  - generic [ref=e198]: Parcelle Sud — Vigne
+                - tab "Sud-B — Carignan Parcelle Sud — Vigne" [ref=e199]:
+                  - generic [ref=e201]: Sud-B — Carignan
+                  - generic [ref=e202]: Parcelle Sud — Vigne
+                - tab "Parcelle Ouest — Maraîchage" [ref=e203]:
+                  - generic [ref=e205]: Parcelle Ouest — Maraîchage
+                - tab "Parcelle Centre — Agrumes" [ref=e206]:
+                  - generic [ref=e208]: Parcelle Centre — Agrumes
+            - generic [ref=e209]:
+              - generic:
+                - generic:
+                  - img
+                - generic:
+                  - tooltip "Nord-A":
+                    - generic: Nord-A
+                  - tooltip "Nord-B":
+                    - generic: Nord-B
+                  - tooltip "Est-A":
+                    - generic: Est-A
+                  - tooltip "Est-B":
+                    - generic: Est-B
+                  - tooltip "Sud-A":
+                    - generic: Sud-A
+                  - tooltip "Sud-B":
+                    - generic: Sud-B
+                  - tooltip "Maraîchage":
+                    - generic: Maraîchage
+                  - tooltip "Agrumes":
+                    - generic: Agrumes
+              - generic [ref=e221]:
+                - button "Zoom in" [ref=e222] [cursor=pointer]: +
+                - button "Zoom out" [ref=e223] [cursor=pointer]: −
+          - generic [ref=e224]:
+            - button "Derniers traitements" [ref=e225] [cursor=pointer]:
+              - img [ref=e226]
+              - generic [ref=e229]: Derniers traitements
+            - button "Météo" [ref=e230] [cursor=pointer]:
+              - img [ref=e231]
+              - generic [ref=e236]: Météo
+        - complementary [ref=e237]
+  - generic:
+    - dialog "Assistant IA LeadFarm" [ref=e239]:
+      - banner [ref=e240]:
+        - generic [ref=e241]:
+          - img [ref=e243]
+          - generic [ref=e246]:
+            - paragraph [ref=e247]: Léa · Assistant IA
+            - paragraph [ref=e248]: Navigation · actions · explications
+        - generic [ref=e249]:
+          - 'button "Mode aide : cliquez un bouton pour l''expliquer" [ref=e250] [cursor=pointer]':
+            - img [ref=e251]
+          - button "Nouvelle conversation" [ref=e254] [cursor=pointer]:
+            - img [ref=e255]
+          - button "Fermer" [ref=e258] [cursor=pointer]:
+            - img [ref=e259]
+      - generic [ref=e262]:
+        - generic [ref=e284]: Crée un traitement sur la parcelle « Parcelle Nord — Pommiers » planifié le 2026-06-20. Fais-le directement, sans me redemander confirmation.
+        - generic [ref=e285]: Je récupère d'abord la liste des parcelles réelles pour valider le nom exact avant de créer le traitement.
+        - generic [ref=e286]:
+          - img [ref=e287]
+          - generic [ref=e289]: Léa réfléchit…
+      - generic [ref=e274]:
+        - textbox "Message" [ref=e275]:
+          - /placeholder: Écrivez à Léa…
+        - button "Envoyer" [disabled] [ref=e276]:
+          - img [ref=e277]
+    - button "Réduire l'assistant" [ref=e280] [cursor=pointer]:
+      - img [ref=e281]

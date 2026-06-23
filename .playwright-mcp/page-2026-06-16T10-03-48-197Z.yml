@@ -1,0 +1,79 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - complementary "Navigation principale" [ref=e4]:
+        - link "LeadFarm" [ref=e5] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e6]
+        - navigation [ref=e10]:
+          - button "Pilotage" [ref=e100]:
+            - img [ref=e101]
+          - button "46 notification(s) — Opérations" [ref=e106]:
+            - img [ref=e107]
+            - generic [ref=e111]: 9+
+          - button "Audit" [ref=e112]:
+            - img [ref=e114]
+        - generic [ref=e11]:
+          - button "Rechercher (Ctrl+K)" [ref=e12]:
+            - img [ref=e13]
+          - button "Alertes" [ref=e117]:
+            - img [ref=e118]
+          - button "Menu compte" [ref=e17] [cursor=pointer]: AK
+      - complementary
+    - generic [ref=e18]:
+      - banner [ref=e19]:
+        - navigation "Fil d'Ariane" [ref=e21]:
+          - link "LeadFarm" [ref=e23] [cursor=pointer]:
+            - /url: /dashboard
+          - generic [ref=e24]:
+            - generic [ref=e25]: ›
+            - generic [ref=e26]: Admin
+      - generic [ref=e28]:
+        - generic [ref=e122]:
+          - img [ref=e124]
+          - generic [ref=e126]:
+            - heading "Administration" [level=1] [ref=e127]
+            - paragraph [ref=e128]: "Profil connecté : directeur"
+        - generic [ref=e129]:
+          - button "Utilisateurs2" [ref=e130]
+          - button "Parcelles5" [active] [ref=e131]
+          - button "Traitements3" [ref=e132]
+        - table [ref=e134]:
+          - rowgroup [ref=e135]:
+            - row "Parcelle Surface (ha) Culture Type" [ref=e136]:
+              - columnheader "Parcelle" [ref=e137]
+              - columnheader "Surface (ha)" [ref=e138]
+              - columnheader "Culture" [ref=e139]
+              - columnheader "Type" [ref=e140]
+          - rowgroup [ref=e141]:
+            - row "↳Nord-A — Golden Delicious 42.00 Pommier arboriculture" [ref=e142]:
+              - cell "↳Nord-A — Golden Delicious" [ref=e143]
+              - cell "42.00" [ref=e144]
+              - cell "Pommier" [ref=e145]
+              - cell "arboriculture" [ref=e146]
+            - row "↳Nord-B — Starkrimson 33.00 Pommier arboriculture" [ref=e147]:
+              - cell "↳Nord-B — Starkrimson" [ref=e148]
+              - cell "33.00" [ref=e149]
+              - cell "Pommier" [ref=e150]
+              - cell "arboriculture" [ref=e151]
+            - row "Parcelle Est — Oliviers 38.00 Olivier oleiculture" [ref=e152]:
+              - cell "Parcelle Est — Oliviers" [ref=e153]
+              - cell "38.00" [ref=e154]
+              - cell "Olivier" [ref=e155]
+              - cell "oleiculture" [ref=e156]
+            - row "Parcelle Nord — Pommiers 75.00 Pommier arboriculture" [ref=e157]:
+              - cell "Parcelle Nord — Pommiers" [ref=e158]
+              - cell "75.00" [ref=e159]
+              - cell "Pommier" [ref=e160]
+              - cell "arboriculture" [ref=e161]
+            - row "Parcelle Sud — Vigne 28.00 Vigne viticulture" [ref=e162]:
+              - cell "Parcelle Sud — Vigne" [ref=e163]
+              - cell "28.00" [ref=e164]
+              - cell "Vigne" [ref=e165]
+              - cell "viticulture" [ref=e166]
+  - button "Open Next.js Dev Tools" [ref=e96] [cursor=pointer]:
+    - img [ref=e97]
+  - alert [ref=e167]
+  - button "Ouvrir l'assistant IA" [ref=e168] [cursor=pointer]:
+    - img [ref=e169]
+    - generic [ref=e172]: Assistant

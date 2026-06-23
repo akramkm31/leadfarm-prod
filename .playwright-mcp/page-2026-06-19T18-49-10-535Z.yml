@@ -1,0 +1,131 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - complementary "Navigation principale" [ref=e4]:
+        - link "LeadFarm" [ref=e5] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e6]
+        - navigation [ref=e10]:
+          - button "Pilotage" [ref=e101]:
+            - img [ref=e103]
+          - button "46 notification(s) — Opérations" [ref=e108]:
+            - img [ref=e109]
+            - generic [ref=e113]: 9+
+          - button "Audit" [ref=e114]:
+            - img [ref=e115]
+        - generic [ref=e11]:
+          - button "Rechercher (Ctrl+K)" [ref=e12]:
+            - img [ref=e13]
+          - button "Alertes" [ref=e118]:
+            - img [ref=e119]
+          - button "Menu compte" [ref=e17] [cursor=pointer]: AD
+      - complementary
+    - generic [ref=e18]:
+      - banner [ref=e19]:
+        - navigation "Fil d'Ariane" [ref=e21]:
+          - link "LeadFarm" [ref=e23] [cursor=pointer]:
+            - /url: /dashboard
+          - generic [ref=e24]:
+            - generic [ref=e25]: ›
+            - generic [ref=e26]: Campagnes
+      - generic [ref=e123]:
+        - generic [ref=e124]:
+          - generic [ref=e125]:
+            - img [ref=e127]
+            - generic [ref=e129]:
+              - heading "Campagnes agricoles" [level=1] [ref=e130]
+              - paragraph [ref=e131]: 3 campagnes — saisons culturales liées aux plantations
+          - generic [ref=e132]:
+            - button "Actualiser" [ref=e133]:
+              - img [ref=e134]
+              - text: Actualiser
+            - button "Nouvelle campagne" [ref=e139]:
+              - img [ref=e140]
+              - text: Nouvelle campagne
+        - generic [ref=e141]:
+          - generic [ref=e142]:
+            - generic [ref=e143]: Total
+            - generic [ref=e144]: "3"
+          - generic [ref=e145]:
+            - generic [ref=e146]: En cours
+            - generic [ref=e147]: "1"
+          - generic [ref=e148]:
+            - generic [ref=e149]: Planifiées
+            - generic [ref=e150]: "1"
+          - generic [ref=e151]:
+            - generic [ref=e152]: Terminées
+            - generic [ref=e153]: "1"
+        - table [ref=e155]:
+          - rowgroup [ref=e156]:
+            - row "Nom Période Statut Actions" [ref=e157]:
+              - columnheader "Nom" [ref=e158]
+              - columnheader "Période" [ref=e159]
+              - columnheader "Statut" [ref=e160]
+              - columnheader "Actions" [ref=e161]
+          - rowgroup [ref=e162]:
+            - row "Campagne 2025-2026 2025-09-01 → 2026-08-31 Planifié" [ref=e163] [cursor=pointer]:
+              - cell "Campagne 2025-2026" [ref=e164]:
+                - generic [ref=e166]: Campagne 2025-2026
+              - cell "2025-09-01 → 2026-08-31" [ref=e167]
+              - cell "Planifié" [ref=e168]
+              - cell [ref=e169]:
+                - generic [ref=e170]:
+                  - button "Modifier" [ref=e171]:
+                    - img [ref=e172]
+                  - button "Supprimer" [ref=e175]:
+                    - img [ref=e176]
+            - row "Campagne 2024-2025 2024-09-01 → 2025-08-31 En cours" [ref=e179] [cursor=pointer]:
+              - cell "Campagne 2024-2025" [ref=e180]:
+                - generic [ref=e182]: Campagne 2024-2025
+              - cell "2024-09-01 → 2025-08-31" [ref=e183]
+              - cell "En cours" [ref=e184]
+              - cell [ref=e185]:
+                - generic [ref=e186]:
+                  - button "Modifier" [ref=e187]:
+                    - img [ref=e188]
+                  - button "Supprimer" [ref=e191]:
+                    - img [ref=e192]
+            - row "Campagne 2023-2024 2023-09-01 → 2024-08-31 Terminé" [ref=e195] [cursor=pointer]:
+              - cell "Campagne 2023-2024" [ref=e196]:
+                - generic [ref=e198]: Campagne 2023-2024
+              - cell "2023-09-01 → 2024-08-31" [ref=e199]
+              - cell "Terminé" [ref=e200]
+              - cell [ref=e201]:
+                - generic [ref=e202]:
+                  - button "Modifier" [ref=e203]:
+                    - img [ref=e204]
+                  - button "Supprimer" [ref=e207]:
+                    - img [ref=e208]
+  - button "Open Next.js Dev Tools" [ref=e96] [cursor=pointer]:
+    - img [ref=e97]
+  - alert [ref=e100]
+  - button "Ouvrir l'assistant IA" [ref=e211] [cursor=pointer]:
+    - img [ref=e212]
+    - generic [ref=e215]: Assistant
+  - generic [ref=e217]:
+    - generic [ref=e218]:
+      - heading "Nouvelle campagne" [level=2] [ref=e219]
+      - button [ref=e220]:
+        - img [ref=e221]
+    - generic [ref=e224]:
+      - text: Nom
+      - generic [ref=e225]: "*"
+      - textbox "Nom *" [active] [ref=e226]:
+        - /placeholder: ex. Campagne 2026-2027
+    - generic [ref=e227]:
+      - generic [ref=e228]:
+        - text: Date début
+        - textbox "Date début" [ref=e229]
+      - generic [ref=e230]:
+        - text: Date fin
+        - textbox "Date fin" [ref=e231]
+    - generic [ref=e232]:
+      - text: Statut
+      - combobox "Statut" [ref=e233]:
+        - option "Planifié"
+        - option "En cours" [selected]
+        - option "Terminé"
+        - option "Suspendu"
+    - generic [ref=e234]:
+      - button "Annuler" [ref=e235]
+      - button "Créer" [ref=e236]

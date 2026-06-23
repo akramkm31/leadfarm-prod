@@ -1,0 +1,579 @@
+[    2437ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[    2667ms] [WARNING] %c%s%c [33m[1m⚠[22m[39m Unsupported metadata themeColor is configured in metadata export in /login. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[    2691ms] [ERROR] Manifest: Line: 1, column: 1, Syntax error. @ http://localhost:3001/manifest.json:0
+[    2755ms] [LOG] [HMR] connected @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[    3410ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[    3419ms] [LOG] [Fast Refresh] done in 116ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[    3825ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[    4040ms] [LOG] [Fast Refresh] done in 319ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[    4064ms] [ERROR] Manifest: Line: 1, column: 1, Syntax error. @ http://localhost:3001/manifest.json:0
+[  241106ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  241271ms] [LOG] [Fast Refresh] done in 271ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  242574ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  242641ms] [LOG] [Fast Refresh] done in 178ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  242950ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  243038ms] [LOG] [Fast Refresh] done in 191ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  245504ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  245657ms] [LOG] [Fast Refresh] done in 252ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  246990ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  247104ms] [LOG] [Fast Refresh] done in 214ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  250312ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  251042ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  251162ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  251286ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  251316ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  251403ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  251438ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  251531ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  251583ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  251699ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  251804ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  251836ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  251905ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  251952ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252008ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252048ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252073ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252152ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252234ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252329ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252403ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252487ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252568ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252654ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252734ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252825ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252900ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  252971ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  253062ms] [ERROR] ./src/components/map/DashboardParcelleHistoryPanel.tsx:601:6
+Parsing ecmascript source code failed
+  599 |         )}
+  600 |       </div>
+> 601 |     </div>
+      |      ^^^^^
+  602 |     </ModalPortal>
+  603 |   );
+  604 | }
+
+Unterminated regexp literal
+
+Import trace:
+  Client Component Browser:
+    ./src/components/map/DashboardParcelleHistoryPanel.tsx [Client Component Browser]
+    ./src/components/map/DashboardMap.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[  253173ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  253541ms] [LOG] [Fast Refresh] done in 451ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  253688ms] [WARNING] %c%s%c [33m[1m⚠[22m[39m Unsupported metadata themeColor is configured in metadata export in /login. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  253861ms] [ERROR] Manifest: Line: 1, column: 1, Syntax error. @ http://localhost:3001/manifest.json:0
+[  254483ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  254570ms] [LOG] [Fast Refresh] done in 202ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  257651ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  257871ms] [LOG] [Fast Refresh] done in 290ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  259462ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  259653ms] [LOG] [Fast Refresh] done in 283ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  261297ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  261412ms] [LOG] [Fast Refresh] done in 206ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  262400ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  262502ms] [LOG] [Fast Refresh] done in 186ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  263462ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  263579ms] [LOG] [Fast Refresh] done in 210ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  264499ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  264581ms] [LOG] [Fast Refresh] done in 183ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  265602ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  265718ms] [LOG] [Fast Refresh] done in 199ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  265850ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  265916ms] [LOG] [Fast Refresh] done in 174ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  267151ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  267242ms] [LOG] [Fast Refresh] done in 194ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  268278ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  268409ms] [LOG] [Fast Refresh] done in 171ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  269283ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  269349ms] [LOG] [Fast Refresh] done in 164ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  270286ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  270366ms] [LOG] [Fast Refresh] done in 167ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  278353ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  278492ms] [LOG] [Fast Refresh] done in 229ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  279370ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  279771ms] [LOG] [Fast Refresh] done in 486ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  280955ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  281046ms] [LOG] [Fast Refresh] done in 190ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  282350ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  282511ms] [LOG] [Fast Refresh] done in 246ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  284268ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  284381ms] [LOG] [Fast Refresh] done in 211ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  289917ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  290464ms] [LOG] [Fast Refresh] done in 631ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  291010ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  293098ms] [LOG] [Fast Refresh] done in 2203ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  293665ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  293711ms] [LOG] [Fast Refresh] done in 148ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  293824ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  293842ms] [LOG] [Fast Refresh] done in 130ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  294884ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  294925ms] [LOG] [Fast Refresh] done in 149ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  295091ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  295239ms] [LOG] [Fast Refresh] done in 248ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  298250ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  300159ms] [LOG] [Fast Refresh] done in 1987ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  300574ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  301505ms] [LOG] [Fast Refresh] done in 1045ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  301560ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  301664ms] [LOG] [Fast Refresh] done in 55ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  302897ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  302977ms] [LOG] [Fast Refresh] done in 183ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  303148ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  303271ms] [LOG] [Fast Refresh] done in 227ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  310248ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  310712ms] [LOG] [Fast Refresh] done in 561ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  319621ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  320110ms] [LOG] [Fast Refresh] done in 545ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  321344ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  321714ms] [LOG] [Fast Refresh] done in 444ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  379480ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  379638ms] [LOG] [Fast Refresh] done in 235ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  398405ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  398416ms] [LOG] [Fast Refresh] done in 116ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  398532ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  398565ms] [LOG] [Fast Refresh] done in 137ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  429324ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  429445ms] [LOG] [Fast Refresh] done in 186ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  429774ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  430092ms] [LOG] [Fast Refresh] done in 437ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  430715ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  430797ms] [LOG] [Fast Refresh] done in 190ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  431135ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  431153ms] [LOG] [Fast Refresh] done in 147ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  431749ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  431796ms] [LOG] [Fast Refresh] done in 111ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  534414ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  534622ms] [LOG] [Fast Refresh] done in 309ms @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[  534848ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297

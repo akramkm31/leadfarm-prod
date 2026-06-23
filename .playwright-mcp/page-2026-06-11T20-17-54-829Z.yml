@@ -1,0 +1,220 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - complementary "Navigation principale" [ref=e4]:
+        - link "LeadFarm" [ref=e5] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e6]
+        - navigation [ref=e10]:
+          - button "Pilotage" [ref=e101]:
+            - img [ref=e103]
+          - button "Opérations" [ref=e108]:
+            - img [ref=e109]
+          - button "Audit" [ref=e113]:
+            - img [ref=e114]
+        - generic [ref=e11]:
+          - button "Rechercher (Ctrl+K)" [ref=e12]:
+            - img [ref=e13]
+          - button "Alertes" [ref=e117]:
+            - img [ref=e118]
+          - button "Menu compte" [ref=e17] [cursor=pointer]: AK
+      - complementary
+    - generic [ref=e18]:
+      - banner [ref=e19]:
+        - navigation "Fil d'Ariane" [ref=e21]:
+          - link "LeadFarm" [ref=e23] [cursor=pointer]:
+            - /url: /dashboard
+          - generic [ref=e24]:
+            - generic [ref=e25]: ›
+            - generic [ref=e26]: Tableau de bord
+        - button "Actualiser" [ref=e122] [cursor=pointer]:
+          - img [ref=e123]
+      - generic [ref=e128]:
+        - banner [ref=e129]:
+          - paragraph [ref=e130]: Tableau de bord
+          - heading "Domaine Khelifa" [level=1] [ref=e131]
+          - paragraph [ref=e132]: 2 traitements planifiés cette semaine · 1 traitements / mois · 16.0 ha ce mois
+        - paragraph [ref=e134]: Aucune alerte opérationnelle — parcelles et planning à jour.
+        - generic [ref=e135]:
+          - generic [ref=e137]:
+            - button "Parcelle Nord — Pommiers 75 ha · Pommier Mix produits 1 produit Insecticide Chlorpyrifos — ok 1 OK 0 Bas 0 Crit. 1 2 0 DZD Stock" [active] [pressed] [ref=e138]:
+              - generic [ref=e139]:
+                - img [ref=e142]
+                - generic [ref=e144]:
+                  - paragraph [ref=e145]: Parcelle Nord — Pommiers
+                  - paragraph [ref=e146]: 75 ha · Pommier
+              - generic [ref=e147]:
+                - generic [ref=e148]:
+                  - generic [ref=e149]:
+                    - generic [ref=e150]: Mix produits
+                    - generic [ref=e151]: 1 produit
+                  - generic "Insecticide Chlorpyrifos — ok" [ref=e153]
+                  - generic [ref=e154]:
+                    - generic [ref=e155]: 1 OK
+                    - generic [ref=e157]: 0 Bas
+                    - generic [ref=e159]: 0 Crit.
+                - generic [ref=e161]:
+                  - generic [ref=e162]:
+                    - generic [ref=e163]:
+                      - img [ref=e164]
+                      - text: "1"
+                    - generic [ref=e168]:
+                      - img [ref=e169]
+                      - text: "2"
+                    - generic [ref=e179]: 0 DZD
+                  - generic [ref=e180]:
+                    - text: Stock
+                    - img [ref=e181]
+            - button "Parcelle Est — Oliviers 38 ha · Olivier Mix produits 1 produit Fongicide Cuivre — ok 1 OK 0 Bas 0 Crit. 1 2 0 DZD Stock" [ref=e183]:
+              - generic [ref=e184]:
+                - img [ref=e187]
+                - generic [ref=e189]:
+                  - paragraph [ref=e190]: Parcelle Est — Oliviers
+                  - paragraph [ref=e191]: 38 ha · Olivier
+              - generic [ref=e192]:
+                - generic [ref=e193]:
+                  - generic [ref=e194]:
+                    - generic [ref=e195]: Mix produits
+                    - generic [ref=e196]: 1 produit
+                  - generic "Fongicide Cuivre — ok" [ref=e198]
+                  - generic [ref=e199]:
+                    - generic [ref=e200]: 1 OK
+                    - generic [ref=e202]: 0 Bas
+                    - generic [ref=e204]: 0 Crit.
+                - generic [ref=e206]:
+                  - generic [ref=e207]:
+                    - generic [ref=e208]:
+                      - img [ref=e209]
+                      - text: "1"
+                    - generic [ref=e213]:
+                      - img [ref=e214]
+                      - text: "2"
+                    - generic [ref=e224]: 0 DZD
+                  - generic [ref=e225]:
+                    - text: Stock
+                    - img [ref=e226]
+            - button "Parcelle Sud — Vigne 28 ha · Vigne Mix produits 0 produits 0 OK 0 Bas 0 Crit. 1 2 0 DZD Stock" [ref=e228]:
+              - generic [ref=e229]:
+                - img [ref=e232]
+                - generic [ref=e242]:
+                  - paragraph [ref=e243]: Parcelle Sud — Vigne
+                  - paragraph [ref=e244]: 28 ha · Vigne
+              - generic [ref=e245]:
+                - generic [ref=e246]:
+                  - generic [ref=e247]:
+                    - generic [ref=e248]: Mix produits
+                    - generic [ref=e249]: 0 produits
+                  - generic [ref=e252]:
+                    - generic [ref=e253]: 0 OK
+                    - generic [ref=e255]: 0 Bas
+                    - generic [ref=e257]: 0 Crit.
+                - generic [ref=e259]:
+                  - generic [ref=e260]:
+                    - generic [ref=e261]:
+                      - img [ref=e262]
+                      - text: "1"
+                    - generic [ref=e266]:
+                      - img [ref=e267]
+                      - text: "2"
+                    - generic [ref=e277]: 0 DZD
+                  - generic [ref=e278]:
+                    - text: Stock
+                    - img [ref=e279]
+            - button "Parcelle Ouest — Maraîchage 18 ha · Maraîchage Mix produits 0 produits 0 OK 0 Bas 0 Crit. 0 0 DZD Stock" [ref=e281]:
+              - generic [ref=e282]:
+                - img [ref=e285]
+                - generic [ref=e288]:
+                  - paragraph [ref=e289]: Parcelle Ouest — Maraîchage
+                  - paragraph [ref=e290]: 18 ha · Maraîchage
+              - generic [ref=e291]:
+                - generic [ref=e292]:
+                  - generic [ref=e293]:
+                    - generic [ref=e294]: Mix produits
+                    - generic [ref=e295]: 0 produits
+                  - generic [ref=e298]:
+                    - generic [ref=e299]: 0 OK
+                    - generic [ref=e301]: 0 Bas
+                    - generic [ref=e303]: 0 Crit.
+                - generic [ref=e305]:
+                  - generic [ref=e306]:
+                    - generic [ref=e307]:
+                      - img [ref=e308]
+                      - text: "0"
+                    - generic [ref=e312]: 0 DZD
+                  - generic [ref=e313]:
+                    - text: Stock
+                    - img [ref=e314]
+            - button "Parcelle Centre — Agrumes 25 ha · Agrumes Mix produits 0 produits 0 OK 0 Bas 0 Crit. 0 0 DZD Stock" [ref=e316]:
+              - generic [ref=e317]:
+                - img [ref=e320]
+                - generic [ref=e322]:
+                  - paragraph [ref=e323]: Parcelle Centre — Agrumes
+                  - paragraph [ref=e324]: 25 ha · Agrumes
+              - generic [ref=e325]:
+                - generic [ref=e326]:
+                  - generic [ref=e327]:
+                    - generic [ref=e328]: Mix produits
+                    - generic [ref=e329]: 0 produits
+                  - generic [ref=e332]:
+                    - generic [ref=e333]: 0 OK
+                    - generic [ref=e335]: 0 Bas
+                    - generic [ref=e337]: 0 Crit.
+                - generic [ref=e339]:
+                  - generic [ref=e340]:
+                    - generic [ref=e341]:
+                      - img [ref=e342]
+                      - text: "0"
+                    - generic [ref=e346]: 0 DZD
+                  - generic [ref=e347]:
+                    - text: Stock
+                    - img [ref=e348]
+          - complementary [ref=e350]:
+            - generic [ref=e352]:
+              - generic [ref=e353]:
+                - generic [ref=e354]:
+                  - img [ref=e355]
+                  - generic [ref=e358]:
+                    - paragraph [ref=e359]: Parcelle Nord — Pommiers
+                    - paragraph [ref=e360]: 75 ha · Pommier
+                - button "Fermer" [ref=e361]:
+                  - img [ref=e362]
+              - generic [ref=e365]:
+                - generic [ref=e366]:
+                  - paragraph [ref=e367]: "1"
+                  - paragraph [ref=e368]: Produits
+                - generic [ref=e369]:
+                  - paragraph [ref=e370]: "1"
+                  - paragraph [ref=e371]: En stock
+                - generic [ref=e372]:
+                  - paragraph [ref=e373]: "0"
+                  - paragraph [ref=e374]: Alertes
+              - generic [ref=e376]:
+                - generic [ref=e377]:
+                  - generic [ref=e378]:
+                    - img [ref=e379]
+                    - generic [ref=e383]: Insecticide Chlorpyrifos
+                  - generic [ref=e384]: OK
+                - generic [ref=e385]:
+                  - generic [ref=e386]:
+                    - generic [ref=e387]: Stock actuel
+                    - generic [ref=e388]: 100.0 L
+                  - generic [ref=e391]:
+                    - generic [ref=e392]: "Min: 10 L"
+                    - generic [ref=e393]: "Max: 500 L"
+                - generic [ref=e395]:
+                  - img [ref=e396]
+                  - generic [ref=e399]: 12.0 L utilisé · 1 traitement
+                - generic [ref=e400]:
+                  - generic [ref=e401]: —
+                  - generic [ref=e402]: 0 DZD
+              - generic [ref=e403]:
+                - generic [ref=e404]:
+                  - text: "Valeur totale :"
+                  - generic [ref=e405]: 0 DZD
+                - link "Gérer le stock" [ref=e406] [cursor=pointer]:
+                  - /url: /stock
+                  - img [ref=e407]
+                  - text: Gérer le stock
+  - button "Open Next.js Dev Tools" [ref=e96] [cursor=pointer]:
+    - img [ref=e97]
+  - alert [ref=e100]

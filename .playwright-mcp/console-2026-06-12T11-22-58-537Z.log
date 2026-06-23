@@ -1,0 +1,30 @@
+[     438ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    3809ms] [LOG] [Fast Refresh] done in 3478ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    4515ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    4580ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    4679ms] [LOG] [HMR] connected @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    5725ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    5881ms] [LOG] [Fast Refresh] done in 262ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    6000ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    6598ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[    6599ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[    6812ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[    6887ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[    8230ms] [LOG] [Fast Refresh] done in 2337ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    8341ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    8787ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/icon-192.png:0
+[    9177ms] [WARNING] Error while trying to use the following icon from the Manifest: http://localhost:3001/icon-192.png (Download error or resource isn't a valid image) @ http://localhost:3001/dashboard:0
+[   10141ms] [LOG] [Fast Refresh] done in 1901ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   61261ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   61920ms] [LOG] [Fast Refresh] done in 766ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   66580ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[   66582ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  126592ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  126627ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  148828ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  152822ms] [LOG] [Fast Refresh] done in 4069ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  159925ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  160765ms] [LOG] [Fast Refresh] done in 884ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  186618ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  186630ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0

@@ -1,0 +1,153 @@
+[     171ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[     346ms] [LOG] [Fast Refresh] done in 280ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    2798ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    2865ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    3034ms] [LOG] [HMR] connected @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    4272ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    5668ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[    5673ms] [LOG] [Fast Refresh] done in 1503ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    5677ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[    5984ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    6065ms] [LOG] [Fast Refresh] done in 304ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    6181ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/icon-192.png:0
+[    6242ms] [WARNING] Error while trying to use the following icon from the Manifest: http://localhost:3001/icon-192.png (Download error or resource isn't a valid image) @ http://localhost:3001/dashboard:0
+[    6338ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[    6382ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[   28293ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   28693ms] [LOG] [Fast Refresh] done in 511ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   55052ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   55479ms] [LOG] [Fast Refresh] done in 538ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   65278ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[   65298ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  125225ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  125230ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  154610ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  154731ms] [LOG] [Fast Refresh] done in 231ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  158232ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  158241ms] [LOG] [Fast Refresh] done in 124ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  159597ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  159709ms] [LOG] [Fast Refresh] done in 220ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  160734ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  160740ms] [LOG] [Fast Refresh] done in 112ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  160952ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  160970ms] [LOG] [Fast Refresh] done in 123ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  185261ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  185272ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  245313ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  245314ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  305343ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  305357ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  344417ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  346199ms] [LOG] [Fast Refresh] done in 1811ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  346516ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  346554ms] [LOG] [Fast Refresh] done in 163ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  354789ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  355692ms] [LOG] [Fast Refresh] done in 991ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  361544ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  362064ms] [LOG] [Fast Refresh] done in 606ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  365215ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  365234ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  367787ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  368501ms] [LOG] [Fast Refresh] done in 804ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  377060ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  378312ms] [LOG] [Fast Refresh] done in 1327ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  384706ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  385654ms] [LOG] [Fast Refresh] done in 1031ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  390749ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  391433ms] [LOG] [Fast Refresh] done in 757ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  396167ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  397094ms] [LOG] [Fast Refresh] done in 974ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  404189ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  405437ms] [LOG] [Fast Refresh] done in 1335ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  420913ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  422067ms] [LOG] [Fast Refresh] done in 1268ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  425243ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  425262ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  445042ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  453787ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  454219ms] [LOG] [Fast Refresh] done in 8850ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  454345ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  460188ms] [LOG] [Fast Refresh] done in 5929ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  466885ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  466969ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  467232ms] [LOG] [HMR] connected @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  469115ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  469286ms] [LOG] [Fast Refresh] done in 272ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  469485ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  469526ms] [LOG] [Fast Refresh] done in 148ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  469717ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  470108ms] [ERROR] %o
+
+%s ReferenceError: DashboardStockOverview is not defined
+    at DashboardView (http://localhost:3001/_next/static/chunks/src_92281f99._.js:12663:359)
+    at Object.react_stack_bottom_frame (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:14826:24)
+    at renderWithHooks (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:4651:24)
+    at updateFunctionComponent (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:6112:21)
+    at beginWork (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:6708:24)
+    at runWithFiberInDEV (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:965:74)
+    at performUnitOfWork (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:9562:97)
+    at workLoopSync (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:9456:40)
+    at renderRootSync (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:9440:13)
+    at performWorkOnRoot (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:9105:47)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:10230:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_8588f287._.js:2647:64) The above error occurred in the <DashboardView> component. It was handled by the <ErrorBoundary> error boundary. @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_client_582c631e._.js:1342
+[  470879ms] [LOG] [Fast Refresh] done in 1262ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  471516ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/icon-192.png:0
+[  471533ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  471856ms] [LOG] [Fast Refresh] done in 425ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  471896ms] [WARNING] Error while trying to use the following icon from the Manifest: http://localhost:3001/icon-192.png (Download error or resource isn't a valid image) @ http://localhost:3001/dashboard:0
+[  476106ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  476178ms] [LOG] [Fast Refresh] done in 174ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  476808ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  476825ms] [LOG] [Fast Refresh] done in 120ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  490278ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  492159ms] [LOG] [Fast Refresh] done in 1968ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  497087ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  503067ms] [LOG] [Fast Refresh] done in 6013ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  503457ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  504430ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  506799ms] [LOG] [Fast Refresh] done in 2460ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  506868ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/icon-192.png:0
+[  506931ms] [WARNING] Error while trying to use the following icon from the Manifest: http://localhost:3001/icon-192.png (Download error or resource isn't a valid image) @ http://localhost:3001/dashboard:0
+[  507390ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  507521ms] [LOG] [Fast Refresh] done in 233ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  560302ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  562276ms] [LOG] [Fast Refresh] done in 2079ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  570830ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  571716ms] [LOG] [Fast Refresh] done in 997ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  592467ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  593336ms] [LOG] [Fast Refresh] done in 975ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  599283ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  599968ms] [LOG] [Fast Refresh] done in 800ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  609581ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  610501ms] [LOG] [Fast Refresh] done in 1026ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  623910ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  626425ms] [LOG] [Fast Refresh] done in 2617ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  640898ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  641418ms] [LOG] [Fast Refresh] done in 634ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  651586ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  651723ms] [LOG] [Fast Refresh] done in 243ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  651967ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  652052ms] [LOG] [Fast Refresh] done in 190ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  656083ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  656384ms] [LOG] [Fast Refresh] done in 405ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  662300ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  662310ms] [LOG] [Fast Refresh] done in 116ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  662432ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  671299ms] [LOG] [Fast Refresh] done in 8975ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  702615ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  705464ms] [LOG] [Fast Refresh] done in 2935ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  711223ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  712366ms] [LOG] [Fast Refresh] done in 1256ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  712546ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  712630ms] [LOG] [Fast Refresh] done in 189ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297

@@ -1,0 +1,146 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - complementary "Navigation principale" [ref=e4]:
+        - link "LeadFarm" [ref=e5] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e6]
+        - navigation [ref=e10]:
+          - button "Pilotage" [ref=e101]:
+            - img [ref=e103]
+          - button "Opérations" [ref=e108]:
+            - img [ref=e109]
+          - button "Audit" [ref=e113]:
+            - img [ref=e114]
+        - generic [ref=e11]:
+          - button "Rechercher (Ctrl+K)" [ref=e12]:
+            - img [ref=e13]
+          - button "Alertes" [ref=e117]:
+            - img [ref=e118]
+          - button "Menu compte" [ref=e17] [cursor=pointer]: AK
+      - complementary
+    - generic [ref=e18]:
+      - banner [ref=e19]:
+        - navigation "Fil d'Ariane" [ref=e21]:
+          - link "LeadFarm" [ref=e23] [cursor=pointer]:
+            - /url: /dashboard
+          - generic [ref=e24]:
+            - generic [ref=e25]: ›
+            - generic [ref=e26]: Tableau de bord
+        - button "Actualiser" [ref=e122] [cursor=pointer]:
+          - img [ref=e123]
+      - generic [ref=e128]:
+        - banner [ref=e129]:
+          - paragraph [ref=e130]: Tableau de bord
+          - heading "Domaine Khelifa" [level=1] [ref=e131]
+          - paragraph [ref=e132]: 2 traitements planifiés cette semaine · 1 traitements / mois · 16.0 ha ce mois
+        - paragraph [ref=e134]: Aucune alerte opérationnelle — parcelles et planning à jour.
+        - generic [ref=e135]:
+          - generic [ref=e136]:
+            - generic [ref=e139]:
+              - button "Recadrer sur les parcelles" [ref=e141]:
+                - img [ref=e142]
+              - generic [ref=e146]:
+                - generic [ref=e147]:
+                  - generic [ref=e148]:
+                    - img [ref=e149]
+                    - text: Parcelles
+                  - generic [ref=e152]: Sélection → panneau latéral
+                  - button "Afficher toutes les parcelles" [ref=e153]:
+                    - img [ref=e154]
+                    - text: Toutes
+                - tablist "Sélection rapide des parcelles" [ref=e157]:
+                  - tab "Parcelle Nord — Pommiers" [ref=e158]:
+                    - generic [ref=e160]: Parcelle Nord — Pommiers
+                  - tab "Nord-A — Golden Delicious Parcelle Nord — Pommiers" [selected] [ref=e161]:
+                    - generic [ref=e163]: Nord-A — Golden Delicious
+                    - generic [ref=e164]: Parcelle Nord — Pommiers
+                  - tab "Nord-B — Starkrimson Parcelle Nord — Pommiers" [ref=e165]:
+                    - generic [ref=e167]: Nord-B — Starkrimson
+                    - generic [ref=e168]: Parcelle Nord — Pommiers
+                  - tab "Parcelle Est — Oliviers" [ref=e169]:
+                    - generic [ref=e171]: Parcelle Est — Oliviers
+                  - tab "Est-A — Sigoise Parcelle Est — Oliviers" [ref=e172]:
+                    - generic [ref=e174]: Est-A — Sigoise
+                    - generic [ref=e175]: Parcelle Est — Oliviers
+                  - tab "Est-B — Chemlal Parcelle Est — Oliviers" [ref=e176]:
+                    - generic [ref=e178]: Est-B — Chemlal
+                    - generic [ref=e179]: Parcelle Est — Oliviers
+                  - tab "Parcelle Sud — Vigne" [ref=e180]:
+                    - generic [ref=e182]: Parcelle Sud — Vigne
+                  - tab "Sud-A — Cinsault Parcelle Sud — Vigne" [ref=e183]:
+                    - generic [ref=e185]: Sud-A — Cinsault
+                    - generic [ref=e186]: Parcelle Sud — Vigne
+                  - tab "Sud-B — Carignan Parcelle Sud — Vigne" [ref=e187]:
+                    - generic [ref=e189]: Sud-B — Carignan
+                    - generic [ref=e190]: Parcelle Sud — Vigne
+                  - tab "Parcelle Ouest — Maraîchage" [ref=e191]:
+                    - generic [ref=e193]: Parcelle Ouest — Maraîchage
+                  - tab "Parcelle Centre — Agrumes" [ref=e194]:
+                    - generic [ref=e196]: Parcelle Centre — Agrumes
+              - generic [active] [ref=e197]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic:
+                    - tooltip "Nord-A":
+                      - generic: Nord-A
+                    - tooltip "Nord-B":
+                      - generic: Nord-B
+                    - tooltip "Est-A":
+                      - generic: Est-A
+                    - tooltip "Est-B":
+                      - generic: Est-B
+                    - tooltip "Sud-A":
+                      - generic: Sud-A
+                    - tooltip "Sud-B":
+                      - generic: Sud-B
+                    - tooltip "Maraîchage":
+                      - generic: Maraîchage
+                    - tooltip "Agrumes":
+                      - generic: Agrumes
+                - generic [ref=e203]:
+                  - button "Zoom in" [ref=e204] [cursor=pointer]: +
+                  - button "Zoom out" [ref=e205] [cursor=pointer]: −
+            - generic [ref=e206]:
+              - button "Derniers traitements" [ref=e207] [cursor=pointer]:
+                - img [ref=e208]
+                - generic [ref=e211]: Derniers traitements
+              - button "Météo" [ref=e212] [cursor=pointer]:
+                - img [ref=e213]
+                - generic [ref=e218]: Météo
+          - complementary [ref=e219]:
+            - generic [ref=e221]:
+              - generic [ref=e222]:
+                - generic [ref=e223]:
+                  - img [ref=e224]
+                  - generic [ref=e227]:
+                    - paragraph [ref=e228]: Nord-A — Golden Delicious
+                    - paragraph [ref=e229]: 42 ha · Pommier
+                - button "Fermer" [ref=e230]:
+                  - img [ref=e231]
+              - generic [ref=e234]:
+                - generic [ref=e235]:
+                  - paragraph [ref=e236]: "0"
+                  - paragraph [ref=e237]: Produits
+                - generic [ref=e238]:
+                  - paragraph [ref=e239]: "0"
+                  - paragraph [ref=e240]: En stock
+                - generic [ref=e241]:
+                  - paragraph [ref=e242]: "0"
+                  - paragraph [ref=e243]: Alertes
+              - paragraph [ref=e244]: Cliquez un produit pour voir son détail stock et l'historique des mouvements.
+              - generic [ref=e246]:
+                - img [ref=e247]
+                - paragraph [ref=e251]: Aucun produit utilisé sur cette parcelle
+              - generic [ref=e252]:
+                - generic [ref=e253]:
+                  - text: "Valeur totale :"
+                  - generic [ref=e254]: 0 DZD
+                - link "Gérer le stock" [ref=e255] [cursor=pointer]:
+                  - /url: /stock
+                  - img [ref=e256]
+                  - text: Gérer le stock
+  - button "Open Next.js Dev Tools" [ref=e96] [cursor=pointer]:
+    - img [ref=e97]
+  - alert [ref=e100]

@@ -1,0 +1,9 @@
+[     126ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/db5fa_next_dist_26dfd560._.js:2297
+[    3480ms] [LOG] [Fast Refresh] done in 3454ms @ http://localhost:3001/_next/static/chunks/db5fa_next_dist_26dfd560._.js:2297
+[    3595ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/db5fa_next_dist_26dfd560._.js:2297
+[    3959ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3001/_next/static/chunks/db5fa_next_dist_26dfd560._.js:2297
+[    4366ms] [LOG] [HMR] connected @ http://localhost:3001/_next/static/chunks/db5fa_next_dist_26dfd560._.js:2297
+[    4563ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/db5fa_next_dist_26dfd560._.js:2297
+[    5544ms] [LOG] [Fast Refresh] done in 1117ms @ http://localhost:3001/_next/static/chunks/db5fa_next_dist_26dfd560._.js:2297
+[   12080ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/db5fa_next_dist_26dfd560._.js:2297
+[   12256ms] [LOG] [Fast Refresh] done in 290ms @ http://localhost:3001/_next/static/chunks/db5fa_next_dist_26dfd560._.js:2297

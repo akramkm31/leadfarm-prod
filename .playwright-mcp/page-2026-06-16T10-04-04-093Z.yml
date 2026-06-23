@@ -1,0 +1,77 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - complementary "Navigation principale" [ref=e4]:
+        - link "LeadFarm" [ref=e5] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e6]
+        - navigation [ref=e10]:
+          - button "Pilotage" [ref=e100]:
+            - img [ref=e101]
+          - button "46 notification(s) — Opérations" [ref=e106]:
+            - img [ref=e107]
+            - generic [ref=e111]: 9+
+          - button "Audit" [ref=e112]:
+            - img [ref=e114]
+        - generic [ref=e11]:
+          - button "Rechercher (Ctrl+K)" [ref=e12]:
+            - img [ref=e13]
+          - button "Alertes" [ref=e117]:
+            - img [ref=e118]
+          - button "Menu compte" [ref=e17] [cursor=pointer]: AK
+      - complementary
+    - generic [ref=e18]:
+      - banner [ref=e19]:
+        - navigation "Fil d'Ariane" [ref=e21]:
+          - link "LeadFarm" [ref=e23] [cursor=pointer]:
+            - /url: /dashboard
+          - generic [ref=e24]:
+            - generic [ref=e25]: ›
+            - generic [ref=e26]: Admin
+      - generic [ref=e28]:
+        - generic [ref=e122]:
+          - img [ref=e124]
+          - generic [ref=e126]:
+            - heading "Administration" [level=1] [ref=e127]
+            - paragraph [ref=e128]: "Profil connecté : directeur"
+        - generic [ref=e129]:
+          - button "Utilisateurs2" [ref=e130]
+          - button "Parcelles5" [ref=e131]
+          - button "Traitements3" [active] [ref=e132]
+        - table [ref=e174]:
+          - rowgroup [ref=e175]:
+            - row "Parcelle Date Type Statut Opérateur Surface (ha)" [ref=e176]:
+              - columnheader "Parcelle" [ref=e177]
+              - columnheader "Date" [ref=e178]
+              - columnheader "Type" [ref=e179]
+              - columnheader "Statut" [ref=e180]
+              - columnheader "Opérateur" [ref=e181]
+              - columnheader "Surface (ha)" [ref=e182]
+          - rowgroup [ref=e183]:
+            - row "Parcelle Est — Oliviers 2026-06-15✓ desherbage En cours Youcef Hadj 22.00" [ref=e184]:
+              - cell "Parcelle Est — Oliviers" [ref=e185]
+              - cell "2026-06-15✓" [ref=e186]
+              - cell "desherbage" [ref=e187]
+              - cell "En cours" [ref=e188]
+              - cell "Youcef Hadj" [ref=e189]
+              - cell "22.00" [ref=e190]
+            - row "Parcelle Nord — Pommiers 2026-06-08 pulverisation Planifié Mehdi Benali 42.00" [ref=e191]:
+              - cell "Parcelle Nord — Pommiers" [ref=e192]
+              - cell "2026-06-08" [ref=e193]
+              - cell "pulverisation" [ref=e194]
+              - cell "Planifié" [ref=e195]
+              - cell "Mehdi Benali" [ref=e196]
+              - cell "42.00" [ref=e197]
+            - row "Parcelle Sud — Vigne 2026-06-06 pulverisation Terminé Mehdi Benali 16.00" [ref=e198]:
+              - cell "Parcelle Sud — Vigne" [ref=e199]
+              - cell "2026-06-06" [ref=e200]
+              - cell "pulverisation" [ref=e201]
+              - cell "Terminé" [ref=e202]
+              - cell "Mehdi Benali" [ref=e203]
+              - cell "16.00" [ref=e204]
+  - button "Open Next.js Dev Tools" [ref=e96] [cursor=pointer]:
+    - img [ref=e97]
+  - alert [ref=e167]
+  - button "Ouvrir l'assistant IA" [ref=e168] [cursor=pointer]:
+    - img [ref=e169]
+    - generic [ref=e172]: Assistant

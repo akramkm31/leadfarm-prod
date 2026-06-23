@@ -129,9 +129,12 @@ export default function DashboardView() {
     return (
       <ConsultantDashboard
         kpis={d.kpis}
+        loading={d.loading}
+        onRefresh={d.loadKpis}
         satelliteData={d.satelliteForMap}
-        onLoadSatellite={d.loadSatellite}
         satelliteLoading={d.satelliteLoading}
+        satelliteError={d.satelliteError}
+        onLoadSatellite={d.loadSatellite}
       />
     );
 

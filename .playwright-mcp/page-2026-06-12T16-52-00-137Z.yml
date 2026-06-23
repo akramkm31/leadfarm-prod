@@ -1,0 +1,20 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e33] [cursor=pointer]:
+    - img [ref=e34]
+  - alert [ref=e37]
+  - generic [ref=e43]:
+    - generic [ref=e44]:
+      - complementary "Navigation principale" [ref=e45]:
+        - link "LeadFarm" [ref=e46] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e47]
+        - navigation [ref=e51]
+        - generic [ref=e52]:
+          - button "Rechercher (Ctrl+K)" [ref=e53]:
+            - img [ref=e54]
+          - button "Menu compte" [ref=e58] [cursor=pointer]: AK
+      - complementary
+    - banner [ref=e60]
+  - button "Ouvrir l'assistant IA" [ref=e38] [cursor=pointer]:
+    - img [ref=e39]
+    - generic [ref=e42]: Assistant

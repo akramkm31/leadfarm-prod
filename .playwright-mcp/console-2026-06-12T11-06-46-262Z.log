@@ -1,0 +1,44 @@
+[     202ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    1840ms] [LOG] [Fast Refresh] done in 1741ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    2383ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    2413ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /login. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    2527ms] [LOG] [HMR] connected @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    2730ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    3138ms] [LOG] [Fast Refresh] done in 512ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    3232ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/icon-192.png:0
+[    3248ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    3326ms] [WARNING] Error while trying to use the following icon from the Manifest: http://localhost:3001/icon-192.png (Download error or resource isn't a valid image) @ http://localhost:3001/login:0
+[    3849ms] [LOG] [Fast Refresh] done in 703ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   13633ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   13650ms] [LOG] [Fast Refresh] done in 133ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   13768ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   13819ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   13870ms] [LOG] [Fast Refresh] done in 156ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   13981ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   14025ms] [LOG] [Fast Refresh] done in 148ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   14232ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   14344ms] [LOG] [Fast Refresh] done in 220ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   14526ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   16272ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   16339ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[   16343ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[   16385ms] [LOG] [Fast Refresh] done in 242ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   16500ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/icon-192.png:0
+[   16507ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[   16509ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[   16646ms] [WARNING] Error while trying to use the following icon from the Manifest: http://localhost:3001/icon-192.png (Download error or resource isn't a valid image) @ http://localhost:3001/dashboard:0
+[   19408ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   19916ms] [LOG] [Fast Refresh] done in 618ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   57467ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   58332ms] [LOG] [Fast Refresh] done in 977ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   76320ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[   76325ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  136259ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  136277ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  196204ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  196205ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  216804ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  220589ms] [LOG] [Fast Refresh] done in 3882ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297

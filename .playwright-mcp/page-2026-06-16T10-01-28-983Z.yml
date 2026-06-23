@@ -1,0 +1,58 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - complementary "Navigation principale" [ref=e4]:
+        - link "LeadFarm" [ref=e5] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e6]
+        - navigation [ref=e10]:
+          - button "Pilotage" [ref=e100]:
+            - img [ref=e101]
+          - button "46 notification(s) — Opérations" [ref=e106]:
+            - img [ref=e107]
+            - generic [ref=e111]: 9+
+          - button "Audit" [ref=e112]:
+            - img [ref=e114]
+        - generic [ref=e11]:
+          - button "Rechercher (Ctrl+K)" [ref=e12]:
+            - img [ref=e13]
+          - button "Alertes" [ref=e117]:
+            - img [ref=e118]
+          - button "Menu compte" [ref=e17] [cursor=pointer]: AK
+      - complementary
+    - generic [ref=e18]:
+      - banner [ref=e19]:
+        - navigation "Fil d'Ariane" [ref=e21]:
+          - link "LeadFarm" [ref=e23] [cursor=pointer]:
+            - /url: /dashboard
+          - generic [ref=e24]:
+            - generic [ref=e25]: ›
+            - generic [ref=e26]: Admin
+      - generic [ref=e28]:
+        - generic [ref=e122]:
+          - img [ref=e124]
+          - generic [ref=e126]:
+            - heading "Administration" [level=1] [ref=e127]
+            - paragraph [ref=e128]: "Profil connecté : directeur"
+        - generic [ref=e129]:
+          - button "Utilisateurs2" [ref=e148]
+          - button "Parcelles" [active] [ref=e131]
+          - button "Traitements3" [ref=e149]
+        - paragraph [ref=e189]: column regions.site does not exist
+        - generic [ref=e190]:
+          - table [ref=e191]:
+            - rowgroup [ref=e192]:
+              - row "Parcelle Surface (ha) Culture Site Type" [ref=e193]:
+                - columnheader "Parcelle" [ref=e194]
+                - columnheader "Surface (ha)" [ref=e195]
+                - columnheader "Culture" [ref=e196]
+                - columnheader "Site" [ref=e197]
+                - columnheader "Type" [ref=e198]
+            - rowgroup
+          - paragraph [ref=e199]: Aucune parcelle
+  - button "Open Next.js Dev Tools" [ref=e96] [cursor=pointer]:
+    - img [ref=e97]
+  - alert [ref=e142]
+  - button "Ouvrir l'assistant IA" [ref=e143] [cursor=pointer]:
+    - img [ref=e144]
+    - generic [ref=e147]: Assistant

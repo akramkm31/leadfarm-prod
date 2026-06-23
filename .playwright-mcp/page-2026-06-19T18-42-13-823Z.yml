@@ -1,0 +1,426 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - link "LeadFarm" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - text: LeadFarm
+        - generic [ref=e7]:
+          - link "Produit" [ref=e8] [cursor=pointer]:
+            - /url: "#produit"
+          - link "Fonctionnalités" [ref=e9] [cursor=pointer]:
+            - /url: "#fonctionnalites"
+          - link "Conformité" [ref=e10] [cursor=pointer]:
+            - /url: "#conformite"
+          - link "Garanties" [ref=e11] [cursor=pointer]:
+            - /url: "#stack"
+          - link "Clients" [ref=e12] [cursor=pointer]:
+            - /url: "#client"
+        - generic [ref=e13]:
+          - generic [ref=e14]: FR
+          - generic [ref=e15]: AR
+          - link "Se connecter" [ref=e16] [cursor=pointer]:
+            - /url: /login
+          - link "Demander une démo" [ref=e17] [cursor=pointer]:
+            - /url: "#cta"
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]: SOLUTION DE RÉFÉRENCE · VERGERS INDUSTRIELS
+        - heading "Pilotez l'exploitation. Dominez l'audit réglementaire." [level=1] [ref=e24]
+        - paragraph [ref=e25]: LeadFarm centralise la cartographie parcelaire, la planification des traitements et la traçabilité opérateur dans une plateforme unique. Chaque intervention est géoréférencée, horodatée et consignée — pour respecter vos DAR, documenter votre IFT et présenter aux contrôles un cahier de culture irréprochable.
+        - generic [ref=e26]:
+          - link "Demander une démo" [ref=e27] [cursor=pointer]:
+            - /url: "#cta"
+            - text: Demander une démo
+            - img [ref=e28]
+          - link "Voir le produit en action" [ref=e30] [cursor=pointer]:
+            - /url: /dashboard
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - generic [ref=e33]: 247 ha
+            - generic [ref=e34]: Surface pilotée
+          - generic [ref=e35]:
+            - generic [ref=e36]: 100 %
+            - generic [ref=e37]: Interventions tracées
+          - generic [ref=e38]:
+            - generic [ref=e39]: "0"
+            - generic [ref=e40]: Saisie papier
+          - generic [ref=e41]:
+            - generic [ref=e42]: < 2 sem.
+            - generic [ref=e43]: Déploiement complet
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - generic [ref=e49]: EN COURS · VERGER A13
+          - generic [ref=e51]: TRAITEMENT EN COURS · VERGER A13
+        - generic [ref=e52]:
+          - generic [ref=e53]: PARCELLE A7 · 12.4 HA
+          - generic [ref=e54]: Pommier · Gala
+          - generic [ref=e55]: EN ATTENTE DAR · 16:00
+        - generic [ref=e56]:
+          - generic [ref=e57]: OPÉRATEUR · L. MANSOUR
+          - generic [ref=e58]: Vent 12 km/h · CONFORME
+          - generic [ref=e59]: PROGRESSION 58% · 14:32
+    - generic [ref=e61]:
+      - generic [ref=e62]:
+        - generic [ref=e63]: Conformité & certifications
+        - generic [ref=e64]: LeadFarm produit les documents exigés par les certifications export et les audits réglementaires, sans charge documentaire supplémentaire pour vos équipes.
+      - generic [ref=e65]:
+        - generic [ref=e66]:
+          - generic [ref=e67]: CERTIFICATION EXPORT
+          - generic [ref=e68]: GLOBALG.A.P. IFA v6
+        - generic [ref=e69]:
+          - generic [ref=e70]: SÉCURITÉ ALIMENTAIRE
+          - generic [ref=e71]: HACCP / ISO 22000
+        - generic [ref=e72]:
+          - generic [ref=e73]: DÉLAI AVANT RÉCOLTE
+          - generic [ref=e74]: Zéro dépassement DAR
+        - generic [ref=e75]:
+          - generic [ref=e76]: INDICE DE FRÉQUENCE
+          - generic [ref=e77]: IFT suivi & déclaré
+        - generic [ref=e78]:
+          - generic [ref=e79]: CAHIER DE CULTURE
+          - generic [ref=e80]: Opposable à l'auditeur
+        - generic [ref=e81]:
+          - generic [ref=e82]: DONNÉES & CONFIDENTIALITÉ
+          - generic [ref=e83]: Conformité RGPD native
+    - generic [ref=e85]:
+      - generic [ref=e86]:
+        - generic [ref=e87]:
+          - text: Fonctionnalités
+          - heading "Un dispositif complet pour le verger industriel professionnel." [level=2] [ref=e88]
+        - paragraph [ref=e89]: Tout ce qu'un exploitant exigeant attend d'un outil de traçabilité — cartographie parcelaire, planification des traitements, registres réglementaires et surveillance permanente — dans une seule plateforme cohérente.
+      - generic [ref=e90]:
+        - generic [ref=e91]:
+          - generic [ref=e92]: PILOTAGE
+          - img [ref=e94]
+          - generic [ref=e97]: 01 · LA CARTE DE L'EXPLOITATION
+          - generic [ref=e98]: L'exploitation sous contrôle, d'un seul regard.
+          - generic [ref=e99]: Constituez votre parcellaire réglementaire directement sur le terrain. Supervisez chaque passage en temps réel — débit, vitesse, progression. En cas de conditions défavorables, LeadFarm suspend l'opération avant tout incident de traitement.
+        - generic [ref=e100]:
+          - img [ref=e102]
+          - generic [ref=e105]: 02 · MÉMOIRE TOTALE
+          - generic [ref=e106]: Un historique inaltérable, opposable en audit.
+          - generic [ref=e107]: Chaque modification — surface, variété, dose, opérateur, date — est conservée dans sa version originale. Rien ne peut être effacé ni altéré. L'auditeur consulte exactement la donnée que vous avez produite, sans possibilité de contestation.
+        - generic [ref=e108]:
+          - img [ref=e110]
+          - generic [ref=e112]: 03 · REGISTRES OFFICIELS
+          - generic [ref=e113]: Cahier de culture généré à la clôture de chaque intervention.
+          - generic [ref=e114]: "L'ordre de traitement réglementaire est édité automatiquement en fin de séance : produit homologué, dose appliquée, opérateur signataire, conditions météorologiques consignées. Prêt pour l'archivage ou la remise au contrôleur."
+        - generic [ref=e115]:
+          - img [ref=e117]
+          - generic [ref=e122]: 04 · SURVEILLANCE EN CONTINU
+          - generic [ref=e123]: Les conditions de traitement validées avant chaque passage.
+          - generic [ref=e124]: Température, humidité, pluviométrie, vent — les paramètres agro-météorologiques de chaque parcelle sont vérifiés en continu. Planifiez les interventions dans les fenêtres favorables et réduisez le nombre de reprises.
+        - generic [ref=e125]:
+          - img [ref=e127]
+          - generic [ref=e130]: 05 · VEILLE PHYTOSANITAIRE
+          - generic [ref=e131]: La pression parasitaire détectée avant l'apparition des symptômes.
+          - generic [ref=e132]: L'état sanitaire de vos vergers est évalué chaque semaine par imagerie satellitaire. Une anomalie foliaire photographiée sur le terrain est identifiée en quelques secondes — mildiou, tavelure, oïdium — avant toute propagation.
+        - generic [ref=e133]:
+          - img [ref=e135]
+          - generic [ref=e138]: 06 · SOUVERAINETÉ DES DONNÉES
+          - generic [ref=e139]: Vos données restent votre propriété exclusive.
+          - generic [ref=e140]: Chaque exploitation dispose de son propre espace cloisonné. Aucune donnée ne transite vers un domaine tiers, aucune analyse agrégée n'est réalisée sans votre accord. Export intégral disponible à tout moment, sans délai.
+    - generic [ref=e142]:
+      - generic [ref=e143]:
+        - generic [ref=e144]:
+          - text: Le produit
+          - heading "L'outil qui pense comme un professionnel de l'exploitation." [level=2] [ref=e145]
+        - paragraph [ref=e146]: Pas un progiciel généraliste. Un outil conçu pour le verger industriel — chaque écran a été construit avec des agronomes et des chefs d'exploitation, directement sur le terrain.
+      - img [ref=e148]:
+        - generic [ref=e151]: LeadFarm
+        - generic [ref=e152]: EXPLOITATION ACTIVE
+        - generic [ref=e154]: Domaine Khelifa
+        - generic [ref=e155]: SIDI BEL ABBÈS · 247 HA
+        - generic [ref=e156]: PILOTAGE
+        - generic [ref=e157]:
+          - generic [ref=e159]: Tableau de bord
+          - generic [ref=e160]: Carte & Parcelles
+          - generic [ref=e161]: Traitements
+          - generic [ref=e162]: Registre & PDF
+        - generic [ref=e163]: OPÉRATIONS
+        - generic [ref=e164]:
+          - generic [ref=e165]: Stock & Produits
+          - generic [ref=e166]: Verger en direct
+          - generic [ref=e167]: Satellite
+        - generic [ref=e168]: AUDIT
+        - generic [ref=e169]:
+          - generic [ref=e170]: Conformité
+          - generic [ref=e171]: Historique
+        - generic [ref=e173]: YK
+        - generic [ref=e174]: Yacine Khelifa
+        - generic [ref=e175]: CHEF D'EXPLOITATION
+        - generic [ref=e177]: LEADFARM › TABLEAU DE BORD
+        - generic [ref=e180]: SYNC IL Y A 12 S
+        - generic [ref=e182]: Alertes
+        - generic [ref=e184]: "3"
+        - generic [ref=e186]: BONJOUR · MARDI 24 FÉVRIER 2026 · 14:32
+        - generic [ref=e187]: 8 traitements planifiés cette semaine.
+        - generic [ref=e188]: 3 fenêtres météo favorables.
+        - generic [ref=e190]: + Planifier un traitement
+        - generic [ref=e192]: Ouvrir la carte
+        - generic [ref=e194]: Registre du jour (PDF)
+        - generic [ref=e203]: 35°11'N · 0°37'W · ALT 482M
+        - generic [ref=e204]:
+          - generic [ref=e206]: SURFACE TOTALE
+          - generic [ref=e207]: 247.3 ha
+          - generic [ref=e208]: +1.2 ha vs. 2025
+          - generic [ref=e210]: TRAITEMENTS / 30 J
+          - generic [ref=e211]: "42"
+          - generic [ref=e212]: dont 38 conformes GLOBALG.A.P.
+          - generic [ref=e214]: STOCK PHYTO
+          - generic [ref=e215]: 74 %
+          - generic [ref=e216]: 2 alertes seuil minimal
+          - generic [ref=e218]: CAPTEURS VERGER
+          - generic [ref=e219]: 8/8
+          - generic [ref=e220]: dernier ping il y a 12 s
+        - generic [ref=e222]: EXPLOITATION
+        - generic [ref=e223]: Vue d'ensemble · 6 parcelles
+        - generic [ref=e225]: Détails ›
+        - generic [ref=e226]:
+          - generic [ref=e231]: A12
+          - generic [ref=e234]: A13
+          - generic [ref=e237]: B04
+          - generic [ref=e240]: B05
+          - generic [ref=e243]: D08
+          - generic [ref=e246]: C01
+          - generic [ref=e252]: "N"
+        - generic [ref=e254]: FLUX D'ALERTES
+        - generic [ref=e255]: 3 actions requises
+        - generic [ref=e257]: LIVE
+        - generic [ref=e258]:
+          - generic [ref=e260]: 14:28
+          - generic [ref=e261]: Verger B05 · Olivier — alerte mildiou détectée
+          - generic [ref=e262]: DÉTECTION AUTOMATIQUE · TRAITER SOUS 48 H
+          - generic [ref=e264]: 13:55
+          - generic [ref=e265]: Stock cuivre — seuil minimal franchi (12 L)
+          - generic [ref=e266]: PHYTODIS · RÉAPPRO 48 H
+          - generic [ref=e268]: 12:40
+          - generic [ref=e269]: Vent prévu > 19 km/h à 16:00 sur secteur Est
+          - generic [ref=e270]: DÉCALER TRAITEMENT VERGER A12
+          - generic [ref=e272]: 09:10
+          - generic [ref=e273]: Nouvelle analyse satellite du verger disponible
+          - generic [ref=e274]: VIGUEUR EN HAUSSE CETTE SEMAINE
+      - generic [ref=e275]:
+        - generic [ref=e276]:
+          - text: "01"
+          - generic [ref=e277]: Récapitulatif opérationnel du jour
+          - generic [ref=e278]: Les interventions prioritaires, les fenêtres météo favorables et les alertes de stock — réunis en une seule vue, sans recherche.
+        - generic [ref=e279]:
+          - text: "02"
+          - generic [ref=e280]: Indicateurs de performance clés
+          - generic [ref=e281]: Surface traitée, produits consommés, réserve de stock, état des parcelles — lisibles d'un coup d'œil depuis le bureau ou le terrain.
+        - generic [ref=e282]:
+          - text: "03"
+          - generic [ref=e283]: Cartographie en temps réel
+          - generic [ref=e284]: Vue d'ensemble de l'exploitation avec position des équipements actifs et accès immédiat à la fiche réglementaire de chaque parcelle.
+        - generic [ref=e285]:
+          - text: "04"
+          - generic [ref=e286]: Alertes opérationnelles priorisées
+          - generic [ref=e287]: Risques sanitaires, conditions défavorables, dépassements de seuil — les décisions urgentes remontent automatiquement, sans délai.
+    - generic [ref=e289]:
+      - generic [ref=e290]:
+        - generic [ref=e291]:
+          - text: Comment ça marche
+          - heading "Du parcellaire au registre signé — en quatre étapes structurées." [level=2] [ref=e292]
+        - paragraph [ref=e293]: Une seule saisie par intervention. Chaque donnée terrain construit automatiquement les registres officiels. Aucune double entrée, aucun risque d'incohérence documentaire.
+      - generic [ref=e294]:
+        - generic [ref=e295]:
+          - generic [ref=e296] [cursor=pointer]:
+            - generic [ref=e297]: "01"
+            - generic [ref=e298]:
+              - generic [ref=e299]: Constituez le parcellaire réglementaire
+              - generic [ref=e300]: Délimitez vos parcelles depuis le bureau ou directement sur le terrain. Les surfaces sont calculées et enregistrées automatiquement dans le registre officiel.
+          - generic [ref=e301] [cursor=pointer]:
+            - generic [ref=e302]: "02"
+            - generic [ref=e303]:
+              - generic [ref=e304]: Validez le plan de traitement
+              - generic [ref=e305]: Sélectionnez le produit homologué, saisissez la dose et désignez l'opérateur. LeadFarm vérifie le délai avant récolte, la disponibilité du stock et les conditions météorologiques prévues.
+          - generic [ref=e306] [cursor=pointer]:
+            - generic [ref=e307]: "03"
+            - generic [ref=e308]:
+              - generic [ref=e309]: Supervisez l'intervention en cours
+              - generic [ref=e310]: L'équipement transmet sa position et son débit en continu. Une alerte agro-météorologique suspend automatiquement l'opération si les conditions deviennent défavorables.
+          - generic [ref=e311] [cursor=pointer]:
+            - generic [ref=e312]: "04"
+            - generic [ref=e313]:
+              - generic [ref=e314]: Clôturez et archivez le registre
+              - generic [ref=e315]: En fin de séance, le cahier de culture est généré, signé par l'opérateur et archivé immédiatement. L'auditeur le consulte à tout moment sans délai supplémentaire.
+        - img [ref=e317]:
+          - generic [ref=e319]:
+            - generic [ref=e321]: 01 · PARCELLE
+            - generic [ref=e322]: Verger A13 · 8.1 ha
+            - generic [ref=e323]: SURFACE CALCULÉE AUTO.
+          - generic [ref=e324]:
+            - generic [ref=e326]: 02 · TRAITEMENT
+            - generic [ref=e327]: Cuivre · 2.5 L/ha
+            - generic [ref=e328]: DOSE VALIDÉE · STOCK OK
+          - generic [ref=e329]:
+            - generic [ref=e331]: 03 · PULVÉRISATION
+            - generic [ref=e332]: L. Mansour · 14:32
+            - generic [ref=e333]: VENT 12 KM/H · GO
+          - generic [ref=e336]: Registre officiel signé
+          - generic [ref=e337]:
+            - generic [ref=e338]: TOUT L'HISTORIQUE CONSERVÉ
+            - generic [ref=e340]: 14 FÉV. 2026
+            - generic [ref=e342]: 02 NOV. 2025
+            - generic [ref=e344]: 18 SEPT. 2024
+            - generic [ref=e346]: 04 MARS 2019
+            - generic [ref=e347]: CHAQUE DÉCISION HORODATÉE
+            - generic [ref=e349]: Surface mise à jour
+            - generic [ref=e350]: 8.1 ha → 8.4 ha
+            - generic [ref=e351]: ↳ ancienne valeur gardée
+            - generic [ref=e352]: ↳ auteur & date notés
+            - generic [ref=e353]: ↳ enregistré
+            - generic [ref=e354]: RIEN NE S'EFFACE JAMAIS
+            - generic [ref=e356]: HISTORIQUE INALTÉRABLE
+    - generic [ref=e358]:
+      - generic [ref=e359]:
+        - generic [ref=e360]:
+          - text: Nos garanties
+          - heading "Une infrastructure conçue pour résister à dix ans d'audits." [level=2] [ref=e361]
+        - paragraph [ref=e362]: Vos registres du premier jour restent aussi lisibles au dixième audit qu'au moment de leur création. Vous demeurez propriétaire absolu de l'intégralité de vos données, sans condition ni dépendance envers un fournisseur.
+      - generic [ref=e363]:
+        - generic [ref=e364]:
+          - generic [ref=e365]: PROPRIÉTÉ DES DONNÉES
+          - generic [ref=e366]: Vous restez propriétaire
+          - generic [ref=e367]: Export intégral à tout moment, sans condition
+        - generic [ref=e368]:
+          - generic [ref=e369]: CLOISONNEMENT
+          - generic [ref=e370]: Isolation stricte par exploitation
+          - generic [ref=e371]: Aucune donnée partagée entre domaines
+        - generic [ref=e372]:
+          - generic [ref=e373]: DISPONIBILITÉ
+          - generic [ref=e374]: 99,9 % garantie
+          - generic [ref=e375]: Sauvegarde quotidienne automatisée
+        - generic [ref=e376]:
+          - generic [ref=e377]: USAGE TERRAIN
+          - generic [ref=e378]: Conçu pour le terrain
+          - generic [ref=e379]: Fonctionnel en réseau dégradé ou hors connexion
+        - generic [ref=e380]:
+          - generic [ref=e381]: TRAÇABILITÉ
+          - generic [ref=e382]: Historique complet et inaltérable
+          - generic [ref=e383]: Aucune modification n'est effacée — jamais
+        - generic [ref=e384]:
+          - generic [ref=e385]: CONFIDENTIALITÉ
+          - generic [ref=e386]: Conformité RGPD native
+          - generic [ref=e387]: Protection intégrale des données opérateurs
+        - generic [ref=e388]:
+          - generic [ref=e389]: ACCESSIBILITÉ
+          - generic [ref=e390]: Français & arabe
+          - generic [ref=e391]: Interface adaptée à chaque équipe de terrain
+        - generic [ref=e392]:
+          - generic [ref=e393]: DÉPLOIEMENT
+          - generic [ref=e394]: Accompagnement sur site
+          - generic [ref=e395]: Chef d'exploitation et opérateurs formés en 2 jours
+        - generic [ref=e396]:
+          - generic [ref=e397]: SUPPORT
+          - generic [ref=e398]: Réponse sous 4 heures
+          - generic [ref=e399]: Assistance active le jour des inspections
+        - generic [ref=e400]:
+          - generic [ref=e401]: INTEROPÉRABILITÉ
+          - generic [ref=e402]: Sans verrouillage propriétaire
+          - generic [ref=e403]: Données exportables dans les formats standards
+    - generic [ref=e406]:
+      - generic [ref=e407]:
+        - text: Client pilote
+        - generic [ref=e408]: « Avant, un seul audit mobilisait deux jours de recherche documentaire. Aujourd'hui, l'inspecteur ouvre LeadFarm et consulte huit ans d'interventions en moins d'une minute — sans qu'un seul document soit introuvable. »
+        - generic [ref=e409]:
+          - generic [ref=e410]: Yacine Khelifa
+          - generic [ref=e411]: DIRECTEUR D'EXPLOITATION · DOMAINE KHELIFA
+      - generic [ref=e412]:
+        - generic [ref=e413]: Le Domaine Khelifa en chiffres
+        - generic [ref=e414]:
+          - generic [ref=e415]:
+            - generic [ref=e416]: "247"
+            - generic [ref=e417]: Hectares pilotés
+          - generic [ref=e418]:
+            - generic [ref=e419]: "38"
+            - generic [ref=e420]: Parcelles cartographiées
+          - generic [ref=e421]:
+            - generic [ref=e422]: 100 %
+            - generic [ref=e423]: Interventions tracées
+          - generic [ref=e424]:
+            - generic [ref=e425]: 8 j
+            - generic [ref=e426]: Mise en service
+        - generic [ref=e427]: Sidi Bel Abbès · Algérie · Pommier, olivier, amandier · Visée commerciale Groupe Lachhab
+    - generic [ref=e430]:
+      - generic [ref=e431]:
+        - text: Passez à l'action
+        - heading "Planifiez votre prochain audit avec sérénité." [level=2] [ref=e432]
+        - paragraph [ref=e433]: Déploiement complet en moins de deux semaines — parcellaire, migration des registres existants et formation des équipes inclus. Démonstration en 20 minutes, ou visite terrain au Domaine Khelifa sur demande.
+        - generic [ref=e434]:
+          - link "Planifier une démo" [ref=e435] [cursor=pointer]:
+            - /url: mailto:contact@leadfarm.dz
+          - link "Ouvrir le produit" [ref=e436] [cursor=pointer]:
+            - /url: /dashboard
+            - text: Ouvrir le produit
+            - img [ref=e437]
+      - generic [ref=e439]:
+        - generic [ref=e440]:
+          - generic [ref=e441]: Déploiement guidé
+          - generic [ref=e442]: PARCELLAIRE + MIGRATION REGISTRES · 8 JOURS
+        - generic [ref=e443]:
+          - generic [ref=e444]: Formation sur site
+          - generic [ref=e445]: CHEF D'EXPLOITATION + OPÉRATEURS TERRAIN
+        - generic [ref=e446]:
+          - generic [ref=e447]: Accompagnement audit
+          - generic [ref=e448]: PRÉSENT LE JOUR DE L'INSPECTION
+    - contentinfo [ref=e449]:
+      - generic [ref=e450]:
+        - generic [ref=e451]:
+          - generic [ref=e452]:
+            - generic [ref=e453]: LeadFarm
+            - generic [ref=e455]: DOMAINE KHELIFA · SIDI BEL ABBÈS
+            - paragraph [ref=e456]: Plateforme de traçabilité phytosanitaire pour vergers industriels. Référence en Algérie pour la conformité GLOBALG.A.P., HACCP et cahier de culture réglementaire.
+          - generic [ref=e457]:
+            - heading "Produit" [level=4] [ref=e458]
+            - list [ref=e459]:
+              - listitem [ref=e460]:
+                - link "Fonctionnalités" [ref=e461] [cursor=pointer]:
+                  - /url: "#fonctionnalites"
+              - listitem [ref=e462]:
+                - link "Garanties" [ref=e463] [cursor=pointer]:
+                  - /url: "#stack"
+              - listitem [ref=e464]:
+                - link "Démo en ligne" [ref=e465] [cursor=pointer]:
+                  - /url: "#produit"
+              - listitem [ref=e466]:
+                - link "Ouvrir l'application" [ref=e467] [cursor=pointer]:
+                  - /url: /dashboard
+          - generic [ref=e468]:
+            - heading "Garanties" [level=4] [ref=e469]
+            - list [ref=e470]:
+              - listitem [ref=e471]:
+                - link "GLOBALG.A.P. IFA v6" [ref=e472] [cursor=pointer]:
+                  - /url: "#conformite"
+              - listitem [ref=e473]:
+                - link "HACCP / ISO 22000" [ref=e474] [cursor=pointer]:
+                  - /url: "#conformite"
+              - listitem [ref=e475]:
+                - link "Cahier de culture réglementaire" [ref=e476] [cursor=pointer]:
+                  - /url: "#conformite"
+              - listitem [ref=e477]:
+                - link "Vos données vous appartiennent" [ref=e478] [cursor=pointer]:
+                  - /url: "#stack"
+          - generic [ref=e479]:
+            - heading "Contact" [level=4] [ref=e480]
+            - list [ref=e481]:
+              - listitem [ref=e482]:
+                - link "contact@leadfarm.dz" [ref=e483] [cursor=pointer]:
+                  - /url: mailto:contact@leadfarm.dz
+              - listitem [ref=e484]:
+                - link "Sidi Bel Abbès · DZ" [ref=e485] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e486]:
+                - link "LinkedIn" [ref=e487] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e488]:
+                - link "Demander une démo" [ref=e489] [cursor=pointer]:
+                  - /url: "#cta"
+        - generic [ref=e490]:
+          - generic [ref=e491]: © 2026 LEADFARM · SIDI BEL ABBÈS · DOMAINE KHELIFA
+          - generic [ref=e492]: LeadFarm
+  - button "Open Next.js Dev Tools" [ref=e498] [cursor=pointer]:
+    - img [ref=e499]
+  - alert [ref=e502]

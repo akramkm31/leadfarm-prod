@@ -1,0 +1,939 @@
+[     325ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    3696ms] [LOG] [Fast Refresh] done in 3477ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    4095ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    4133ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    4163ms] [LOG] [HMR] connected @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    4623ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    5365ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[    5370ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[    5423ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[    6047ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[    6332ms] [LOG] [Fast Refresh] done in 1816ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[    6367ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/icon-192.png:0
+[    6392ms] [WARNING] Error while trying to use the following icon from the Manifest: http://localhost:3001/icon-192.png (Download error or resource isn't a valid image) @ http://localhost:3001/dashboard:0
+[   23584ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   24232ms] [LOG] [Fast Refresh] done in 751ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   43024ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   43428ms] [LOG] [Fast Refresh] done in 507ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[   65343ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[   65350ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  125375ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  125380ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  185585ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  185587ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  245343ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  245351ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  305335ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  305336ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  365325ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  365327ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  428151ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  428156ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  428375ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  428431ms] [LOG] [Fast Refresh] done in 159ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  428804ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  428816ms] [LOG] [Fast Refresh] done in 123ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  457932ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  458120ms] [LOG] [Fast Refresh] done in 293ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  458260ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  458265ms] [LOG] [Fast Refresh] done in 115ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  472439ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  472461ms] [LOG] [Fast Refresh] done in 133ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  472567ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  472568ms] [LOG] [Fast Refresh] done in 103ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  485347ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  485348ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  511159ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  511170ms] [LOG] [Fast Refresh] done in 121ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  545490ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  545495ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  555571ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  555650ms] [LOG] [Fast Refresh] done in 181ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  605362ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  605400ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  628932ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  629714ms] [LOG] [Fast Refresh] done in 850ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  631591ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  632666ms] [LOG] [Fast Refresh] done in 1172ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  633049ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  633750ms] [LOG] [Fast Refresh] done in 626ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  634057ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/treatments?select=id&status=eq.pending_approval:0
+[  634062ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://rjvmygudsemlnkpfdfzd.supabase.co/rest/v1/stock_levels?select=current_quantity%2Cavg_unit_price_dzd%2Ctotal_value_dzd:0
+[  635982ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  639514ms] [LOG] [Fast Refresh] done in 3610ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  641396ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  643459ms] [ERROR] %o
+
+%s ReferenceError: countTreatmentsInWeek is not defined
+    at useDashboardPage.useMemo[plannedThisWeek] (http://localhost:3001/_next/static/chunks/src_b0cb1442._.js?id=%255Bproject%255D%252Fsrc%252Fcomponents%252Fdashboard%252FuseDashboardPage.ts+%255Bapp-client%255D+%2528ecmascript%2529:215:58)
+    at mountMemo (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:5424:25)
+    at Object.useMemo (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:15003:24)
+    at exports.useMemo (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_8588f287._.js:1742:36)
+    at useDashboardPage (http://localhost:3001/_next/static/chunks/src_b0cb1442._.js?id=%255Bproject%255D%252Fsrc%252Fcomponents%252Fdashboard%252FuseDashboardPage.ts+%255Bapp-client%255D+%2528ecmascript%2529:214:313)
+    at DashboardView (http://localhost:3001/_next/static/chunks/src_629405cc._.js?id=%255Bproject%255D%252Fsrc%252Fcomponents%252Fdashboard%252FDashboardView.tsx+%255Bapp-client%255D+%2528ecmascript%2529:84:189)
+    at Object.react_stack_bottom_frame (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:14826:24)
+    at renderWithHooks (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:4651:24)
+    at updateFunctionComponent (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:6112:21)
+    at beginWork (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:6708:24)
+    at runWithFiberInDEV (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:965:74)
+    at performUnitOfWork (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:9562:97)
+    at workLoopSync (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:9456:40)
+    at renderRootSync (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:9440:13)
+    at performWorkOnRoot (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:9105:47)
+    at performSyncWorkOnRoot (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:10238:9)
+    at flushSyncWorkAcrossRoots_impl (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:10154:316)
+    at flushSyncWork$1 (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:9237:86)
+    at Object.scheduleRefresh (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:299:13)
+    at http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_8588f287._.js:391:33
+    at Set.forEach (<anonymous>)
+    at Object.performReactRefresh (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_8588f287._.js:384:38)
+    at applyUpdate (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_8588f287._.js:878:31)
+    at http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_8588f287._.js:886:13 The above error occurred in the <DashboardView> component. It was handled by the <ErrorBoundary> error boundary. @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_client_582c631e._.js:1342
+[  643594ms] [LOG] [Fast Refresh] done in 2310ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  644122ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  644164ms] [LOG] [Fast Refresh] done in 148ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  644279ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  646652ms] [LOG] [Fast Refresh] done in 2485ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  650362ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  650447ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  650682ms] [LOG] [HMR] connected @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  652453ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  652459ms] [LOG] [Fast Refresh] done in 190ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  652701ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  652838ms] [LOG] [Fast Refresh] done in 244ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  652961ms] [ERROR] %o
+
+%s ReferenceError: summary is not defined
+    at useDashboardPage (http://localhost:3001/_next/static/chunks/src_b0cb1442._.js:12786:9)
+    at DashboardView (http://localhost:3001/_next/static/chunks/src_b0cb1442._.js:12908:189)
+    at Object.react_stack_bottom_frame (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:14826:24)
+    at renderWithHooks (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:4651:24)
+    at updateFunctionComponent (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:6112:21)
+    at beginWork (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:6708:24)
+    at runWithFiberInDEV (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:965:74)
+    at performUnitOfWork (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:9562:97)
+    at workLoopSync (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:9456:40)
+    at renderRootSync (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:9440:13)
+    at performWorkOnRoot (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:9105:47)
+    at performWorkOnRootViaSchedulerTask (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_react-dom_3882bb77._.js:10230:9)
+    at MessagePort.performWorkUntilDeadline (http://localhost:3001/_next/static/chunks/c2a0a_next_dist_compiled_8588f287._.js:2647:64) The above error occurred in the <DashboardView> component. It was handled by the <ErrorBoundary> error boundary. @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_client_582c631e._.js:1342
+[  652963ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/icon-192.png:0
+[  653130ms] [WARNING] Error while trying to use the following icon from the Manifest: http://localhost:3001/icon-192.png (Download error or resource isn't a valid image) @ http://localhost:3001/dashboard:0
+[  653203ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  653457ms] [LOG] [Fast Refresh] done in 355ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  653606ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  654129ms] [LOG] [Fast Refresh] done in 588ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  663627ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  663632ms] [LOG] [Fast Refresh] done in 105ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  664371ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  664451ms] [LOG] [Fast Refresh] done in 185ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  665219ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  665395ms] [LOG] [Fast Refresh] done in 276ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  804155ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  808329ms] [LOG] [Fast Refresh] done in 4281ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  814211ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  814337ms] [LOG] [Fast Refresh] done in 232ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  814991ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  815179ms] [LOG] [Fast Refresh] done in 306ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  843669ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  848163ms] [LOG] [Fast Refresh] done in 4566ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  848646ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  848720ms] [LOG] [Fast Refresh] done in 186ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  848829ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  851889ms] [LOG] [Fast Refresh] done in 3165ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  853307ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  855427ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  855576ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  855669ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  855788ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  855903ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  855927ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  856986ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  857016ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  857799ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  857816ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  857910ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  858983ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  859000ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  859115ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  860256ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  860285ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  860297ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  860301ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  860410ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  860550ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  860660ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  860678ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  860792ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  861307ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  861339ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  861346ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  861445ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  861470ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  861560ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  861570ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  861673ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  861900ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  861907ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  862096ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  862174ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  862708ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  862727ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  862967ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  863099ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  863119ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  863234ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  863309ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  863428ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  863434ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  863562ms] [ERROR] ./src/components/dashboard/DashboardView.tsx:207:20
+Parsing ecmascript source code failed
+  205 |           onSelectTreatment={d.handleTreatmentRowSelect}
+  206 |         />
+> 207 |       </PageScreen>
+      |                    ^
+> 208 |     </>
+      | ^^^^^
+  209 |   );
+  210 | }
+  211 |
+
+Expected '</', got 'jsx text'
+
+Import traces:
+  Client Component Browser:
+    ./src/components/dashboard/DashboardView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/dashboard/DashboardView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:3127
+[  863563ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  863747ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  865213ms] [LOG] [Fast Refresh] done in 1440ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  865750ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  867496ms] [LOG] [Fast Refresh] done in 1846ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  871498ms] [WARNING] %c%s%c ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  871721ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  871833ms] [LOG] [Fast Refresh] done in 219ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  872115ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  872144ms] [LOG] [Fast Refresh] done in 131ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  872398ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  872522ms] [LOG] [Fast Refresh] done in 230ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  872639ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  872890ms] [LOG] [Fast Refresh] done in 358ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  873002ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  873331ms] [LOG] [Fast Refresh] done in 437ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  876050ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  886872ms] [LOG] [Fast Refresh] done in 10927ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  886882ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/icon-192.png:0
+[  887153ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  887244ms] [LOG] [Fast Refresh] done in 197ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  887520ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  887946ms] [WARNING] Error while trying to use the following icon from the Manifest: http://localhost:3001/icon-192.png (Download error or resource isn't a valid image) @ http://localhost:3001/dashboard:0
+[  888055ms] [LOG] [Fast Refresh] done in 643ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  888234ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  888445ms] [LOG] [Fast Refresh] done in 316ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  888591ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  888609ms] [LOG] [Fast Refresh] done in 129ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  893191ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  893992ms] [LOG] [Fast Refresh] done in 907ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  894107ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  904330ms] [LOG] [Fast Refresh] done in 10116ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  919952ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[  921441ms] [LOG] [Fast Refresh] done in 1581ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1060596ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1061181ms] [LOG] [Fast Refresh] done in 681ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1063983ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1064253ms] [LOG] [Fast Refresh] done in 368ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1066393ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1067455ms] [LOG] [Fast Refresh] done in 1150ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1072206ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1073767ms] [LOG] [Fast Refresh] done in 1630ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1082942ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1084599ms] [LOG] [Fast Refresh] done in 1767ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1085102ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1087885ms] [LOG] [Fast Refresh] done in 2668ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1088494ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1088657ms] [LOG] [Fast Refresh] done in 278ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1090353ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1092471ms] [LOG] [Fast Refresh] done in 2193ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1544372ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1557638ms] [LOG] [Fast Refresh] done in 13367ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1559808ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1563747ms] [LOG] [Fast Refresh] done in 4009ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1579873ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1582803ms] [LOG] [Fast Refresh] done in 3040ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1586492ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1586501ms] [LOG] [Fast Refresh] done in 115ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1586760ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1586806ms] [LOG] [Fast Refresh] done in 157ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1587547ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1587735ms] [LOG] [Fast Refresh] done in 290ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1598332ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1599001ms] [LOG] [Fast Refresh] done in 770ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1616513ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1617812ms] [LOG] [Fast Refresh] done in 1407ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1623618ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1624257ms] [LOG] [Fast Refresh] done in 753ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1634562ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1636310ms] [LOG] [Fast Refresh] done in 1836ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1642427ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1648645ms] [LOG] [Fast Refresh] done in 6151ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1657914ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1658385ms] [LOG] [Fast Refresh] done in 581ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1664019ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1664871ms] [LOG] [Fast Refresh] done in 964ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1665288ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1665386ms] [LOG] [Fast Refresh] done in 205ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1665878ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297
+[ 1666055ms] [LOG] [Fast Refresh] done in 285ms @ http://localhost:3001/_next/static/chunks/c2a0a_next_dist_28e8fb8c._.js:2297

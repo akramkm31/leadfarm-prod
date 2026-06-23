@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import QRCode from "qrcode";
 import { useParams } from "next/navigation";
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -368,13 +369,17 @@ export default function PublicLotPage() {
   const [lang, setLang] = useState<Lang>("fr");
   const [allRounds, setAllRounds] = useState(false);
   const [pageUrl, setPageUrl] = useState("");
+  const [qrDataUrl, setQrDataUrl] = useState("");
   const [now, setNow] = useState("");
   const [live, setLive] = useState<LiveData | null>(null);
   const t = I18N[lang];
 
   useEffect(() => {
-    setPageUrl(window.location.href);
+    const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || window.location.origin;
+    const url = `${base}/lot/${encodeURIComponent(routeLotId)}`;
+    setPageUrl(url);
     setNow(new Date().toLocaleString("fr-FR"));
+    QRCode.toDataURL(url, { width: 160, margin: 1 }).then(setQrDataUrl).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -423,10 +428,6 @@ export default function PublicLotPage() {
     ? `${liveTreatments.length} traitement${liveTreatments.length !== 1 ? "s" : ""} enregistré${liveTreatments.length !== 1 ? "s" : ""} — campagne ${cmp.nom ?? ""}${objectifs?.ift != null ? ` · IFT cible ≤ ${objectifs.ift}` : ""}`
     : "5 traitements réalisés · IFT total 3.2 sur objectif ≤ 4.0";
 
-  const qrSrc = useMemo(
-    () => pageUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=0&data=${encodeURIComponent(pageUrl)}` : "",
-    [pageUrl]
-  );
 
   const conform = lmrAllOk();
 
@@ -503,8 +504,8 @@ export default function PublicLotPage() {
                 </div>
               </div>
               <div style={{ textAlign: "center" }}>
-                {qrSrc
-                  ? <img src={qrSrc} alt="QR de cette page" width={120} height={120} style={{ borderRadius: 8, border: `1px solid ${C.border}`, background: "#fff" }} />
+                {qrDataUrl
+                  ? <img src={qrDataUrl} alt="QR de cette page" width={120} height={120} style={{ borderRadius: 8, border: `1px solid ${C.border}`, background: "#fff" }} />
                   : <div style={{ width: 120, height: 120, borderRadius: 8, border: `1px solid ${C.border}`, background: "#fff" }} />}
                 <div style={{ fontSize: 10, color: C.sub, marginTop: 6 }}>{t.share}</div>
               </div>

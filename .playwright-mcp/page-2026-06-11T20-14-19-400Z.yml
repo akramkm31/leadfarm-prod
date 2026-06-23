@@ -1,0 +1,23 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e33] [cursor=pointer]:
+    - img [ref=e34]
+  - alert [ref=e37]
+  - generic [ref=e38]:
+    - generic [ref=e39]:
+      - complementary "Navigation principale" [ref=e40]:
+        - link "LeadFarm" [ref=e41] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e42]
+        - navigation [ref=e46]
+        - generic [ref=e47]:
+          - button "Rechercher (Ctrl+K)" [ref=e48]:
+            - img [ref=e49]
+          - button "Menu compte" [ref=e53] [cursor=pointer]: AK
+      - complementary
+    - banner [ref=e55]:
+      - navigation "Fil d'Ariane" [ref=e57]:
+        - link "LeadFarm" [ref=e59] [cursor=pointer]:
+          - /url: /dashboard
+        - generic [ref=e60]:
+          - generic [ref=e61]: ›
+          - generic [ref=e62]: Tableau de bord

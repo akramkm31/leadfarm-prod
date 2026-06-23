@@ -1,0 +1,112 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e16] [cursor=pointer]:
+    - img [ref=e17]
+  - alert [ref=e20]
+  - generic [ref=e47]:
+    - generic [ref=e48]:
+      - complementary "Navigation principale" [ref=e49]:
+        - link "LeadFarm" [ref=e50] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e51]
+        - navigation [ref=e55]:
+          - button "Pilotage" [ref=e56]:
+            - img [ref=e58]
+          - button "Opérations" [ref=e63]:
+            - img [ref=e64]
+          - button "Audit" [ref=e68]:
+            - img [ref=e69]
+        - generic [ref=e72]:
+          - button "Rechercher (Ctrl+K)" [ref=e73]:
+            - img [ref=e74]
+          - button "Alertes" [ref=e77]:
+            - img [ref=e78]
+          - button "Menu compte" [ref=e82] [cursor=pointer]: AK
+      - complementary
+    - generic [ref=e83]:
+      - banner [ref=e84]:
+        - navigation "Fil d'Ariane" [ref=e86]:
+          - link "LeadFarm" [ref=e88] [cursor=pointer]:
+            - /url: /dashboard
+          - generic [ref=e89]:
+            - generic [ref=e90]: ›
+            - generic [ref=e91]: Tableau de bord
+        - button "Actualiser" [ref=e93] [cursor=pointer]:
+          - img [ref=e94]
+      - generic [ref=e100]:
+        - banner [ref=e101]:
+          - paragraph [ref=e102]: Tableau de bord
+          - heading "Domaine Khelifa" [level=1] [ref=e103]
+          - paragraph [ref=e104]: 2 traitements planifiés cette semaine · 1 traitements / mois · 16.0 ha ce mois
+        - paragraph [ref=e106]: Aucune alerte opérationnelle — parcelles et planning à jour.
+        - generic [ref=e107]:
+          - generic [ref=e108]:
+            - generic [ref=e111]:
+              - button "Recadrer sur les parcelles" [ref=e113]:
+                - img [ref=e114]
+              - generic [ref=e118]:
+                - generic [ref=e119]:
+                  - generic [ref=e120]:
+                    - img [ref=e121]
+                    - text: Parcelles
+                  - generic [ref=e124]: Sélection → panneau latéral
+                - tablist "Sélection rapide des parcelles" [ref=e125]:
+                  - tab "Parcelle Nord — Pommiers" [ref=e126]:
+                    - generic [ref=e128]: Parcelle Nord — Pommiers
+                  - tab "Nord-A — Golden Delicious Parcelle Nord — Pommiers" [ref=e129]:
+                    - generic [ref=e131]: Nord-A — Golden Delicious
+                    - generic [ref=e132]: Parcelle Nord — Pommiers
+                  - tab "Nord-B — Starkrimson Parcelle Nord — Pommiers" [ref=e133]:
+                    - generic [ref=e135]: Nord-B — Starkrimson
+                    - generic [ref=e136]: Parcelle Nord — Pommiers
+                  - tab "Parcelle Est — Oliviers" [ref=e137]:
+                    - generic [ref=e139]: Parcelle Est — Oliviers
+                  - tab "Est-A — Sigoise Parcelle Est — Oliviers" [ref=e140]:
+                    - generic [ref=e142]: Est-A — Sigoise
+                    - generic [ref=e143]: Parcelle Est — Oliviers
+                  - tab "Est-B — Chemlal Parcelle Est — Oliviers" [ref=e144]:
+                    - generic [ref=e146]: Est-B — Chemlal
+                    - generic [ref=e147]: Parcelle Est — Oliviers
+                  - tab "Parcelle Sud — Vigne" [ref=e148]:
+                    - generic [ref=e150]: Parcelle Sud — Vigne
+                  - tab "Sud-A — Cinsault Parcelle Sud — Vigne" [ref=e151]:
+                    - generic [ref=e153]: Sud-A — Cinsault
+                    - generic [ref=e154]: Parcelle Sud — Vigne
+                  - tab "Sud-B — Carignan Parcelle Sud — Vigne" [ref=e155]:
+                    - generic [ref=e157]: Sud-B — Carignan
+                    - generic [ref=e158]: Parcelle Sud — Vigne
+                  - tab "Parcelle Ouest — Maraîchage" [ref=e159]:
+                    - generic [ref=e161]: Parcelle Ouest — Maraîchage
+                  - tab "Parcelle Centre — Agrumes" [ref=e162]:
+                    - generic [ref=e164]: Parcelle Centre — Agrumes
+              - generic [ref=e165]:
+                - generic:
+                  - generic:
+                    - img
+                  - generic:
+                    - tooltip "Nord-A":
+                      - generic: Nord-A
+                    - tooltip "Nord-B":
+                      - generic: Nord-B
+                    - tooltip "Est-A":
+                      - generic: Est-A
+                    - tooltip "Est-B":
+                      - generic: Est-B
+                    - tooltip "Sud-A":
+                      - generic: Sud-A
+                    - tooltip "Sud-B":
+                      - generic: Sud-B
+                    - tooltip "Maraîchage":
+                      - generic: Maraîchage
+                    - tooltip "Agrumes":
+                      - generic: Agrumes
+                - generic [ref=e177]:
+                  - button "Zoom in" [ref=e178] [cursor=pointer]: +
+                  - button "Zoom out" [ref=e179] [cursor=pointer]: −
+            - generic [ref=e180]:
+              - button "Derniers traitements" [ref=e181] [cursor=pointer]:
+                - img [ref=e182]
+                - generic [ref=e185]: Derniers traitements
+              - button "Météo" [ref=e186] [cursor=pointer]:
+                - img [ref=e187]
+                - generic [ref=e192]: Météo
+          - complementary [ref=e193]

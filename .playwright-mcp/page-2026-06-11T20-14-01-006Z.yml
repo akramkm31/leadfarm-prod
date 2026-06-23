@@ -1,0 +1,24 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - heading "LeadFarm" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Se connecter
+      - paragraph [ref=e9]: Accédez à votre compte et poursuivez votre suivi phytosanitaire
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - generic [ref=e13]: Adresse e-mail
+        - textbox "Adresse e-mail" [ref=e14]:
+          - /placeholder: akram@leadfarm.dz
+          - text: admin@leadfarm.dz
+      - generic [ref=e15]:
+        - generic [ref=e16]: Mot de passe
+        - generic [ref=e17]:
+          - textbox "Mot de passe" [ref=e18]:
+            - /placeholder: ••••••••
+          - button "Afficher le mot de passe" [ref=e19] [cursor=pointer]:
+            - img [ref=e20]
+      - button "Se connecter" [ref=e23] [cursor=pointer]:
+        - text: Se connecter
+        - img [ref=e24]
+  - button "Open Next.js Dev Tools" [ref=e33] [cursor=pointer]:
+    - img [ref=e34]
