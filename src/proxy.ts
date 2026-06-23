@@ -11,6 +11,8 @@ const PUBLIC_ROUTES = [
   "/api/readings",
   "/verify",
   "/api/v1/verify",
+  "/lot/",
+  "/api/v1/public/",
 ];
 
 /** Marketing home + static media must stay reachable without a session. */

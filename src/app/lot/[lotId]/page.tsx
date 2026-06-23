@@ -908,6 +908,39 @@ export default function PublicLotPage() {
           <div style={{ marginTop: 6 }}>leadfarm.app — GGN <span style={{ fontFamily: MONO }}>{objectifs?.ggn || LOT.ggn}</span></div>
         </footer>
       </main>
+
+      {/* ── Scroll bar ── */}
+      <div style={{
+        position: "fixed", bottom: 20, right: 14, zIndex: 50,
+        display: "flex", flexDirection: "column", gap: 0,
+        borderRadius: 999, overflow: "hidden",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.22)",
+        border: `1px solid ${C.border}`,
+      }}>
+        {[
+          { label: "↑↑", title: "Haut de page", action: () => window.scrollTo({ top: 0, behavior: "smooth" }) },
+          { label: "↑", title: "Défiler vers le haut", action: () => window.scrollBy({ top: -window.innerHeight * 0.7, behavior: "smooth" }) },
+          { label: "↓", title: "Défiler vers le bas", action: () => window.scrollBy({ top: window.innerHeight * 0.7, behavior: "smooth" }) },
+          { label: "↓↓", title: "Bas de page", action: () => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }) },
+        ].map(({ label, title, action }, i, arr) => (
+          <button
+            key={label}
+            onClick={action}
+            title={title}
+            style={{
+              width: 44, height: 44, border: "none", cursor: "pointer",
+              background: "#fff", color: C.green,
+              fontSize: label.length > 1 ? 11 : 16,
+              fontWeight: 900,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              borderBottom: i < arr.length - 1 ? `1px solid ${C.border}` : "none",
+              transition: "background 0.15s",
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = `${C.green}18`)}
+            onMouseLeave={e => (e.currentTarget.style.background = "#fff")}
+          >{label}</button>
+        ))}
+      </div>
     </div>
   );
 }
